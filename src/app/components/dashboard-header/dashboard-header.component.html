@@ -1,0 +1,212 @@
+<!-- ================================================== -->
+<!-- HEADER DEL DASHBOARD -->
+<!-- ================================================== -->
+
+<header class="dashboard-header">
+
+  <!-- ================================================== -->
+  <!-- INFORMACIÓN DEL DASHBOARD -->
+  <!-- ================================================== -->
+
+  <div class="dashboard-info">
+
+    <h1>
+      {{ header.titulo }}
+    </h1>
+
+    <p>
+      {{ header.descripcion }}
+    </p>
+
+  </div>
+
+
+  <!-- ================================================== -->
+  <!-- INFORMACIÓN DEL LADO DERECHO -->
+  <!-- ================================================== -->
+
+  <div class="dashboard-actions">
+
+    <!-- ================================================== -->
+<!-- ACTUALIZACIÓN -->
+<!-- ================================================== -->
+
+<div class="last-update">
+
+  <!-- ================================================== -->
+  <!-- LOGO + INFORMACIÓN -->
+  <!-- ================================================== -->
+
+  <div class="update-info">
+
+    <img
+      src="/imagenes/actualizar.png"
+      class="update-icon"
+      alt="Actualizar"
+    >
+
+    <div class="update-content">
+
+      <span>
+        {{ header.ultimaActualizacion }}
+      </span>
+
+      <button>
+        Actualizar
+      </button>
+
+    </div>
+
+  </div>
+
+</div>
+
+    <!-- ================================================== -->
+    <!-- MOTOR IA -->
+    <!-- ================================================== -->
+
+    <div class="ia-status">
+
+      <!-- ================================================== -->
+      <!-- CÍRCULO CON IMAGEN -->
+      <!-- ================================================== -->
+
+      <div class="ia-icon-container">
+
+        <img
+          src="/imagenes/IA.png"
+          class="ia-icon"
+          alt="Motor IA"
+        >
+
+      </div>
+
+
+      <!-- ================================================== -->
+      <!-- INFORMACIÓN DEL MOTOR IA -->
+      <!-- ================================================== -->
+
+      <div class="ia-content">
+
+        <!-- MOTOR IA + ESTADO -->
+
+        <div class="ia-title">
+
+          <span>
+            Motor IA
+          </span>
+
+          <button
+            type="button"
+            class="ia-estado-boton"
+            (click)="abrirModalIA()"
+          >
+            {{ header.motorIAActivo ? 'ACTIVO' : 'INACTIVO' }}
+          </button>
+
+        </div>
+
+
+        <!-- VERSIÓN DEL MODELO -->
+
+        <span class="ia-version">
+          Modelo v2.4.1
+        </span>
+
+      </div>
+
+    </div>
+
+
+    <!-- ================================================== -->
+    <!-- USUARIO -->
+    <!-- ================================================== -->
+
+    <div class="user-info">
+
+      <!-- ================================================== -->
+      <!-- CUADRO JD -->
+      <!-- ================================================== -->
+
+      <div class="user-icon">
+
+        <span>
+          JD
+        </span>
+
+      </div>
+
+
+      <!-- ================================================== -->
+      <!-- INFORMACIÓN DEL USUARIO -->
+      <!-- ================================================== -->
+
+      <div class="user-details">
+
+        <strong>
+          {{ header.nombreUsuario }}
+        </strong>
+
+        <span>
+          {{ header.rolUsuario }}
+        </span>
+
+      </div>
+
+
+      <!-- ================================================== -->
+      <!-- CHEVRON DEL USUARIO -->
+      <!-- ================================================== -->
+
+      <span class="user-chevron"></span>
+
+    </div>
+
+  </div>
+
+</header>
+
+
+<!-- ================================================== -->
+<!-- MODAL MOTOR IA -->
+<!-- ================================================== -->
+
+<div
+  class="ia-modal-overlay"
+  *ngIf="isModalIAOpen"
+>
+
+  <div class="ia-modal">
+
+    <!-- ================================================== -->
+    <!-- CONTENIDO -->
+    <!-- ================================================== -->
+
+    <div class="ia-modal-content">
+
+      <h2>
+        Motor IA
+      </h2>
+
+      <p>
+        Configuración del Motor IA
+      </p>
+
+    </div>
+
+
+    <!-- ================================================== -->
+    <!-- CERRAR -->
+    <!-- ================================================== -->
+
+    <button
+      type="button"
+      class="ia-modal-close"
+      (click)="cerrarModalIA()"
+    >
+      Cerrar
+    </button>
+
+  </div>
+
+</div>

@@ -1,0 +1,98 @@
+<!-- ================================================== -->
+<!-- BUSCAR CASO -->
+<!-- ================================================== -->
+
+<div
+  class="search-case-overlay"
+  *ngIf="isOpen"
+>
+
+  <section
+    class="search-case-modal"
+    [class.searching]="isSearching"
+  >
+
+    <!-- ================================================== -->
+    <!-- ENCABEZADO -->
+    <!-- ================================================== -->
+
+    <div class="search-case-header">
+
+      <div>
+
+        <h2>
+          Buscar caso
+        </h2>
+
+        <p>
+          Busca por número de caso, asociado, documento u obligación.
+        </p>
+
+      </div>
+
+      <button
+        type="button"
+        class="search-case-close"
+        (click)="close()"
+      >
+        ×
+      </button>
+
+    </div>
+
+
+    <!-- ================================================== -->
+    <!-- CAMPO DE BÚSQUEDA -->
+    <!-- ================================================== -->
+
+    <div class="search-case-input">
+
+      <i class="bi bi-search"></i>
+
+      <input
+        type="text"
+        [(ngModel)]="searchText"
+        (input)="onSearch()"
+        placeholder="Ingresa al menos 3 caracteres para iniciar la búsqueda"
+      >
+
+      <!-- X PARA LIMPIAR -->
+      <button
+        type="button"
+        class="clear-search"
+        *ngIf="searchText"
+        (click)="clearSearch()"
+      >
+        ×
+      </button>
+
+    </div>
+
+
+    <!-- ================================================== -->
+    <!-- CAMPOS DE CARGA DEL MODAL 2 -->
+    <!-- ================================================== -->
+
+    <div
+      class="search-loading"
+      *ngIf="isSearching"
+    >
+
+      <!-- CAMPO 1 -->
+      <div class="search-loading-field">
+      </div>
+
+      <!-- CAMPO 2 -->
+      <div class="search-loading-field">
+      </div>
+
+      <!-- CAMPO 3 -->
+      <div class="search-loading-field">
+      </div>
+
+    </div>
+
+
+  </section>
+
+</div>

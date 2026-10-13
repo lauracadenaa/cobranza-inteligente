@@ -1,0 +1,240 @@
+/* ================================================== */
+/* CASOS POR ESTADO */
+/* ================================================== */
+
+.case-status-chart {
+  width: 552px;
+  height: 390px;
+
+  display: flex;
+  flex-direction: column;
+
+  box-sizing: border-box;
+
+  padding-top: 15px;
+  padding-right: 16px;
+  padding-bottom: 15px;
+  padding-left: 10px;
+
+  background: #FFFFFF;
+
+  border: 1px solid #E2E8F0;
+  border-radius: 16px;
+  margin-top: 16px;
+}
+
+
+/* ================================================== */
+/* TÍTULO */
+/* ================================================== */
+
+.case-status-chart h2 {
+  margin: 0;
+
+  font-family: 'Roboto', sans-serif;
+
+  font-size: 16px;
+  font-weight: 500;
+
+  line-height: 100%;
+  letter-spacing: -0.44px;
+
+  color: #0F172A;
+}
+
+
+/* ================================================== */
+/* CONTENIDO */
+/* ================================================== */
+
+.case-status-content {
+
+  flex: 1;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  gap: 35px;
+}
+
+
+/* ================================================== */
+/* TORTA */
+/* ================================================== */
+
+.case-status-pie {
+
+  width: 210px;
+  height: 210px;
+
+  border-radius: 50%;
+
+  background:
+    conic-gradient(
+      #1A4DD6 0deg 66.7deg,
+      #10989B 66.7deg 160deg,
+      #64748B 160deg 200deg,
+      #F59E0B 200deg 253.3deg,
+      #8B5CF6 253.3deg 280deg,
+      #22C55E 280deg 360deg
+    );
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+}
+
+
+/* ================================================== */
+/* CENTRO DE LA TORTA */
+/* ================================================== */
+
+.pie-center {
+
+  width: 120px;
+  height: 120px;
+
+  border-radius: 50%;
+
+  background: #FFFFFF;
+
+  display: flex;
+
+  flex-direction: column;
+
+  align-items: center;
+  justify-content: center;
+}
+
+
+/* ================================================== */
+/* TOTAL */
+/* ================================================== */
+
+.pie-total {
+
+  font-family: 'Roboto', sans-serif;
+
+  font-size: 24px;
+  font-weight: 700;
+
+  line-height: 100%;
+
+  color: #0F172A;
+}
+
+
+/* ================================================== */
+/* TEXTO DEL TOTAL */
+/* ================================================== */
+
+.pie-label {
+
+  margin-top: 6px;
+
+  font-family: 'Roboto', sans-serif;
+
+  font-size: 12px;
+  font-weight: 400;
+
+  line-height: 100%;
+
+  color: #64748B;
+}
+
+
+/* ================================================== */
+/* LEYENDA */
+/* ================================================== */
+
+.case-status-legend {
+
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 14px;
+}
+
+
+/* ================================================== */
+/* ELEMENTO DE LEYENDA */
+/* ================================================== */
+
+.legend-item {
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 8px;
+}
+
+
+/* ================================================== */
+/* PUNTO DE COLOR */
+/* ================================================== */
+
+.legend-dot {
+
+  width: 8px;
+  height: 8px;
+
+  flex-shrink: 0;
+
+  border-radius: 50%;
+}
+
+
+/* ================================================== */
+/* COLORES DE LOS ESTADOS */
+/* ================================================== */
+
+.legend-dot.nuevo {
+  background: #1A4DD6;
+}
+
+.legend-dot.gestion {
+  background: #10989B;
+}
+
+.legend-dot.ilocalizado {
+  background: #64748B;
+}
+
+.legend-dot.promesa {
+  background: #F59E0B;
+}
+
+.legend-dot.prejuridico {
+  background: #8B5CF6;
+}
+
+.legend-dot.cerrado {
+  background: #22C55E;
+}
+
+
+/* ================================================== */
+/* TEXTO DE LA LEYENDA */
+/* ================================================== */
+
+.legend-item p {
+
+  margin: 0;
+
+  font-family: 'Roboto', sans-serif;
+
+  font-size: 12px;
+  font-weight: 400;
+
+  line-height: 100%;
+  letter-spacing: -0.66px;
+
+  color: #64748B;
+
+  white-space: nowrap;
+}

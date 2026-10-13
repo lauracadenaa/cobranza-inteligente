@@ -1,0 +1,545 @@
+/* ================================================== */
+/* CARTERA POR ANTIGÜEDAD */
+/* ================================================== */
+
+.aging-chart {
+  width: 552px;
+  height: 390px;
+
+  display: flex;
+  flex-direction: column;
+
+  gap: 16px;
+
+  padding-top: 11px;
+  padding-right: 14px;
+  padding-bottom: 11px;
+  padding-left: 14px;
+
+  box-sizing: border-box;
+
+  background: #FFFFFF;
+
+  border: 1px solid #E2E8F0;
+  border-radius: 16px;
+
+  opacity: 1;
+  margin-top: 16px;
+}
+
+/* ================================================== */
+/* ENCABEZADO */
+/* ================================================== */
+
+.aging-header {
+  display: flex;
+  flex-direction: column;
+
+  align-items: flex-start;
+
+  width: 100%;
+
+  gap: 16px;
+}
+
+
+/* ================================================== */
+/* TÍTULO */
+/* ================================================== */
+
+.aging-header h2 {
+  margin: 0;
+
+  font-family: 'Roboto', sans-serif;
+  font-size: 18px;
+  font-weight: 700;
+  font-style: normal;
+  line-height: 24px;
+  letter-spacing: -0.32px;
+
+  width: 220px;
+  height: 24px;
+
+  color: #0A3B4E;
+
+  white-space: nowrap;
+}
+
+/* ================================================== */
+/* FILA DEL TÍTULO Y FILTRO */
+/* ================================================== */
+
+.aging-title-row {
+  width: 100%;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+
+/* ================================================== */
+/* BOTÓN ASESOR */
+/* ================================================== */
+
+.asesor-filtro-button {
+  border: none;
+  background: transparent;
+
+  padding: 0;
+
+  font-family: 'Roboto', sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  font-style: normal;
+  line-height: 20px;
+  letter-spacing: 0;
+
+  color: #64748B;
+
+  display: flex;
+  align-items: center;
+  gap: 6px;
+
+  cursor: pointer;
+}
+
+
+/* ================================================== */
+/* FLECHA */
+/* ================================================== */
+
+.asesor-flecha {
+  font-size: 14px;
+  line-height: 1;
+}
+
+/* ================================================== */
+/* CONTENEDOR DEL FILTRO */
+/* ================================================== */
+
+.asesor-filtro {
+  position: relative;
+  margin-left: 100px;
+}
+
+/* ================================================== */
+/* CONTENEDOR DEL MENÚ DE ASESOR */
+/* ================================================== */
+
+.asesor-menu {
+  position: absolute;
+
+  bottom: auto;
+  top: 44px;
+
+  right: 0;
+
+  width: 140px;
+
+  background: #FFFFFF;
+
+  border: 1px solid #E2E8F0;
+  border-radius: 8px;
+
+  padding: 4px 0;
+
+  box-sizing: border-box;
+
+  z-index: 100;
+}
+
+/* ================================================== */
+/* MENÚ DE ASESOR */
+/* ================================================== */
+
+.asesor-menu button {
+  width: 100%;
+  height: 36px;
+
+  padding: 8px 12px;
+
+  border: none;
+  background: transparent;
+
+  font-family: 'Roboto', sans-serif;
+  font-size: 12px;
+  font-weight: 400;
+  font-style: normal;
+  line-height: 20px;
+  letter-spacing: 0;
+
+  color: #64748B;
+
+  text-align: left;
+
+  cursor: pointer;
+
+  box-sizing: border-box;
+}
+
+
+/* ================================================== */
+/* OPCIONES DEL MENÚ */
+/* ================================================== */
+
+.asesor-filtro-button {
+  width: 140px;
+  height: 40px;
+
+  padding-right: 12px;
+  padding-left: 12px;
+
+  box-sizing: border-box;
+
+  border: 1px solid #E2E8F0;
+  border-radius: 8px;
+
+  background: #FFFFFF;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 8px;
+
+  font-family: 'Roboto', sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  font-style: normal;
+  line-height: 20px;
+  letter-spacing: 0;
+
+  color: #64748B;
+
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+/* ================================================== */
+/* OPCIÓN AL PASAR EL MOUSE */
+/* ================================================== */
+
+.asesor-menu button:hover {
+  background: #F8FAFC;
+  color: #0A3B4E;
+}
+
+/* ================================================== */
+/* OPCIONES */
+/* ================================================== */
+
+.aging-options {
+  display: flex;
+  align-items: center;
+
+  gap: 16px;
+}
+
+
+/* ================================================== */
+/* BOTONES TRANSPARENTES */
+/* ================================================== */
+
+.aging-options button {
+  border: none;
+  outline: none;
+  background: transparent;
+
+  width: 174px;
+  height: 48px;
+
+  padding: 14px 16px;
+
+  box-sizing: border-box;
+
+  font-family: 'Roboto', sans-serif;
+  font-size: 16px;
+  font-weight: 500;
+  font-style: normal;
+  line-height: 20px;
+  letter-spacing: 0;
+
+  color: #64748B;
+
+  text-align: center;
+  vertical-align: middle;
+
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+/* ================================================== */
+/* BOTÓN ACTIVO */
+/* ================================================== */
+
+.aging-options button.active {
+  background: transparent;
+
+  color: #1A4DD6;
+
+  font-weight: 500;
+}
+
+/* ================================================== */
+/* DIAGRAMA */
+/* ================================================== */
+
+.aging-diagram {
+  display: flex;
+
+  width: 100%;
+  height: 280px;
+}
+
+
+/* ================================================== */
+/* EJE VERTICAL */
+/* ================================================== */
+
+.aging-y-axis {
+  width: 55px;
+
+  display: flex;
+  flex-direction: column;
+
+  justify-content: space-between;
+
+  padding-bottom: 31px;
+
+  box-sizing: border-box;
+}
+
+
+.aging-y-axis span {
+  font-family: 'Roboto', sans-serif;
+
+  font-size: 12px;
+  font-weight: 400;
+
+  line-height: 100%;
+  letter-spacing: -0.66px;
+
+  color: #64748B;
+
+  white-space: nowrap;
+}
+
+
+/* ================================================== */
+/* ÁREA DEL GRÁFICO */
+/* ================================================== */
+
+.aging-graph {
+  position: relative;
+
+  flex: 1;
+
+  height: 100%;
+
+  min-width: 0;
+}
+
+
+/* ================================================== */
+/* LÍNEAS HORIZONTALES */
+/* ================================================== */
+
+.aging-grid {
+  position: absolute;
+
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 31px;
+
+  display: flex;
+  flex-direction: column;
+
+  justify-content: space-between;
+}
+
+
+.grid-line {
+  width: 100%;
+  height: 1px;
+
+  background: #E2E8F0;
+}
+
+
+/* ================================================== */
+/* CONTENEDOR DE BARRAS */
+/* ================================================== */
+
+.aging-bars {
+  position: absolute;
+
+  left: 0;
+  right: 0;
+
+  bottom: 31px;
+  top: 0;
+
+  display: flex;
+
+  align-items: flex-end;
+  justify-content: space-around;
+
+  gap: 20px;
+}
+
+
+/* ================================================== */
+/* CADA BARRA */
+/* ================================================== */
+
+.aging-bar-item {
+  position: relative;
+
+  height: 100%;
+
+  flex: 1;
+
+  max-width: 90px;
+
+  display: flex;
+  flex-direction: column;
+
+  justify-content: flex-end;
+  align-items: center;
+}
+
+
+/* ================================================== */
+/* VALOR SOBRE LA BARRA */
+/* ================================================== */
+
+.aging-value {
+  margin-bottom: 8px;
+
+  font-family: 'Roboto', sans-serif;
+
+  font-size: 12px;
+  font-weight: 500;
+
+  line-height: 100%;
+  letter-spacing: -0.44px;
+
+  color: #0F172A;
+
+  white-space: nowrap;
+}
+
+
+/* ================================================== */
+/* BARRA */
+/* ================================================== */
+
+.aging-bar {
+  width: 42px;
+
+  min-height: 4px;
+
+  border-radius: 6px 6px 0 0;
+
+  background: #1A4DD6;
+
+  transition: height 0.3s ease;
+}
+
+
+/* ================================================== */
+/* RANGO DE MORA */
+/* ================================================== */
+
+.aging-label {
+  position: absolute;
+
+  bottom: -31px;
+
+  left: 50%;
+
+  transform: translateX(-50%);
+
+  width: 74px;
+
+  text-align: center;
+
+  font-family: 'Roboto', sans-serif;
+
+  font-size: 12px;
+  font-weight: 400;
+  font-style: normal;
+
+  line-height: 100%;
+  letter-spacing: -0.66px;
+
+  vertical-align: middle;
+
+  color: #64748B;
+
+  white-space: nowrap;
+}
+
+
+/* ================================================== */
+/* DIAGRAMAS TEMPORALES */
+/* ================================================== */
+
+.aging-placeholder {
+  width: 100%;
+  height: 280px;
+
+  display: flex;
+  flex-direction: column;
+
+  align-items: center;
+  justify-content: center;
+
+  text-align: center;
+}
+
+
+.aging-placeholder h3 {
+  margin: 0 0 8px;
+
+  font-family: 'Roboto', sans-serif;
+
+  font-size: 16px;
+  font-weight: 500;
+
+  color: #0F172A;
+}
+
+
+.aging-placeholder p {
+  margin: 0;
+
+  font-family: 'Roboto', sans-serif;
+
+  font-size: 12px;
+  font-weight: 400;
+
+  color: #64748B;
+}
+
+/* ================================================== */
+/* COLORES - DIAGRAMA POR RIESGO */
+/* ================================================== */
+
+.aging-bar.risk-bajo {
+  background-color: #22C55E !important;
+}
+
+.aging-bar.risk-medio {
+  background-color: #EAB308 !important;
+}
+
+.aging-bar.risk-alto {
+  background-color: #F97316 !important;
+}
+
+.aging-bar.risk-critico {
+  background-color: #EF4444 !important;
+}

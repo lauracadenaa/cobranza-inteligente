@@ -1,0 +1,270 @@
+/* ================================================== */
+/* CONTENEDOR DEL MODAL */
+/* ================================================== */
+
+.search-case-overlay {
+  position: fixed;
+  inset: 0;
+
+  display: flex;
+
+  /* CENTRAR VERTICALMENTE */
+  align-items: center;
+
+  /* CENTRAR HORIZONTALMENTE */
+  justify-content: center;
+
+  background: rgba(0, 0, 0, 0.55);
+
+  z-index: 1000;
+}
+
+
+/* ================================================== */
+/* MODAL */
+/* ================================================== */
+
+.search-case-modal {
+  width: 600px;
+
+  min-height: 159px;
+
+  box-sizing: border-box;
+
+  padding: 24px;
+
+  background: #FFFFFF;
+
+  border: 1px solid #E2E8F0;
+
+  border-radius: 24px;
+
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 24px;
+}
+
+
+/* ================================================== */
+/* MODAL NORMAL */
+/* ================================================== */
+
+.search-case-modal {
+  width: 600px;
+
+  height: 159px;
+
+  box-sizing: border-box;
+
+  padding: 24px;
+
+  background: #FFFFFF;
+
+  border: 1px solid #E2E8F0;
+
+  border-radius: 24px;
+}
+
+
+/* ================================================== */
+/* MODAL 2 - CUANDO SE ESCRIBEN 3 CARACTERES */
+/* ================================================== */
+
+.search-case-modal.searching {
+  width: 600px;
+
+  height: 543px;
+}
+
+/* ================================================== */
+/* ENCABEZADO */
+/* ================================================== */
+
+.search-case-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+
+  width: 100%;
+}
+
+
+.search-case-header h2 {
+  margin: 0;
+
+  font-family: 'Roboto', sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 100%;
+  letter-spacing: -0.44px;
+
+  color: #0F172A;
+}
+
+
+.search-case-header p {
+  margin: 3px 0 0 0;
+
+  font-family: 'Roboto', sans-serif;
+  font-size: 7px;
+  font-weight: 400;
+  line-height: 100%;
+  letter-spacing: -0.2px;
+
+  color: #64748B;
+}
+
+
+/* ================================================== */
+/* BOTÓN CERRAR */
+/* ================================================== */
+
+.search-case-close {
+  width: 16px;
+  height: 16px;
+
+  padding: 0;
+
+  border: none;
+  background: transparent;
+
+  font-family: Arial, sans-serif;
+  font-size: 15px;
+  font-weight: 400;
+
+  line-height: 16px;
+
+  color: #1A4DD6;
+
+  cursor: pointer;
+}
+
+
+/* ================================================== */
+/* CAMPO DE BÚSQUEDA */
+/* ================================================== */
+
+.search-case-input {
+  width: 100%;
+  height: 32px;
+
+  margin-top: 10px;
+
+  display: flex;
+  align-items: center;
+
+  box-sizing: border-box;
+
+  padding: 0 9px;
+
+  background: #F8FAFC;
+
+  border: 1px solid #E2E8F0;
+  border-radius: 6px;
+}
+
+
+.search-case-input i {
+  margin-right: 7px;
+
+  font-size: 10px;
+
+  color: #94A3B8;
+}
+
+
+.search-case-input input {
+  width: 100%;
+  height: 100%;
+
+  padding: 0;
+
+  border: none;
+  outline: none;
+
+  background: transparent;
+
+  font-family: 'Roboto', sans-serif;
+  font-size: 7px;
+  font-weight: 400;
+  line-height: 100%;
+
+  color: #0F172A;
+}
+
+
+.search-case-input input::placeholder {
+  color: #94A3B8;
+}
+
+
+/* ================================================== */
+/* BOTÓN PARA LIMPIAR LA BÚSQUEDA */
+/* ================================================== */
+
+.clear-search {
+  width: 20px;
+  height: 20px;
+  padding: 0;
+
+  border: none;
+  background: transparent;
+
+  color: #64748B;
+
+  font-family: Arial, sans-serif;
+  font-size: 16px;
+  line-height: 20px;
+
+  cursor: pointer;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.clear-search:hover {
+  color: #0F172A;
+}
+
+/* ================================================== */
+/* CONTENEDOR DE LOS CAMPOS DE CARGA */
+/* ================================================== */
+
+.search-loading {
+
+  width: 100%;
+
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 12px;
+
+}
+
+
+/* ================================================== */
+/* CAMPO DE CARGA */
+/* ================================================== */
+
+.search-loading-field {
+
+  width: 552px;
+
+  height: 88px;
+
+  box-sizing: border-box;
+
+  padding: 16px;
+
+  background: #FFFFFF;
+
+  border: 1px solid #E2E8F0;
+
+  border-radius: 12px;
+
+}
+

@@ -1,0 +1,273 @@
+<!-- ================================================== -->
+<!-- ESTRUCTURA PRINCIPAL DEL DASHBOARD -->
+<!-- ================================================== -->
+
+<div class="dashboard-layout">
+
+  <!-- ================================================== -->
+  <!-- BARRA LATERAL -->
+  <!-- ================================================== -->
+
+  <app-sidebar></app-sidebar>
+
+
+  <!-- ================================================== -->
+  <!-- CONTENIDO PRINCIPAL -->
+  <!-- ================================================== -->
+
+  <main class="dashboard-content">
+
+    <!-- ================================================== -->
+    <!-- ENCABEZADO -->
+    <!-- ================================================== -->
+
+    <app-dashboard-header></app-dashboard-header>
+
+
+    <!-- ================================================== -->
+    <!-- TARJETAS KPI -->
+    <!-- ================================================== -->
+
+    <app-kpi-cards></app-kpi-cards>
+
+
+    <!-- ================================================== -->
+    <!-- GRÁFICOS PRINCIPALES -->
+    <!-- ================================================== -->
+
+    <div class="dashboard-charts">
+
+      <!-- ================================================== -->
+      <!-- CARTERA POR ANTIGÜEDAD -->
+      <!-- ================================================== -->
+
+      <app-aging-chart></app-aging-chart>
+
+
+      <!-- ================================================== -->
+      <!-- CASOS POR ESTADO -->
+      <!-- ================================================== -->
+
+      <app-case-status-chart></app-case-status-chart>
+
+    </div>
+
+
+    <!-- ================================================== -->
+    <!-- CASOS GESTIONADOS -->
+    <!-- ================================================== -->
+
+    <section class="managed-cases">
+
+      <!-- ================================================== -->
+      <!-- ENCABEZADO -->
+      <!-- ================================================== -->
+
+      <div class="managed-cases-header">
+
+        <h2>
+          Casos gestionados
+        </h2>
+
+      </div>
+
+
+      <!-- ================================================== -->
+      <!-- TABLA -->
+      <!-- ================================================== -->
+
+      <div class="managed-cases-table">
+
+        <table>
+
+          <thead>
+
+            <tr>
+
+              <th>Caso</th>
+              <th>Asociado</th>
+              <th>Obligación</th>
+              <th>Riesgo</th>
+              <th>Días mora</th>
+              <th>Tiempo límite</th>
+              <th>Asesor</th>
+              <th>Acciones</th>
+
+            </tr>
+
+          </thead>
+
+
+          <tbody>
+
+            <tr *ngFor="let c of cases">
+
+              <td>
+                {{ c.id }}
+              </td>
+
+              <td>
+                {{ c.asociado }}
+              </td>
+
+              <td>
+                {{ c.obligacion }}
+              </td>
+
+              <td>
+                {{ c.riesgo }}
+              </td>
+
+              <td>
+                {{ c.diasMora }}
+              </td>
+
+              <td>
+                {{ c.tiempoLimite }}
+              </td>
+
+              <td>
+                {{ c.asesor }}
+              </td>
+
+              <td>
+
+                <button
+                  type="button"
+                  class="case-action"
+                >
+                  Ver detalle
+                </button>
+
+              </td>
+
+            </tr>
+
+          </tbody>
+
+        </table>
+
+      </div>
+
+
+      <!-- ================================================== -->
+      <!-- ACCIONES RÁPIDAS -->
+      <!-- ================================================== -->
+
+      <section class="quick-actions">
+
+        <!-- ================================================== -->
+        <!-- TÍTULO -->
+        <!-- ================================================== -->
+
+        <h2>
+          Acciones rápidas
+        </h2>
+
+
+        <!-- ================================================== -->
+        <!-- OPCIONES -->
+        <!-- ================================================== -->
+
+        <div class="quick-actions-grid">
+
+          <!-- ================================================== -->
+          <!-- CARGAR ARCHIVO -->
+          <!-- ================================================== -->
+
+          <button
+            type="button"
+            class="quick-card"
+          >
+
+            <div class="quick-icon">
+              <i class="bi bi-upload"></i>
+            </div>
+
+            <span>
+              Cargar archivo
+            </span>
+
+          </button>
+
+
+          <!-- ================================================== -->
+          <!-- BUSCAR CASO -->
+          <!-- ================================================== -->
+
+          <button
+            type="button"
+            class="quick-card"
+            (click)="openSearchCase()"
+          >
+
+            <div class="quick-icon">
+              <i class="bi bi-search"></i>
+            </div>
+
+            <span>
+              Buscar caso
+            </span>
+
+          </button>
+
+
+          <!-- ================================================== -->
+          <!-- CREAR ACUERDO -->
+          <!-- ================================================== -->
+
+          <button
+            type="button"
+            class="quick-card"
+          >
+
+            <div class="quick-icon">
+              <i class="bi bi-handshake"></i>
+            </div>
+
+            <span>
+              Crear acuerdo
+            </span>
+
+          </button>
+
+
+          <!-- ================================================== -->
+          <!-- GENERAR REPORTE -->
+          <!-- ================================================== -->
+
+          <button
+            type="button"
+            class="quick-card"
+          >
+
+            <div class="quick-icon">
+              <i class="bi bi-file-earmark-text"></i>
+            </div>
+
+            <span>
+              Generar reporte
+            </span>
+
+          </button>
+
+        </div>
+
+      </section>
+
+    </section>
+
+
+    <!-- ================================================== -->
+    <!-- MODAL BUSCAR CASO -->
+    <!-- ================================================== -->
+
+    <app-search-case
+      [isOpen]="isSearchCaseOpen"
+      (closed)="closeSearchCase()">
+    </app-search-case>
+
+
+  </main>
+
+</div>

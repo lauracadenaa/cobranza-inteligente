@@ -1,0 +1,125 @@
+<!-- ================================================== -->
+<!-- SIDEBAR PRINCIPAL -->
+<!-- ================================================== -->
+
+<aside class="sidebar">
+
+  <!-- ================================================== -->
+  <!-- LOGO -->
+  <!-- ================================================== -->
+
+  <div class="sidebar-logo">
+
+    <div class="logo">
+
+      <!-- CUADRO BV -->
+      <div class="logo-bv">
+        BV
+      </div>
+
+      <!-- NOMBRE -->
+      <span class="logo-text">
+        BankVision
+      </span>
+
+    </div>
+
+  </div>
+
+
+  <!-- ================================================== -->
+  <!-- OPCIONES DEL MENÚ -->
+  <!-- ================================================== -->
+
+  <nav class="menu">
+
+    <!-- INICIO -->
+    <a
+      href="#"
+      class="menu-item"
+      [class.active]="opcionSeleccionada === 'Inicio'"
+      (click)="seleccionarOpcion('Inicio'); $event.preventDefault()"
+    >
+      <span>Inicio</span>
+    </a>
+
+
+    <!-- CARTERA -->
+    <a
+      href="#"
+      class="menu-item"
+      [class.active]="opcionSeleccionada === 'Cartera'"
+      (click)="seleccionarOpcion('Cartera'); $event.preventDefault()"
+    >
+      <span>Cartera</span>
+    </a>
+
+
+    <!-- GESTIÓN DE CASOS -->
+    <a
+      href="#"
+      class="menu-item"
+      [class.active]="opcionSeleccionada === 'Gestión de casos'"
+      (click)="seleccionarOpcion('Gestión de casos'); $event.preventDefault()"
+    >
+      <span>Gestión de casos</span>
+    </a>
+
+
+    <!-- MOTOR IA Y SCORING -->
+    <a
+      href="#"
+      class="menu-item"
+      [class.active]="opcionSeleccionada === 'Motor IA y Scoring'"
+      (click)="seleccionarOpcion('Motor IA y Scoring'); $event.preventDefault()"
+    >
+      <span>Motor IA y Scoring</span>
+    </a>
+
+
+    <!-- ESTRATEGIAS -->
+    <a
+      href="#"
+      class="menu-item"
+      [class.active]="opcionSeleccionada === 'Estrategias'"
+      (click)="seleccionarOpcion('Estrategias'); $event.preventDefault()"
+    >
+      <span>Estrategias</span>
+    </a>
+
+
+    <!-- PAGOS Y RECAUDOS -->
+    <a
+      href="#"
+      class="menu-item"
+      [class.active]="opcionSeleccionada === 'Pagos y recaudos'"
+      (click)="seleccionarOpcion('Pagos y recaudos'); $event.preventDefault()"
+    >
+      <span>Pagos y recaudos</span>
+    </a>
+
+
+    <!-- REPORTES Y AUDITORÍA -->
+    <a
+      href="#"
+      class="menu-item"
+      [class.active]="opcionSeleccionada === 'Reportes y auditoría'"
+      (click)="seleccionarOpcion('Reportes y auditoría'); $event.preventDefault()"
+    >
+      <span>Reportes y auditoría</span>
+    </a>
+
+
+    <!-- ADMINISTRACIÓN -->
+    <a
+      href="#"
+      class="menu-item"
+      [class.active]="opcionSeleccionada === 'Administración'"
+      (click)="seleccionarOpcion('Administración'); $event.preventDefault()"
+    >
+      <span>Administración</span>
+    </a>
+
+  </nav>
+
+</aside>

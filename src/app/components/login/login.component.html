@@ -1,0 +1,401 @@
+<main class="contenedor">
+  <section class="lado-izquierdo">
+    <img src="assets/imagenes/Mask group.jpg" alt="Cobranza Inteligente">
+    <div class="logo">BV</div>
+    <div class="texto-izquierdo">
+      <h1>Cobranza<br>Inteligente</h1>
+      <p>Gestión, seguimiento y recuperación de cartera con IA</p>
+    </div>
+  </section>
+
+  <section class="lado-derecho">
+    <div class="formulario">
+      <h2>Accede a la plataforma de gestión y monitoreo de cobranza</h2>
+
+      <div class="campo-login">
+        <label for="usuario">Nombre de Usuario</label>
+        <input
+          type="text"
+          id="usuario"
+          [(ngModel)]="usuario"
+          placeholder="Ingresa tu nombre de usuario">
+      </div>
+
+      <div class="campo-password">
+        <label for="password">Contraseña</label>
+        <div class="contenedor-password">
+          <input
+            [type]="mostrarPasswordMain ? 'text' : 'password'"
+            id="password"
+            [(ngModel)]="password"
+            placeholder="Ingresa tu contraseña">
+          <button
+            type="button"
+            id="mostrarPassword"
+            (click)="toggleMostrarPassword('main')">
+            <i class="bi" [ngClass]="mostrarPasswordMain ? 'bi-eye' : 'bi-eye-slash'"></i>
+          </button>
+        </div>
+      </div>
+
+      <a href="javascript:void(0)" id="olvidePassword" (click)="abrirModal('recuperar')">
+        Olvidé mi contraseña
+      </a>
+
+      <button type="button" id="iniciarSesion" (click)="iniciarSesion()">
+        Iniciar sesión
+      </button>
+
+      <p id="mensaje" [style.color]="colorMensajeLogin">{{ mensajeLogin }}</p>
+
+      <p class="texto-seguridad">
+        <br>Acceso exclusivo para usuarios autorizados.<br>
+        Tu actividad puede ser registrada por seguridad y auditoría
+      </p>
+    </div>
+  </section>
+</main>
+
+<!-- MODAL: RECUPERAR CONTRASEÑA -->
+<div
+  class="modal"
+  id="modalPassword"
+  *ngIf="modalActivo === 'recuperar'"
+  (click)="onBackdropClick($event, 'recuperar')">
+  <div class="modal-contenido">
+    <div class="modal-lado-izquierdo">
+      <div class="cuadro-recuperacion"></div>
+      <h2>Recuperar<br>contraseña</h2>
+      <p>Confirma tu usuario y correo registrado</p>
+    </div>
+
+    <div class="modal-lado-derecho">
+      <div class="campo-recuperacion">
+        <label for="usuarioRecuperacion">Usuario</label>
+        <input
+          type="text"
+          id="usuarioRecuperacion"
+          [(ngModel)]="usuarioRecuperacion"
+          placeholder="Nombre de usuario">
+      </div>
+
+      <div class="campo-recuperacion">
+        <label for="correoCorporativo">Correo corporativo</label>
+        <input
+          type="email"
+          id="correoCorporativo"
+          [(ngModel)]="correoCorporativo"
+          placeholder="ejemplo@correo.com">
+      </div>
+
+      <p id="mensajeRecuperacion">{{ mensajeRecuperacion }}</p>
+
+      <div class="botones-recuperacion">
+        <button
+          type="button"
+          class="boton-regresar"
+          id="botonRegresar"
+          (click)="cerrarModales()">
+          Regresar
+        </button>
+        <button
+          type="button"
+          class="boton-continuar"
+          id="botonContinuar"
+          [disabled]="botonContinuarDisabled"
+          (click)="abrirModal('otp')">
+          Continuar
+        </button>
+      </div>
+    </div>
+
+    <button type="button" class="cerrar-modal" id="cerrarModal" (click)="cerrarModales()">
+      <i class="bi bi-x-lg"></i>
+    </button>
+  </div>
+</div>
+
+<!-- MODAL: CÓDIGO OTP -->
+<div
+  class="modal"
+  id="modalSiguiente"
+  *ngIf="modalActivo === 'otp'"
+  (click)="onBackdropClick($event, 'otp')">
+  <div class="modal-contenido">
+    <div class="modal-lado-izquierdo">
+      <div class="cuadro-recuperacion"></div>
+      <h2>Recuperar contraseña</h2>
+      <p>Crea una nueva contraseña para recuperar el<br>acceso a tu cuenta.</p>
+    </div>
+
+    <div class="modal-lado-derecho">
+      <h3>Código OTP</h3>
+      <p>Ingresa el código enviado a tu correo</p>
+
+      <div class="campos-otp">
+        <input
+          type="text"
+          class="campo-otp"
+          maxlength="1"
+          inputmode="numeric"
+          autocomplete="one-time-code"
+          aria-label="Dígito 1 del código"
+          [value]="otp1"
+          (input)="escribirOtp($event, 1)"
+          (keydown)="borrarOtp($event, 1)">
+
+        <input
+          type="text"
+          class="campo-otp"
+          maxlength="1"
+          inputmode="numeric"
+          autocomplete="off"
+          aria-label="Dígito 2 del código"
+          [value]="otp2"
+          (input)="escribirOtp($event, 2)"
+          (keydown)="borrarOtp($event, 2)">
+
+        <input
+          type="text"
+          class="campo-otp"
+          maxlength="1"
+          inputmode="numeric"
+          autocomplete="off"
+          aria-label="Dígito 3 del código"
+          [value]="otp3"
+          (input)="escribirOtp($event, 3)"
+          (keydown)="borrarOtp($event, 3)">
+
+        <input
+          type="text"
+          class="campo-otp"
+          maxlength="1"
+          inputmode="numeric"
+          autocomplete="off"
+          aria-label="Dígito 4 del código"
+          [value]="otp4"
+          (input)="escribirOtp($event, 4)"
+          (keydown)="borrarOtp($event, 4)">
+
+        <input
+          type="text"
+          class="campo-otp"
+          maxlength="1"
+          inputmode="numeric"
+          autocomplete="off"
+          aria-label="Dígito 5 del código"
+          [value]="otp5"
+          (input)="escribirOtp($event, 5)"
+          (keydown)="borrarOtp($event, 5)">
+
+        <input
+          type="text"
+          class="campo-otp"
+          maxlength="1"
+          inputmode="numeric"
+          autocomplete="off"
+          aria-label="Dígito 6 del código"
+          [value]="otp6"
+          (input)="escribirOtp($event, 6)"
+          (keydown)="borrarOtp($event, 6)">
+      </div>
+
+      <div class="temporizador-otp">
+        <p>¿No has recibido?</p>
+        <p>Espera</p>
+        <i class="bi bi-clock"></i>
+        <span id="temporizador" *ngIf="tiempoRestante > 0">{{ tiempoFormateado }}</span>
+        <button
+          type="button"
+          class="boton-reenviar"
+          id="botonReenviar"
+          *ngIf="tiempoRestante <= 0"
+          (click)="reenviarCodigo()">
+          Reenviar código
+        </button>
+      </div>
+
+      <div id="errorOtp" class="error-otp" *ngIf="errorOtp">
+        <i class="bi bi-exclamation-circle"></i>
+        <span>Código OTP incorrecto o expirado. Verifica el código e intenta nuevamente</span>
+      </div>
+
+      <div id="mensajeReenvio" class="mensaje-reenvio" *ngIf="mensajeReenvio">
+        <img src="assets/imagenes/Vector.png" alt="Código reenviado">
+        <span>Código OTP enviado al correo registrado</span>
+      </div>
+
+      <button
+        type="button"
+        class="boton-regresar"
+        id="botonRegresarSiguiente"
+        (click)="abrirModal('recuperar')">
+        Regresar
+      </button>
+      <button
+        type="button"
+        class="boton-continuar"
+        id="botonValidarIdentidad"
+        [disabled]="botonValidarOtpDisabled"
+        (click)="validarOtp()">
+        Validar identidad
+      </button>
+    </div>
+
+    <button
+      type="button"
+      class="cerrar-modal"
+      id="cerrarModalSiguiente"
+      (click)="cerrarModales()">
+      <i class="bi bi-x-lg"></i>
+    </button>
+  </div>
+</div>
+
+<!-- MODAL: CAMBIAR CONTRASEÑA -->
+<div
+  class="modal"
+  id="modalCambioPassword"
+  *ngIf="modalActivo === 'cambio'"
+  (click)="onBackdropClick($event, 'cambio')">
+  <div class="modal-contenido">
+    <div class="modal-lado-izquierdo">
+      <div class="cuadro-recuperacion"></div>
+      <h2>Recuperar contraseña</h2>
+      <p>Crea una nueva contraseña para recuperar el acceso a tu cuenta.</p>
+    </div>
+
+    <div class="modal-lado-derecho">
+      <h3>Nueva contraseña</h3>
+
+      <div class="campo-password-nueva">
+        <div class="contenedor-password">
+          <input
+            [type]="mostrarNuevaPassword ? 'text' : 'password'"
+            id="nuevaPassword"
+            [(ngModel)]="nuevaPassword"
+            (ngModelChange)="evaluarNuevaPassword()"
+            [ngClass]="{
+              'password-error': mensajePasswordError,
+              'password-correcta': !mensajePasswordError && confirmarPassword !== '' && nuevaPassword === confirmarPassword
+            }"
+            placeholder="Ingresa tu nueva contraseña">
+          <button
+            type="button"
+            id="mostrarNuevaPassword"
+            (click)="toggleMostrarPassword('nueva')">
+            <i class="bi" [ngClass]="mostrarNuevaPassword ? 'bi-eye' : 'bi-eye-slash'"></i>
+          </button>
+        </div>
+      </div>
+
+      <div id="seguridadPassword" class="lineas-seguridad">
+        <span [style.backgroundColor]="coloresSeguridad[0]"></span>
+        <span [style.backgroundColor]="coloresSeguridad[1]"></span>
+        <span [style.backgroundColor]="coloresSeguridad[2]"></span>
+      </div>
+
+      <div class="requisitos-password">
+        <p>Tu contraseña debe incluir:</p>
+        <div class="requisito" [ngClass]="{'cumplido': reqMin12}">
+          <i class="bi" [ngClass]="reqMin12 ? 'bi-check-circle' : 'bi-x-circle'"></i>
+          <span>Mínimo 12 caracteres</span>
+        </div>
+        <div class="requisito" [ngClass]="{'cumplido': reqMayuscula}">
+          <i class="bi" [ngClass]="reqMayuscula ? 'bi-check-circle' : 'bi-x-circle'"></i>
+          <span>Una letra mayúscula</span>
+        </div>
+        <div class="requisito" [ngClass]="{'cumplido': reqMinuscula}">
+          <i class="bi" [ngClass]="reqMinuscula ? 'bi-check-circle' : 'bi-x-circle'"></i>
+          <span>Una letra minúscula</span>
+        </div>
+        <div class="requisito" [ngClass]="{'cumplido': reqNumero}">
+          <i class="bi" [ngClass]="reqNumero ? 'bi-check-circle' : 'bi-x-circle'"></i>
+          <span>Un número</span>
+        </div>
+        <div class="requisito" [ngClass]="{'cumplido': reqEspecial}">
+          <i class="bi" [ngClass]="reqEspecial ? 'bi-check-circle' : 'bi-x-circle'"></i>
+          <span>Un carácter especial</span>
+        </div>
+      </div>
+
+      <div class="campo-password-nueva">
+        <label for="confirmarPassword">Confirmar contraseña</label>
+        <div class="contenedor-password">
+          <input
+            [type]="mostrarConfirmarPassword ? 'text' : 'password'"
+            id="confirmarPassword"
+            [(ngModel)]="confirmarPassword"
+            [ngClass]="{
+              'password-error': mensajePasswordError,
+              'password-correcta': !mensajePasswordError && confirmarPassword !== '' && nuevaPassword === confirmarPassword
+            }"
+            placeholder="Ingresa nuevamente tu contraseña">
+          <button
+            type="button"
+            id="mostrarConfirmarPassword"
+            (click)="toggleMostrarPassword('confirmar')">
+            <i class="bi" [ngClass]="mostrarConfirmarPassword ? 'bi-eye' : 'bi-eye-slash'"></i>
+          </button>
+        </div>
+      </div>
+
+      <p id="mensajePasswordError" class="mensaje-password-error" *ngIf="mensajePasswordError">
+        Las contraseñas no coinciden. Verifica la información e inténtalo nuevamente.
+      </p>
+
+      <div class="botones-recuperacion">
+        <button
+          type="button"
+          class="boton-regresar"
+          id="botonRegresarCambio"
+          (click)="abrirModal('otp')">
+          Regresar
+        </button>
+        <button
+          type="button"
+          class="boton-continuar"
+          id="actualizarPassword"
+          (click)="actualizarPassword()">
+          Actualizar contraseña
+        </button>
+      </div>
+    </div>
+
+    <button
+      type="button"
+      class="cerrar-modal"
+      id="cerrarModalCambioPassword"
+      (click)="cerrarModales()">
+      <i class="bi bi-x-lg"></i>
+    </button>
+  </div>
+</div>
+
+<!-- MODAL: CONTRASEÑA ACTUALIZADA -->
+<div
+  class="modal"
+  id="modalCuartaVentana"
+  *ngIf="modalActivo === 'exito'"
+  (click)="onBackdropClick($event, 'exito')">
+  <div class="modal-contenido">
+    <button
+      type="button"
+      id="cerrarCuartaVentana"
+      class="cerrar-modal"
+      (click)="cerrarModales()">
+      <i class="bi bi-x-lg"></i>
+    </button>
+
+    <div class="cuadro-recuperacion"></div>
+    <h2>Contraseña<br>actualizada</h2>
+    <p>
+      Tu contraseña ha sido actualizada exitosamente.
+      Ya puedes iniciar sesión con tu nueva contraseña.
+    </p>
+
+    <button type="button" id="volverInicioSesion" (click)="cerrarModales()">
+      Volver al inicio de sesión
+    </button>
+  </div>
+</div>

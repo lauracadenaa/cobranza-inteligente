@@ -1,0 +1,794 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;800&display=swap');
+
+:host {
+  display: block;
+  width: 100%;
+  min-height: 100vh;
+  font-family: 'Roboto', sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+.contenedor {
+  width: 100%;
+  min-height: 100vh;
+  padding: 20px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 24px;
+}
+
+.lado-izquierdo,
+.lado-derecho {
+  width: min(636px, calc((100vw - 64px) / 2));
+  min-height: min(945px, calc(100vh - 40px));
+  border-radius: 35px;
+}
+
+.lado-izquierdo {
+  padding: 66px 70px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 42px;
+  position: relative;
+  overflow: hidden;
+  color: #fff;
+  background: #001822 url('/imagenes/Mask group.jpg') center / cover no-repeat;
+}
+
+.lado-izquierdo > img {
+  display: none;
+}
+
+.logo {
+  width: 65px;
+  height: 66px;
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  background: #10989b;
+  font-size: 30px;
+  font-weight: 800;
+}
+
+.texto-izquierdo {
+  width: 100%;
+  max-width: 416px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.texto-izquierdo h1 {
+  margin: 0;
+  font-size: clamp(42px, 5vw, 70px);
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: -0.72px;
+}
+
+.texto-izquierdo p {
+  margin: 0;
+  font-size: 21px;
+  font-weight: 300;
+  line-height: 1.25;
+}
+
+.lado-derecho {
+  padding: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #e2e8f0;
+  background: #fff;
+}
+
+.formulario {
+  width: 100%;
+  max-width: 416px;
+  display: flex;
+  flex-direction: column;
+}
+
+.formulario h2 {
+  margin: 0 0 28px;
+  color: #10989b;
+  font-size: 26px;
+  font-weight: 800;
+  line-height: 1.25;
+}
+
+.formulario label,
+.campo-recuperacion label,
+.campo-password-nueva label {
+  display: block;
+  margin: 0;
+  color: #001822;
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 1.25;
+}
+
+.campo-login,
+.campo-password {
+  width: 100%;
+  height: auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 0;
+}
+
+.campo-password {
+  margin-top: 18px;
+}
+
+#usuario,
+#password,
+#modalCambioPassword .contenedor-password input {
+  width: 100%;
+  height: 45px;
+  padding: 0 15px;
+  border: 1px solid #cbd5e1;
+  border-radius: 10px;
+  outline: none;
+  font: 400 15px 'Roboto', sans-serif;
+}
+
+#password,
+#modalCambioPassword .contenedor-password input {
+  padding-right: 45px;
+}
+
+#usuario:focus,
+#password:focus,
+.campo-recuperacion input:focus,
+#modalCambioPassword .contenedor-password input:focus {
+  border-color: #3b82f6;
+}
+
+.contenedor-password {
+  width: 100%;
+  height: 45px;
+  position: relative;
+  margin: 0;
+}
+
+#mostrarPassword,
+#modalCambioPassword .contenedor-password button {
+  position: absolute;
+  top: 50%;
+  right: 10px;
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transform: translateY(-50%);
+  border: 0;
+  background: transparent;
+  color: #64748b;
+  cursor: pointer;
+}
+
+#mostrarPassword i,
+#modalCambioPassword .contenedor-password button i {
+  font-size: 18px;
+}
+
+#olvidePassword {
+  display: block;
+  width: 100%;
+  margin: 10px 0 0;
+  color: #3b82f6;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.4;
+  text-decoration: none;
+}
+
+#olvidePassword:hover {
+  text-decoration: underline;
+}
+
+#iniciarSesion {
+  width: 100%;
+  min-height: 48px;
+  margin-top: 30px;
+  border: 0;
+  border-radius: 16px;
+  background: #1a4dd6;
+  color: #fff;
+  font: 500 16px 'Roboto', sans-serif;
+  cursor: pointer;
+}
+
+#mensaje {
+  width: 100%;
+  min-height: 20px;
+  margin: 10px 0 0;
+  font-size: 14px;
+}
+
+.texto-seguridad {
+  width: 100%;
+  margin: 32px 0 0;
+  color: #475569;
+  font-size: 14px;
+  line-height: 1.5;
+  text-align: center;
+}
+
+/* Modales */
+.modal {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  width: 100%;
+  min-height: 100%;
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgb(0 0 0 / 55%);
+  backdrop-filter: blur(8px);
+}
+
+.cerrar-modal {
+  position: absolute;
+  top: 20px;
+  right: 22px;
+  width: 35px;
+  height: 35px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  background: transparent;
+  color: #64748b;
+  cursor: pointer;
+}
+
+.cerrar-modal i {
+  font-size: 18px;
+}
+
+#modalPassword .modal-contenido,
+#modalSiguiente .modal-contenido,
+#modalCambioPassword .modal-contenido {
+  position: relative;
+  width: min(1170px, 100%);
+  max-height: calc(100vh - 40px);
+  padding: 56px 8%;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(320px, 416px);
+  align-items: center;
+  gap: clamp(32px, 8vw, 100px);
+  overflow: auto;
+  border: 1px solid #e2e8f0;
+  border-radius: 35px;
+  background: #fff;
+}
+
+.modal-lado-izquierdo {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 16px;
+}
+
+.cuadro-recuperacion {
+  width: 65px;
+  height: 65px;
+  flex: 0 0 auto;
+  border-radius: 9px;
+  background: #1e3a5f url('/imagenes/Vector.svg') center / 39px 39px no-repeat;
+}
+
+.modal-lado-izquierdo h2 {
+  margin: 0;
+  color: #3b82f6;
+  font-size: clamp(34px, 4vw, 48px);
+  font-weight: 300;
+  line-height: 1.1;
+  text-align: left;
+}
+
+.modal-lado-izquierdo > p {
+  max-width: 400px;
+  margin: 0;
+  color: #0a3b4e;
+  font-size: 15px;
+  line-height: 1.5;
+  text-align: left;
+}
+
+.modal-lado-derecho {
+  min-width: 0;
+  width: 100%;
+}
+
+#modalPassword .modal-lado-derecho {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.campo-recuperacion {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.campo-recuperacion input {
+  width: 100%;
+  height: 46px;
+  padding: 0 15px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  outline: none;
+  font: 400 14px 'Roboto', sans-serif;
+}
+
+#mensajeRecuperacion {
+  min-height: 18px;
+  margin: 0;
+  font-size: 13px;
+}
+
+.botones-recuperacion {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 16px;
+}
+
+.boton-regresar,
+.boton-continuar {
+  min-height: 50px;
+  padding: 0 22px;
+  border-radius: 15px;
+  font: 500 15px 'Roboto', sans-serif;
+  cursor: pointer;
+}
+
+.boton-regresar {
+  min-width: 114px;
+  border: 1px solid #cbd5e1;
+  background: #fff;
+  color: #2563eb;
+}
+
+.boton-continuar {
+  min-width: 120px;
+  border: 0;
+  background: #1a4dd6;
+  color: #fff;
+}
+
+.boton-continuar:disabled,
+#botonValidarIdentidad:disabled {
+  border-color: #cbd5e1;
+  background: #cbd5e1;
+  color: #64748b;
+  cursor: not-allowed;
+}
+
+/* Modal OTP */
+#modalSiguiente .modal-lado-derecho {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-content: center;
+  align-items: start;
+  column-gap: 16px;
+  row-gap: 10px;
+}
+
+#modalSiguiente .modal-lado-derecho h3,
+#modalSiguiente .modal-lado-derecho > p,
+#modalSiguiente .campos-otp,
+#modalSiguiente .temporizador-otp,
+#modalSiguiente .error-otp,
+#modalSiguiente .mensaje-reenvio {
+  grid-column: 1 / -1;
+}
+
+#modalSiguiente .modal-lado-derecho h3 {
+  margin: 0;
+  color: #001822;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+#modalSiguiente .modal-lado-derecho > p {
+  margin: 0;
+  color: #86888c;
+  font-size: 15px;
+}
+
+.campos-otp {
+  width: 100%;
+  display: flex;
+  gap: 8px;
+}
+
+.campo-otp {
+  width: 100%;
+  min-width: 0;
+  height: 56px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  outline: none;
+  background: #f8f8f8;
+  font: 500 20px 'Roboto', sans-serif;
+  text-align: center;
+}
+
+.campo-otp:focus {
+  border-color: #3b82f6;
+}
+
+.campo-otp.otp-error {
+  border: 2px solid #ef4444;
+  color: #ef4444;
+}
+
+.campo-otp.otp-correcto {
+  border: 2px solid #22c55e;
+  color: #22c55e;
+}
+
+.temporizador-otp {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  color: #64748b;
+}
+
+.temporizador-otp p {
+  margin: 0;
+  font-size: 14px;
+}
+
+.temporizador-otp i {
+  font-size: 18px;
+}
+
+#temporizador {
+  color: #083b4c;
+  font-size: 18px;
+}
+
+.boton-reenviar {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #2563eb;
+  font: 500 14px 'Roboto', sans-serif;
+  cursor: pointer;
+}
+
+.error-otp {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  border: 1px solid #ef4444;
+  border-radius: 8px;
+  background: #fef2f2;
+  color: #ef4444;
+  font-size: 12px;
+}
+
+.error-otp i {
+  flex: 0 0 auto;
+  font-size: 20px;
+}
+
+.mensaje-reenvio {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px;
+  border: 1px solid #22c55e;
+  border-radius: 8px;
+  background: #f0fdf4;
+  color: #22c55e;
+  font-size: 12px;
+}
+
+.mensaje-reenvio img {
+  width: 20px;
+  height: 20px;
+  object-fit: contain;
+}
+
+#botonRegresarSiguiente,
+#botonValidarIdentidad {
+  width: 100%;
+  min-height: 50px;
+}
+
+/* Modal cambiar contraseña */
+#modalCambioPassword .modal-lado-derecho {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 10px;
+}
+
+#modalCambioPassword .modal-lado-derecho h3 {
+  margin: 0 0 4px;
+  color: #001822;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.campo-password-nueva {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+#modalCambioPassword .contenedor-password {
+  width: 100%;
+  height: 45px;
+}
+
+#modalCambioPassword .contenedor-password input {
+  height: 45px;
+  border-radius: 10px;
+}
+
+.lineas-seguridad {
+  width: 100%;
+  height: 5px;
+  display: flex;
+  gap: 5px;
+  margin-top: 2px;
+}
+
+.lineas-seguridad span {
+  height: 4px;
+  flex: 1;
+  border-radius: 5px;
+}
+
+.requisitos-password {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.requisitos-password > p {
+  margin: 0 0 3px;
+  color: #0a3b4e;
+  font-size: 13px;
+}
+
+.requisito {
+  min-height: 20px;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.requisito i {
+  color: #ef4444;
+  font-size: 15px;
+}
+
+.requisito span {
+  color: #64748b;
+  font-size: 13px;
+}
+
+.requisito.cumplido i,
+.requisito.cumplido span {
+  color: #22c55e;
+}
+
+.password-error {
+  border: 2px solid #ef4444 !important;
+  color: #ef4444;
+}
+
+.password-correcta {
+  border-color: #22c55e !important;
+}
+
+.mensaje-password-error {
+  margin: 0;
+  color: #ef4444;
+  font-size: 12px;
+}
+
+#modalCambioPassword .botones-recuperacion {
+  margin-top: 6px;
+}
+
+#actualizarPassword {
+  flex: 1;
+}
+
+/* Modal de éxito */
+#modalCuartaVentana .modal-contenido {
+  position: relative;
+  width: min(503px, 100%);
+  max-height: calc(100vh - 40px);
+  padding: 70px 48px 48px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 22px;
+  overflow: auto;
+  border: 1px solid #e2e8f0;
+  border-radius: 30px;
+  background: #fff;
+}
+
+#modalCuartaVentana .cuadro-recuperacion {
+  background-color: #dcfce7;
+  background-image: url('/imagenes/badge-check.svg');
+  background-size: 45px;
+}
+
+#modalCuartaVentana .modal-contenido h2 {
+  margin: 0;
+  color: #15803d;
+  font-size: 40px;
+  font-weight: 300;
+  line-height: 1.2;
+}
+
+#modalCuartaVentana .modal-contenido p {
+  max-width: 338px;
+  margin: 0;
+  color: #0a3b4e;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+#modalCuartaVentana #volverInicioSesion {
+  min-height: 50px;
+  align-self: center;
+  padding: 0 24px;
+  border: 0;
+  border-radius: 15px;
+  background: #2563eb;
+  color: #fff;
+  font: 500 15px 'Roboto', sans-serif;
+  cursor: pointer;
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+  .contenedor {
+    flex-direction: column;
+    padding: 16px;
+  }
+
+  .lado-izquierdo,
+  .lado-derecho {
+    width: min(636px, 100%);
+    min-height: auto;
+  }
+
+  .lado-izquierdo {
+    padding: 40px;
+    gap: 24px;
+  }
+
+  .lado-derecho {
+    padding: 40px;
+  }
+
+  .texto-izquierdo h1 {
+    font-size: clamp(40px, 8vw, 60px);
+  }
+
+  #modalPassword .modal-contenido,
+  #modalSiguiente .modal-contenido,
+  #modalCambioPassword .modal-contenido {
+    grid-template-columns: 1fr;
+    gap: 28px;
+    padding: 44px 32px 32px;
+  }
+
+  #modalPassword .modal-lado-derecho,
+  #modalSiguiente .modal-lado-derecho,
+  #modalCambioPassword .modal-lado-derecho {
+    width: 100%;
+  }
+}
+
+@media (max-width: 520px) {
+  .contenedor {
+    padding: 10px;
+    gap: 12px;
+  }
+
+  .lado-izquierdo,
+  .lado-derecho {
+    padding: 26px 20px;
+    border-radius: 22px;
+  }
+
+  .lado-izquierdo {
+    min-height: 300px;
+  }
+
+  .texto-izquierdo p {
+    font-size: 17px;
+  }
+
+  .formulario h2 {
+    margin-bottom: 22px;
+    font-size: 23px;
+  }
+
+  #iniciarSesion {
+    margin-top: 24px;
+  }
+
+  .texto-seguridad {
+    margin-top: 24px;
+    font-size: 12px;
+  }
+
+  .modal {
+    padding: 10px;
+  }
+
+  #modalPassword .modal-contenido,
+  #modalSiguiente .modal-contenido,
+  #modalCambioPassword .modal-contenido,
+  #modalCuartaVentana .modal-contenido {
+    max-height: calc(100vh - 20px);
+    padding: 48px 20px 24px;
+    border-radius: 20px;
+  }
+
+  .modal-lado-izquierdo h2 {
+    font-size: 34px;
+  }
+
+  .campos-otp {
+    gap: 5px;
+  }
+
+  .campo-otp {
+    height: 48px;
+    font-size: 18px;
+  }
+
+  .botones-recuperacion {
+    gap: 10px;
+  }
+
+  .boton-regresar,
+  .boton-continuar {
+    min-width: 0;
+    flex: 1;
+    padding: 0 12px;
+  }
+
+  
+}

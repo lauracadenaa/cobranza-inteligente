@@ -1,3 +1,4 @@
+
 @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;800&display=swap');
 
 :host {
@@ -227,7 +228,10 @@
   text-align: center;
 }
 
-/* Modales */
+/* ================================================== */
+/* MODALES */
+/* ================================================== */
+
 .modal {
   position: fixed;
   inset: 0;
@@ -262,9 +266,12 @@
   font-size: 18px;
 }
 
+/* Contenedor general de los modales */
+
 #modalPassword .modal-contenido,
 #modalSiguiente .modal-contenido,
-#modalCambioPassword .modal-contenido {
+#modalCambioPassword .modal-contenido,
+#modalCambioInicial .modal-contenido {
   position: relative;
   width: min(1170px, 100%);
   max-height: calc(100vh - 40px);
@@ -317,6 +324,10 @@
   min-width: 0;
   width: 100%;
 }
+
+/* ================================================== */
+/* MODAL RECUPERAR CONTRASEÑA */
+/* ================================================== */
 
 #modalPassword .modal-lado-derecho {
   display: flex;
@@ -386,7 +397,10 @@
   cursor: not-allowed;
 }
 
-/* Modal OTP */
+/* ================================================== */
+/* MODAL OTP */
+/* ================================================== */
+
 #modalSiguiente .modal-lado-derecho {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -524,7 +538,10 @@
   min-height: 50px;
 }
 
-/* Modal cambiar contraseña */
+/* ================================================== */
+/* MODAL CAMBIAR CONTRASEÑA */
+/* ================================================== */
+
 #modalCambioPassword .modal-lado-derecho {
   display: flex;
   flex-direction: column;
@@ -628,7 +645,84 @@
   flex: 1;
 }
 
-/* Modal de éxito */
+/* ================================================== */
+/* MODAL CAMBIO DE CONTRASEÑA INICIAL */
+/* ================================================== */
+
+#modalCambioInicial .modal-lado-derecho {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 10px;
+}
+
+#modalCambioInicial .modal-lado-derecho h3 {
+  margin: 0 0 4px;
+  color: #001822;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+#modalCambioInicial .campo-password-nueva {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+#modalCambioInicial .contenedor-password {
+  width: 100%;
+  height: 45px;
+  position: relative;
+}
+
+#modalCambioInicial .contenedor-password input {
+  width: 100%;
+  height: 45px;
+  padding: 0 45px 0 15px;
+  border: 1px solid #cbd5e1;
+  border-radius: 10px;
+  outline: none;
+  font: 400 14px 'Roboto', sans-serif;
+}
+
+#modalCambioInicial .contenedor-password input:focus {
+  border-color: #3b82f6;
+}
+
+#modalCambioInicial .contenedor-password button {
+  position: absolute;
+  top: 50%;
+  right: 10px;
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transform: translateY(-50%);
+  border: 0;
+  background: transparent;
+  color: #64748b;
+  cursor: pointer;
+}
+
+#modalCambioInicial .contenedor-password button i {
+  font-size: 18px;
+}
+
+#modalCambioInicial .botones-recuperacion {
+  margin-top: 6px;
+}
+
+#modalCambioInicial #actualizarPasswordInicial {
+  flex: 1;
+}
+
+/* ================================================== */
+/* MODAL DE ÉXITO */
+/* ================================================== */
+
 #modalCuartaVentana .modal-contenido {
   position: relative;
   width: min(503px, 100%);
@@ -678,7 +772,10 @@
   cursor: pointer;
 }
 
-/* Responsive */
+/* ================================================== */
+/* RESPONSIVE - TABLETAS */
+/* ================================================== */
+
 @media (max-width: 900px) {
   .contenedor {
     flex-direction: column;
@@ -706,7 +803,8 @@
 
   #modalPassword .modal-contenido,
   #modalSiguiente .modal-contenido,
-  #modalCambioPassword .modal-contenido {
+  #modalCambioPassword .modal-contenido,
+  #modalCambioInicial .modal-contenido {
     grid-template-columns: 1fr;
     gap: 28px;
     padding: 44px 32px 32px;
@@ -714,10 +812,15 @@
 
   #modalPassword .modal-lado-derecho,
   #modalSiguiente .modal-lado-derecho,
-  #modalCambioPassword .modal-lado-derecho {
+  #modalCambioPassword .modal-lado-derecho,
+  #modalCambioInicial .modal-lado-derecho {
     width: 100%;
   }
 }
+
+/* ================================================== */
+/* RESPONSIVE - CELULARES */
+/* ================================================== */
 
 @media (max-width: 520px) {
   .contenedor {
@@ -760,6 +863,7 @@
   #modalPassword .modal-contenido,
   #modalSiguiente .modal-contenido,
   #modalCambioPassword .modal-contenido,
+  #modalCambioInicial .modal-contenido,
   #modalCuartaVentana .modal-contenido {
     max-height: calc(100vh - 20px);
     padding: 48px 20px 24px;
@@ -789,6 +893,4 @@
     flex: 1;
     padding: 0 12px;
   }
-
-  
 }

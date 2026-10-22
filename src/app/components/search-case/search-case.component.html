@@ -1,3 +1,4 @@
+
 <!-- ================================================== -->
 <!-- BUSCAR CASO -->
 <!-- ================================================== -->
@@ -10,6 +11,8 @@
   <section
     class="search-case-modal"
     [class.searching]="isSearching"
+    [class.no-results]="isSearching && (filteredCases.length === 0 || searchError)"
+    [class.summary-open]="showCaseSummary"
   >
 
     <!-- ================================================== -->
@@ -40,7 +43,6 @@
 
     </div>
 
-
     <!-- ================================================== -->
     <!-- CAMPO DE BÚSQUEDA -->
     <!-- ================================================== -->
@@ -57,6 +59,7 @@
       >
 
       <!-- X PARA LIMPIAR -->
+
       <button
         type="button"
         class="clear-search"
@@ -68,30 +71,252 @@
 
     </div>
 
+    <ng-container *ngIf="showCaseSummary && selectedCase as caso; else searchResults">
 
-    <!-- ================================================== -->
-    <!-- CAMPOS DE CARGA DEL MODAL 2 -->
-    <!-- ================================================== -->
+      <div class="case-summary-content">
 
-    <div
-      class="search-loading"
-      *ngIf="isSearching"
-    >
+        <button
+          type="button"
+          class="summary-back"
+          (click)="closeCaseSummary()"
+        >
+          ← Volver a resultados
+        </button>
 
-      <!-- CAMPO 1 -->
-      <div class="search-loading-field">
+        <h3 class="summary-title">Resumen del caso</h3>
+
+        <section class="case-summary-card">
+
+          <div class="summary-case-heading">
+            <strong class="summary-case-id">{{ caso.id }}</strong>
+
+            <div class="summary-badges">
+              <span
+                class="summary-badge"
+                [ngClass]="getEstadoClass(caso.estado)"
+              >
+                {{ getEstadoLabel(caso.estado) }}
+              </span>
+              <span class="summary-badge priority-badge">
+                Riesgo: {{ caso.riesgo }}
+              </span>
+            </div>
+          </div>
+
+          <section class="summary-section">
+            <h4>ASOCIADO</h4>
+            <div class="summary-fields">
+              <div class="summary-field">
+                <span>Nombre</span>
+                <strong>{{ caso.asociado }}</strong>
+              </div>
+              <div class="summary-field">
+                <span>Segmento</span>
+                <strong>{{ caso.segmento || 'Sin información' }}</strong>
+              </div>
+              <div class="summary-field">
+                <span>Documento</span>
+                <strong>{{ caso.documento || 'Sin información' }}</strong>
+              </div>
+              <div class="summary-field">
+                <span>Asesor</span>
+                <strong>{{ caso.asesor }}</strong>
+              </div>
+            </div>
+          </section>
+
+          <section class="summary-section">
+            <h4>OBLIGACIÓN</h4>
+            <div class="summary-fields">
+              <div class="summary-field">
+                <span>Número</span>
+                <strong>{{ caso.obligacion }}</strong>
+              </div>
+              <div class="summary-field">
+                <span>Saldo vencido</span>
+                <strong class="summary-balance">
+                  {{ formatBalance(caso.saldoVencido) }}
+                </strong>
+              </div>
+              <div class="summary-field">
+                <span>Días de mora</span>
+                <strong class="summary-overdue">{{ caso.diasMora }}</strong>
+              </div>
+              <div class="summary-field">
+                <span>Producto</span>
+                <strong>Sin información</strong>
+              </div>
+            </div>
+          </section>
+
+          <section class="summary-section">
+            <h4>GESTIÓN ACTUAL</h4>
+            <div class="summary-fields">
+              <div class="summary-field">
+                <span>Responsable</span>
+                <strong>{{ caso.asesor }}</strong>
+              </div>
+              <div class="summary-field">
+                <span>Próxima acción</span>
+                <strong>Sin información</strong>
+              </div>
+              <div class="summary-field">
+                <span>Fecha de creación</span>
+                <strong>{{ formatDate(caso.fechaCreacion) }}</strong>
+              </div>
+              <div class="summary-field">
+                <span>Tiempo límite</span>
+                <strong>{{ caso.tiempoLimite }}</strong>
+              </div>
+            </div>
+          </section>
+
+        </section>
+
+        <div class="case-summary-actions">
+          <button
+            type="button"
+            class="summary-back-button"
+            (click)="showAssociatedCases(caso)"
+          >
+            Ver asociado
+          </button>
+          <button
+            type="button"
+            class="summary-open-button"
+            (click)="goToCaseManagement()"
+          >
+            Abrir caso
+          </button>
+        </div>
+
       </div>
 
-      <!-- CAMPO 2 -->
-      <div class="search-loading-field">
+    </ng-container>
+
+    <ng-template #searchResults>
+
+      <!-- RESULTADOS DE LA BÚSQUEDA -->
+      <div
+        class="search-results"
+        *ngIf="isSearching"
+      >
+
+        <div class="search-results-header">
+          <span>Resultados</span>
+          <span class="results-count">
+            {{ filteredCases.length }} coincidencias
+          </span>
+        </div>
+
+        <div
+          class="search-results-list"
+          *ngIf="filteredCases.length > 0"
+        >
+
+          <div
+            class="search-result-item"
+            *ngFor="let caso of filteredCases"
+          >
+
+            <div class="search-result-main">
+              <div class="search-result-heading">
+                <h3>{{ caso.id }}</h3>
+                <span
+                  class="case-status"
+                  [ngClass]="getEstadoClass(caso.estado)"
+                >
+                  {{ getEstadoLabel(caso.estado) }}
+                </span>
+              </div>
+
+              <p class="search-result-client">
+                {{ caso.asociado }}
+                <ng-container *ngIf="caso.documento">
+                  · CC {{ caso.documento }}
+                </ng-container>
+              </p>
+
+              <div class="search-result-footer">
+                <p class="search-result-summary">
+                  <span>{{ caso.obligacion }}</span>
+                  <span>{{ caso.diasMora }} días de mora</span>
+                  <span
+                    class="case-risk"
+                    [ngClass]="getRiesgoClass(caso.riesgo)"
+                  >
+                    Riesgo {{ caso.riesgo }}
+                  </span>
+                </p>
+
+                <button
+                  type="button"
+                  class="search-result-action"
+                  (click)="openCaseSummary(caso)"
+                >
+                  Ver resumen
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div
+          class="search-no-results"
+          *ngIf="filteredCases.length === 0 && !searchError"
+        >
+          <div class="no-results-icon">
+            <i class="bi bi-x-lg"></i>
+          </div>
+          <h3>No encontramos casos</h3>
+          <p>{{ getSearchDescription() }}</p>
+          <div class="no-results-actions">
+            <button
+              type="button"
+              class="no-results-clear"
+              (click)="clearSearch()"
+            >
+              Limpiar búsqueda
+            </button>
+            <button
+              type="button"
+              class="no-results-go"
+              (click)="goToCaseManagement()"
+            >
+              Ir a gestión de casos
+            </button>
+          </div>
+        </div>
+
+        <div
+          class="search-no-results search-error"
+          *ngIf="searchError"
+        >
+          <div class="no-results-icon error-icon">
+            <i class="bi bi-exclamation-circle"></i>
+          </div>
+          <h3>No pudimos realizar la búsqueda</h3>
+          <p>Intenta nuevamente.</p>
+          <div class="no-results-actions">
+            <button
+              type="button"
+              class="no-results-clear"
+              (click)="close()"
+            >
+              Cancelar
+            </button>
+            <button
+              type="button"
+              class="no-results-go"
+              (click)="retrySearch()"
+            >
+              Reintentar
+            </button>
+          </div>
+        </div>
       </div>
 
-      <!-- CAMPO 3 -->
-      <div class="search-loading-field">
-      </div>
-
-    </div>
-
+    </ng-template>
 
   </section>
 

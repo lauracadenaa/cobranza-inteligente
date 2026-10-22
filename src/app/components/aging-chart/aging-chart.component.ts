@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 import { DashboardService } from '../../service/dashboard.service';
@@ -49,20 +49,38 @@ segmentData: AgingData[] = [];
 
   asesorMenuAbierto = false;
 
+// Máximo dinámico según los datos recibidos del backend
+get maxAgingValue(): number {
 
-  // ==================================================
-  // VALOR MÁXIMO DEL GRÁFICO
-  // ==================================================
+  let datosActuales: AgingData[] = [];
 
-  maxAgingValue = 120000000;
+  if (this.vistaActual === 'antiguedad') {
+    datosActuales = this.agingData;
+  } else if (this.vistaActual === 'segmento') {
+    datosActuales = this.segmentData;
+  } else {
+    datosActuales = this.riskData;
+  }
 
+  const maximo = Math.max(
+    ...datosActuales.map(dato => dato.valor),
+    0
+  );
+
+  return Math.max(
+    Math.ceil(maximo / 4000000) * 4000000,
+    4000000
+  );
+
+}
 
   // ==================================================
   // CONSTRUCTOR
   // ==================================================
 
   constructor(
-    private dashboardService: DashboardService
+    private dashboardService: DashboardService,
+    private changeDetectorRef: ChangeDetectorRef
   ) { }
 
 
@@ -72,21 +90,36 @@ segmentData: AgingData[] = [];
 
  ngOnInit(): void {
 
+  // CARTERA POR ANTIGÜEDAD
   this.dashboardService.getAgingData().subscribe(data => {
 
     this.agingData = data;
 
+    console.log('Cartera por antigüedad:', data);
+
+    this.changeDetectorRef.markForCheck();
+
   });
 
+  // CARTERA POR SEGMENTO
   this.dashboardService.getSegmentData().subscribe(data => {
 
     this.segmentData = data;
 
+    console.log('Cartera por segmento:', data);
+
+    this.changeDetectorRef.markForCheck();
+
   });
 
+  // CARTERA POR RIESGO
   this.dashboardService.getRiskData().subscribe(data => {
 
     this.riskData = data;
+
+    console.log('Cartera por riesgo:', data);
+
+    this.changeDetectorRef.markForCheck();
 
   });
 
@@ -125,5 +158,29 @@ segmentData: AgingData[] = [];
     return (valor / this.maxAgingValue) * 100;
 
   }
+
+  // ==================================================
+// FORMATO DE VALORES EN MILLONES
+// ==================================================
+
+getFormattedValue(valor: number): string {
+
+  return '$' + (valor / 1000000).toLocaleString('es-CO', {
+    maximumFractionDigits: 1
+  }) + 'M';
+
+}
+
+// ==================================================
+// ETIQUETAS DINÁMICAS DEL EJE VERTICAL
+// ==================================================
+
+getAxisLabel(posicion: number): string {
+
+  const valor = this.maxAgingValue * posicion / 4;
+
+  return this.getFormattedValue(valor);
+
+}
 
 }

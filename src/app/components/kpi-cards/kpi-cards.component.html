@@ -1,34 +1,45 @@
+
 <div class="kpi-container">
 
- <div
-  class="kpi-card"
-  [class.kpi-card-recaudo]="kpi.title === 'Recaudo del período'"
-  *ngFor="let kpi of kpis"
->
+  <div
+    class="kpi-card"
+    [class.kpi-card-recaudo]="kpi.title === 'Recaudo del período'"
+    *ngFor="let kpi of kpis"
+  >
 
+    <!-- TÍTULO DEL KPI -->
     <div class="kpi-title">
       {{ kpi.title }}
     </div>
 
-    <div
-  class="kpi-value"
-  [class.kpi-value-recaudo]="kpi.title === 'Recaudo del período'"
->
-  {{ kpi.value }}
-</div>
+    <!-- IMAGEN EN LA PARTE SUPERIOR DERECHA -->
+    <div class="kpi-icon" *ngIf="kpi.image">
+      <img
+        [src]="kpi.image"
+        [alt]="'Icono de ' + kpi.title"
+      >
+    </div>
 
+    <!-- VALOR DEL KPI -->
+    <div
+      class="kpi-value"
+      [class.kpi-value-recaudo]="kpi.title === 'Recaudo del período'"
+    >
+      {{ kpi.value }}
+    </div>
+
+    <!-- PORCENTAJE Y PERÍODO -->
     <div class="kpi-change">
 
-  <span class="kpi-percentage">
-    {{ kpi.changePercentage }}%
-  </span>
+      <span class="kpi-percentage">
+        {{ kpi.changePercentage }}%
+      </span>
 
-  <span class="kpi-period">
-    {{ kpi.periodText }}
-  </span>
+      <span class="kpi-period">
+        {{ kpi.periodText }}
+      </span>
 
-
-</div>
+    </div>
 
   </div>
 

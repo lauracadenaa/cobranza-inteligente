@@ -1,3 +1,4 @@
+
 /* ================================================== */
 /* CONTENEDOR DEL MODAL */
 /* ================================================== */
@@ -5,77 +6,54 @@
 .search-case-overlay {
   position: fixed;
   inset: 0;
-
   display: flex;
-
-  /* CENTRAR VERTICALMENTE */
   align-items: center;
-
-  /* CENTRAR HORIZONTALMENTE */
   justify-content: center;
-
   background: rgba(0, 0, 0, 0.55);
-
   z-index: 1000;
 }
-
 
 /* ================================================== */
 /* MODAL */
 /* ================================================== */
 
 .search-case-modal {
-  width: 600px;
-
-  min-height: 159px;
-
+  width: min(600px, calc(100vw - 32px));
+  height: 159px;
   box-sizing: border-box;
-
   padding: 24px;
-
   background: #FFFFFF;
-
   border: 1px solid #E2E8F0;
-
   border-radius: 24px;
-
   display: flex;
-
   flex-direction: column;
-
   gap: 24px;
 }
 
-
 /* ================================================== */
-/* MODAL NORMAL */
-/* ================================================== */
-
-.search-case-modal {
-  width: 600px;
-
-  height: 159px;
-
-  box-sizing: border-box;
-
-  padding: 24px;
-
-  background: #FFFFFF;
-
-  border: 1px solid #E2E8F0;
-
-  border-radius: 24px;
-}
-
-
-/* ================================================== */
-/* MODAL 2 - CUANDO SE ESCRIBEN 3 CARACTERES */
+/* MODAL CUANDO SE ESCRIBEN 3 CARACTERES */
 /* ================================================== */
 
 .search-case-modal.searching {
-  width: 600px;
+  height: 529px;
+  max-height: min(680px, calc(100vh - 32px));
+  overflow: hidden;
+}
 
-  height: 543px;
+/* ================================================== */
+/* MODAL CUANDO NO HAY COINCIDENCIAS */
+/* ================================================== */
+
+.search-case-modal.no-results {
+  width: 600px;
+  height: 460px;
+  min-height: 460px;
+  box-sizing: border-box;
+  padding: 24px;
+  gap: 24px;
+  border-radius: 24px;
+  border: 1px solid #E2E8F0;
+  opacity: 1;
 }
 
 /* ================================================== */
@@ -86,61 +64,45 @@
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-
   width: 100%;
 }
 
-
 .search-case-header h2 {
   margin: 0;
-
   font-family: 'Roboto', sans-serif;
-  font-size: 12px;
+  font-size: 16px;
   font-weight: 700;
-  line-height: 100%;
-  letter-spacing: -0.44px;
-
+  line-height: 20px;
+  margin-bottom: 6px;
   color: #0F172A;
 }
 
-
 .search-case-header p {
-  margin: 3px 0 0 0;
-
+  margin: 4px 0 0;
   font-family: 'Roboto', sans-serif;
-  font-size: 7px;
+  font-size: 12px;
   font-weight: 400;
-  line-height: 100%;
-  letter-spacing: -0.2px;
-
+  line-height: 16px;
   color: #64748B;
 }
-
 
 /* ================================================== */
 /* BOTÓN CERRAR */
 /* ================================================== */
 
 .search-case-close {
-  width: 16px;
-  height: 16px;
-
+  width: 24px;
+  height: 24px;
   padding: 0;
-
   border: none;
   background: transparent;
-
   font-family: Arial, sans-serif;
-  font-size: 15px;
+  font-size: 20px;
   font-weight: 400;
-
-  line-height: 16px;
-
+  line-height: 24px;
   color: #1A4DD6;
-
   cursor: pointer;
 }
-
 
 /* ================================================== */
 /* CAMPO DE BÚSQUEDA */
@@ -148,57 +110,40 @@
 
 .search-case-input {
   width: 100%;
-  height: 32px;
-
-  margin-top: 10px;
-
+  height: 44px;
+  flex-shrink: 0;
   display: flex;
   align-items: center;
-
   box-sizing: border-box;
-
-  padding: 0 9px;
-
+  padding: 0 12px;
   background: #F8FAFC;
-
   border: 1px solid #E2E8F0;
-  border-radius: 6px;
+  border-radius: 8px;
 }
-
 
 .search-case-input i {
-  margin-right: 7px;
-
-  font-size: 10px;
-
+  margin-right: 10px;
+  font-size: 14px;
   color: #94A3B8;
 }
-
 
 .search-case-input input {
   width: 100%;
   height: 100%;
-
   padding: 0;
-
   border: none;
   outline: none;
-
   background: transparent;
-
   font-family: 'Roboto', sans-serif;
-  font-size: 7px;
+  font-size: 13px;
   font-weight: 400;
-  line-height: 100%;
-
+  line-height: 20px;
   color: #0F172A;
 }
-
 
 .search-case-input input::placeholder {
   color: #94A3B8;
 }
-
 
 /* ================================================== */
 /* BOTÓN PARA LIMPIAR LA BÚSQUEDA */
@@ -208,18 +153,13 @@
   width: 20px;
   height: 20px;
   padding: 0;
-
   border: none;
   background: transparent;
-
   color: #64748B;
-
   font-family: Arial, sans-serif;
   font-size: 16px;
   line-height: 20px;
-
   cursor: pointer;
-
   display: flex;
   align-items: center;
   justify-content: center;
@@ -234,37 +174,797 @@
 /* ================================================== */
 
 .search-loading {
-
   width: 100%;
-
   display: flex;
-
   flex-direction: column;
-
   gap: 12px;
-
 }
-
 
 /* ================================================== */
 /* CAMPO DE CARGA */
 /* ================================================== */
 
 .search-loading-field {
-
-  width: 552px;
-
+  width: 100%;
   height: 88px;
-
   box-sizing: border-box;
-
   padding: 16px;
-
   background: #FFFFFF;
-
   border: 1px solid #E2E8F0;
-
   border-radius: 12px;
-
 }
 
+/* ================================================== */
+/* CONTENEDOR DE RESULTADOS */
+/* ================================================== */
+
+.search-results {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+/* ================================================== */
+/* ENCABEZADO DE RESULTADOS */
+/* ================================================== */
+
+.search-results-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.search-results-header > span:first-child {
+  font-family: 'Roboto', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  font-style: normal;
+  line-height: 15px;
+  letter-spacing: 0;
+  color: #0A3B4E;
+}
+
+.results-count {
+  font-family: 'Roboto', sans-serif;
+  font-size: 13px;
+  font-weight: 400;
+  font-style: normal;
+  line-height: 15px;
+  letter-spacing: 0;
+  color: #63768A;
+}
+
+/* ================================================== */
+/* LISTA DE CASOS ENCONTRADOS */
+/* ================================================== */
+
+.search-results-list {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  flex: 1 1 auto;
+  min-height: 0;
+  max-height: 330px;
+  overflow-y: auto;
+  padding-right: 5px;
+  box-sizing: border-box;
+}
+
+/* ================================================== */
+/* TARJETA DE CADA CASO */
+/* ================================================== */
+
+.search-result-item {
+  width: 100%;
+  height: 97px;
+  min-height: 97px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 16px;
+  background: #FFFFFF;
+  border: 1px solid #E2E8F0;
+  border-radius: 12px;
+}
+
+.search-result-item:hover {
+  border-color: #BFDBFE;
+  background: #F8FAFC;
+}
+
+/* ================================================== */
+/* INFORMACIÓN DEL CASO */
+/* ================================================== */
+
+.search-result-main {
+  width: 100%;
+  min-width: 0;
+}
+
+.search-result-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+/* ================================================== */
+/* NÚMERO DEL CASO */
+/* ================================================== */
+
+.search-result-heading h3 {
+  min-width: 0;
+  overflow: hidden;
+  margin: 0;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-family: 'Roboto', sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  font-style: normal;
+  line-height: 16px;
+  letter-spacing: 0;
+  color: #0A3B4E;
+}
+
+/* ================================================== */
+/* ETIQUETA DE ESTADO */
+/* ================================================== */
+
+.case-status {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  width: 75px;
+  height: 22px;
+  padding: 4px 8px;
+  border-radius: 100px;
+  font-family: 'Roboto', sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  font-style: normal;
+  line-height: 14px;
+  letter-spacing: 0;
+  white-space: nowrap;
+}
+
+.status-in-progress {
+  color: #2563EB;
+  background: #EFF6FF;
+}
+
+.status-promise {
+  color: #D97706;
+  background: #FFF7E6;
+}
+
+.status-new {
+  color: #059669;
+  background: #ECFDF5;
+}
+
+.status-closed,
+.status-default {
+  color: #64748B;
+  background: #F1F5F9;
+}
+
+/* ================================================== */
+/* NOMBRE DEL ASOCIADO */
+/* ================================================== */
+
+.search-result-client {
+  overflow: hidden;
+  margin: 7px 0 4px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-family: 'Roboto', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  font-style: normal;
+  line-height: 15px;
+  letter-spacing: 0;
+  color: #173042;
+}
+
+/* ================================================== */
+/* PIE DE LA TARJETA */
+/* ================================================== */
+
+.search-result-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+/* ================================================== */
+/* INFORMACIÓN DE OBLIGACIÓN Y DÍAS DE MORA */
+/* ================================================== */
+
+.search-result-summary {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  overflow: hidden;
+  margin: 0;
+  white-space: nowrap;
+  font-family: 'Roboto', sans-serif;
+  font-size: 12px;
+  font-weight: 400;
+  font-style: normal;
+  line-height: 14px;
+  letter-spacing: 0;
+  color: #63768A;
+}
+
+/* ================================================== */
+/* SEPARADORES */
+/* ================================================== */
+
+.search-result-summary > span:not(:first-child)::before {
+  content: '·';
+  margin-right: 5px;
+  color: #94A3B8;
+}
+
+/* ================================================== */
+/* COLORES DEL NIVEL DE RIESGO */
+/* ================================================== */
+
+.case-risk {
+  font-family: 'Roboto', sans-serif;
+  font-size: 12px;
+  font-weight: 400;
+  font-style: normal;
+  line-height: 14px;
+  letter-spacing: 0;
+}
+
+.risk-bajo {
+  color: #10B981;
+}
+
+.risk-medio {
+  color: #F59E0B;
+}
+
+.risk-alto,
+.risk-critico {
+  color: #F97316;
+}
+
+/* ================================================== */
+/* ACCIÓN: VER RESUMEN */
+/* ================================================== */
+
+.search-result-action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 81px;
+  height: 20px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: #2563EB;
+  font-family: 'Roboto', sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  font-style: normal;
+  line-height: 20px;
+  letter-spacing: 0;
+  vertical-align: middle;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.search-result-action:hover {
+  color: #1D4ED8;
+}
+
+/* ================================================== */
+/* INFORMACIÓN ADICIONAL */
+/* ================================================== */
+
+.search-result-details {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 7px;
+  flex-shrink: 0;
+  font-family: 'Roboto', sans-serif;
+  font-size: 9px;
+  color: #64748B;
+}
+
+.search-result-details span:first-child {
+  padding: 5px 9px;
+  background: #FEF3C7;
+  border-radius: 20px;
+  color: #92400E;
+  font-weight: 600;
+}
+
+/* ================================================== */
+/* MENSAJE CUANDO NO HAY RESULTADOS */
+/* ================================================== */
+
+.search-no-results {
+  width: 100%;
+  min-height: 230px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 20px 16px;
+  border: none;
+  border-radius: 12px;
+}
+
+/* ================================================== */
+/* CUADRO DEL ICONO X */
+/* ================================================== */
+
+.no-results-icon {
+  width: 50px;
+  height: 66px;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 21px 13px;
+  background: #FEF2F2;
+  border-radius: 8px;
+  margin-bottom: 12px;
+}
+
+/* ================================================== */
+/* ICONO X */
+/* ================================================== */
+
+.no-results-icon i {
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #EF4444;
+  font-size: 12px;
+  line-height: 24px;
+}
+
+/* ================================================== */
+/* TÍTULO SIN RESULTADOS */
+/* ================================================== */
+
+.search-no-results h3 {
+  width: 166px;
+  height: 19px;
+  margin: 0 0 8px;
+  white-space: nowrap;
+  font-family: 'Roboto', sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+  font-style: normal;
+  line-height: 19px;
+  letter-spacing: 0;
+  color: #0A3B4E;
+  opacity: 1;
+}
+
+/* ================================================== */
+/* DESCRIPCIÓN SIN RESULTADOS */
+/* ================================================== */
+
+.search-no-results p {
+  width: 380px;
+  height: 32px;
+  max-width: 100%;
+  margin: 0;
+  font-family: 'Roboto', sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  font-style: normal;
+  line-height: 14px;
+  letter-spacing: 0;
+  text-align: center;
+  color: #63768A;
+  opacity: 1;
+}
+
+/* ================================================== */
+/* CONTENEDOR DE BOTONES */
+/* ================================================== */
+
+.no-results-actions {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+/* ================================================== */
+/* CONTENEDOR TRANSPARENTE DE CADA BOTÓN */
+/* ================================================== */
+
+.no-results-actions button {
+  width: 146px;
+  min-width: 146px;
+  height: 48px;
+  box-sizing: border-box;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+  font-family: 'Roboto', sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  font-style: normal;
+  line-height: 20px;
+  letter-spacing: 0;
+  vertical-align: middle;
+  color: #2563EB;
+  cursor: pointer;
+  opacity: 1;
+}
+
+/* ================================================== */
+/* BOTÓN LIMPIAR */
+/* ================================================== */
+
+.no-results-clear {
+  color: #2563EB;
+}
+
+/* ================================================== */
+/* BOTÓN IR A GESTIÓN DE CASOS */
+/* ================================================== */
+
+.no-results-go {
+  color: #2563EB;
+}
+
+/* ================================================== */
+/* ESTADO DE ERROR DE BÚSQUEDA */
+/* ================================================== */
+
+.search-no-results.search-error {
+  width: 100%;
+  min-height: 100%;
+  padding: 20px 16px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+/* ================================================== */
+/* ICONO DE ADVERTENCIA */
+/* ================================================== */
+
+.search-error .no-results-icon {
+  width: 50px;
+  height: 50px;
+  min-height: 50px;
+  padding: 0;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #FEF2F2;
+  border: 1px solid #FECACA;
+  border-radius: 50%;
+}
+
+.search-error .no-results-icon i {
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  line-height: 24px;
+  color: #EF4444;
+}
+
+/* ================================================== */
+/* TÍTULO DEL ERROR */
+/* ================================================== */
+
+.search-error h3 {
+  width: auto;
+  height: auto;
+  margin: 0 0 8px;
+  white-space: normal;
+  font-family: 'Roboto', sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 19px;
+  letter-spacing: 0;
+  color: #0A3B4E;
+}
+
+/* ================================================== */
+/* DESCRIPCIÓN DEL ERROR */
+/* ================================================== */
+
+.search-error p {
+  width: 380px;
+  max-width: 100%;
+  height: auto;
+  margin: 0;
+  font-family: 'Roboto', sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 14px;
+  letter-spacing: 0;
+  text-align: center;
+  color: #63768A;
+}
+
+/* ================================================== */
+/* BOTONES DEL ERROR */
+/* ================================================== */
+
+.search-error .no-results-actions {
+  margin-top: 20px;
+}
+
+
+/* ================================================== */
+/* MODAL DEL RESUMEN DEL CASO */
+/* ================================================== */
+
+.search-case-modal.summary-open {
+  width: 596px;
+  height: 709px;
+  max-height: min(720px, calc(100vh - 32px));
+
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+
+  padding: 24px;
+  gap: 0;
+
+  overflow: hidden;
+
+  background: #FFFFFF;
+  border: 1px solid #E2E8F0;
+  border-radius: 24px;
+}
+
+.case-summary-content {
+  width: 100%;
+  min-height: 0;
+  margin-top: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  flex: 1 1 auto;
+}
+
+/* Botón volver a resultados */
+
+.summary-back {
+  width: 140px;
+  height: 20px;
+  margin-bottom: 0;
+  padding: 0;
+
+  display: flex;
+  align-items: center;
+
+  color: #2563EB;
+  background: transparent;
+  border: none;
+
+  font-family: 'Roboto', sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 20px;
+  letter-spacing: normal;
+  text-align: left;
+
+  opacity: 1;
+  cursor: pointer;
+}
+
+.summary-title {
+  margin: 0;
+  color: #0A3B4E;
+  font: 700 14px/18px 'Roboto', sans-serif;
+}
+
+.case-summary-card {
+  width: 100%;
+  min-height: 0;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  overflow-y: auto;
+  padding: 12px;
+  background: #F8FAFC;
+  border: 1px solid #E2E8F0;
+  border-radius: 12px;
+}
+
+.summary-case-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding-bottom: 10px;
+}
+
+.summary-case-id {
+  min-width: 0;
+  overflow: hidden;
+  color: #0A3B4E;
+  font: 700 13px/18px 'Roboto', sans-serif;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.summary-badges {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 7px;
+}
+
+.summary-badge {
+  padding: 4px 7px;
+  border-radius: 20px;
+  font: 600 10px/12px 'Roboto', sans-serif;
+  white-space: nowrap;
+}
+
+.priority-badge {
+  color: #EA580C;
+  background: #FFF7ED;
+}
+
+.summary-section {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  padding: 10px 0;
+  border-top: 1px solid #DCE5ED;
+}
+
+.summary-section h4 {
+  margin: 0;
+  color: #0A3B4E;
+  font: 700 10px/12px 'Roboto', sans-serif;
+}
+
+.summary-fields {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  column-gap: 18px;
+  row-gap: 7px;
+}
+
+.summary-field {
+  min-width: 0;
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  font: 10px/13px 'Roboto', sans-serif;
+}
+
+.summary-field span {
+  flex-shrink: 0;
+  color: #63768A;
+}
+
+.summary-field strong {
+  min-width: 0;
+  overflow: hidden;
+  color: #173042;
+  font-weight: 600;
+  text-align: right;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.summary-field strong.summary-balance,
+.summary-field strong.summary-overdue {
+  color: #DC2626;
+}
+
+.case-summary-actions {
+  width: 100%;
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: auto;
+}
+
+.case-summary-actions button {
+  min-width: 96px;
+  height: 40px;
+  padding: 0 16px;
+  border: 1px solid #D5E0EB;
+  border-radius: 12px;
+  background: #FFFFFF;
+  color: #2563EB;
+  font: 500 12px/18px 'Roboto', sans-serif;
+  cursor: pointer;
+}
+
+.case-summary-actions .summary-open-button {
+  border-color: #2563EB;
+  background: #2563EB;
+  color: #FFFFFF;
+}
+
+.case-summary-actions .summary-open-button:hover {
+  background: #1D4ED8;
+}
+
+/* ================================================== */
+/* RESPONSIVE */
+/* ================================================== */
+
+@media (max-width: 520px) {
+  .search-result-item {
+    padding: 10px;
+  }
+
+  .search-result-footer {
+    align-items: flex-start;
+  }
+
+  .search-result-summary {
+    flex-wrap: wrap;
+    white-space: normal;
+  }
+
+  .no-results-actions {
+    gap: 8px;
+  }
+
+  .no-results-actions button {
+    padding: 0 10px;
+    font-size: 12px;
+  }
+
+  .summary-fields {
+    grid-template-columns: 1fr;
+    row-gap: 6px;
+  }
+
+  .summary-case-heading {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .case-summary-content {
+    gap: 10px;
+  }
+}

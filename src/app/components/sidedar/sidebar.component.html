@@ -120,6 +120,77 @@
       <span>Administración</span>
     </a>
 
-  </nav>
+      </nav>
+
+  <!-- ================================================== -->
+  <!-- BOTÓN CERRAR SESIÓN -->
+  <!-- ================================================== -->
+
+  <button
+    type="button"
+    class="logout-button"
+    (click)="cerrarSesion()"
+  >
+    <span class="logout-icon">
+      <i class="bi bi-box-arrow-right"></i>
+    </span>
+
+    <span>Cerrar sesión</span>
+  </button>
 
 </aside>
+
+<!-- ================================================== -->
+<!-- MODAL CONFIRMAR CIERRE DE SESIÓN -->
+<!-- ================================================== -->
+
+<div class="logout-modal-overlay" *ngIf="mostrarModalCerrarSesion">
+
+  <div class="logout-modal">
+
+    <!-- BOTÓN PARA CERRAR EL MODAL -->
+<button
+  type="button"
+  class="logout-modal-close"
+  (click)="cancelarCerrarSesion()"
+  aria-label="Cerrar ventana">
+
+  <i class="bi bi-x-lg"></i>
+
+</button>
+
+    <!-- ICONO DE SALIDA -->
+    <div class="logout-modal-icon">
+      <img src="imagenes/Cerrar-sesion.png" alt="Cerrar Sesión">
+    </div>
+
+    <!-- TÍTULO -->
+    <h2>¿Cerrar sesión?</h2>
+
+    <!-- MENSAJE -->
+    <p>
+      Tendrás que iniciar sesión nuevamente para acceder nuevamente.
+    </p>
+
+    <!-- BOTONES -->
+    <div class="logout-modal-buttons">
+
+      <button
+        type="button"
+        class="btn-seguir"
+        (click)="cancelarCerrarSesion()">
+        Seguir navegando
+      </button>
+
+      <button
+        type="button"
+        class="btn-cerrar"
+        (click)="confirmarCerrarSesion()">
+        Cerrar sesión
+      </button>
+
+    </div>
+
+  </div>
+
+</div>

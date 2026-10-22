@@ -1,9 +1,9 @@
+
 <!-- ================================================== -->
 <!-- CARTERA -->
 <!-- ================================================== -->
 
 <section class="aging-chart">
-
 
   <!-- ================================================== -->
   <!-- ENCABEZADO -->
@@ -11,26 +11,14 @@
 
   <div class="aging-header">
 
-
-    <!-- ================================================== -->
     <!-- TÍTULO Y FILTRO DE ASESOR -->
-    <!-- ================================================== -->
-
     <div class="aging-title-row">
-
-      <!-- ================================================== -->
-      <!-- TÍTULO -->
-      <!-- ================================================== -->
 
       <h2>
         Cartera por antigüedad
       </h2>
 
-
-      <!-- ================================================== -->
       <!-- FILTRO DE ASESOR -->
-      <!-- ================================================== -->
-
       <div class="asesor-filtro">
 
         <button
@@ -43,14 +31,9 @@
           <span class="asesor-flecha">
             ⌄
           </span>
-
         </button>
 
-
-        <!-- ================================================== -->
         <!-- MENÚ DESPLEGABLE -->
-        <!-- ================================================== -->
-
         <div
           class="asesor-menu"
           *ngIf="asesorMenuAbierto"
@@ -86,11 +69,7 @@
 
     </div>
 
-
-    <!-- ================================================== -->
     <!-- OPCIONES DEL DIAGRAMA -->
-    <!-- ================================================== -->
-
     <div class="aging-options">
 
       <button
@@ -101,7 +80,6 @@
         Por antigüedad de mora
       </button>
 
-
       <button
         type="button"
         [class.active]="vistaActual === 'segmento'"
@@ -109,7 +87,6 @@
       >
         Por segmento
       </button>
-
 
       <button
         type="button"
@@ -123,7 +100,6 @@
 
   </div>
 
-
   <!-- ================================================== -->
   <!-- DIAGRAMA POR ANTIGÜEDAD -->
   <!-- ================================================== -->
@@ -133,104 +109,58 @@
     *ngIf="vistaActual === 'antiguedad'"
   >
 
-
-    <!-- ================================================== -->
     <!-- EJE VERTICAL -->
-    <!-- ================================================== -->
-
     <div class="aging-y-axis">
 
-      <span>
-        $120.0M
-      </span>
-
-      <span>
-        $90.0M
-      </span>
-
-      <span>
-        $60.0M
-      </span>
-
-      <span>
-        $30.0M
-      </span>
-
-      <span>
-        $0
-      </span>
+      <span>$120.0M</span>
+      <span>$90.0M</span>
+      <span>$60.0M</span>
+      <span>$30.0M</span>
+      <span>$0</span>
 
     </div>
 
-
-    <!-- ================================================== -->
     <!-- ÁREA DEL GRÁFICO -->
-    <!-- ================================================== -->
-
     <div class="aging-graph">
 
-
-      <!-- ================================================== -->
       <!-- LÍNEAS HORIZONTALES -->
-      <!-- ================================================== -->
-
       <div class="aging-grid">
 
         <div class="grid-line"></div>
-
         <div class="grid-line"></div>
-
         <div class="grid-line"></div>
-
         <div class="grid-line"></div>
-
         <div class="grid-line"></div>
 
       </div>
 
-
-      <!-- ================================================== -->
       <!-- BARRAS -->
-      <!-- ================================================== -->
-
       <div class="aging-bars">
 
         <div
           class="aging-bar-item"
-          *ngFor="let dato of agingData"
+          *ngFor="let dato of agingData; let i = index"
         >
 
-
-          <!-- ============================================ -->
-          <!-- VALOR -->
-          <!-- ============================================ -->
-
-          <div class="aging-value">
-
-            {{ dato.valor }}
-
-          </div>
-
-
-          <!-- ============================================ -->
           <!-- BARRA -->
-          <!-- ============================================ -->
-
           <div
             class="aging-bar"
             [style.height.%]="getBarHeight(dato.valor)"
+          ></div>
+
+          <!-- INFORMACIÓN AL PASAR EL CURSOR -->
+          <div
+            class="aging-tooltip"
+            [class.tooltip-left]="i >= agingData.length - 2"
           >
+            <strong>{{ dato.rangoMora }}</strong>
+            <span>Monto: {{ getFormattedValue(dato.valor) }}</span>
+            <span>Obligaciones: {{ dato.obligaciones }}</span>
           </div>
 
-
-          <!-- ============================================ -->
           <!-- RANGO DE MORA -->
-          <!-- ============================================ -->
-
           <div class="aging-label">
-
             {{ dato.rangoMora }}
-
           </div>
 
         </div>
@@ -241,232 +171,75 @@
 
   </div>
 
-
-<!-- ================================================== -->
-<!-- DIAGRAMA POR SEGMENTO -->
-<!-- ================================================== -->
-
-<div
-  class="aging-diagram"
-  *ngIf="vistaActual === 'segmento'"
->
-
   <!-- ================================================== -->
-  <!-- EJE VERTICAL -->
+  <!-- DIAGRAMA POR SEGMENTO -->
   <!-- ================================================== -->
 
-  <div class="aging-y-axis">
+  <div
+    class="aging-diagram"
+    *ngIf="vistaActual === 'segmento'"
+  >
 
-    <span>
-      $120.0M
-    </span>
+    <!-- EJE VERTICAL -->
+    <div class="aging-y-axis">
 
-    <span>
-      $90.0M
-    </span>
-
-    <span>
-      $60.0M
-    </span>
-
-    <span>
-      $30.0M
-    </span>
-
-    <span>
-      $0
-    </span>
-
-  </div>
-
-
-  <!-- ================================================== -->
-  <!-- ÁREA DEL GRÁFICO -->
-  <!-- ================================================== -->
-
-  <div class="aging-graph">
-
-    <!-- ================================================== -->
-    <!-- LÍNEAS HORIZONTALES -->
-    <!-- ================================================== -->
-
-    <div class="aging-grid">
-
-      <div class="grid-line"></div>
-
-      <div class="grid-line"></div>
-
-      <div class="grid-line"></div>
-
-      <div class="grid-line"></div>
-
-      <div class="grid-line"></div>
+      <span>{{ getAxisLabel(4) }}</span>
+      <span>{{ getAxisLabel(3) }}</span>
+      <span>{{ getAxisLabel(2) }}</span>
+      <span>{{ getAxisLabel(1) }}</span>
+      <span>{{ getAxisLabel(0) }}</span>
 
     </div>
 
+    <!-- ÁREA DEL GRÁFICO -->
+    <div class="aging-graph">
 
-    <!-- ================================================== -->
-    <!-- BARRAS POR SEGMENTO -->
-    <!-- ================================================== -->
+      <!-- LÍNEAS HORIZONTALES -->
+      <div class="aging-grid">
 
-    <div class="aging-bars">
-
-      <div
-        class="aging-bar-item"
-        *ngFor="let dato of segmentData"
-      >
-
-        <!-- ============================================ -->
-        <!-- VALOR -->
-        <!-- ============================================ -->
-
-        <div class="aging-value">
-
-          {{ dato.valor }}
-
-        </div>
-
-
-        <!-- ============================================ -->
-        <!-- BARRA -->
-        <!-- ============================================ -->
-
-       <div
-  class="aging-bar"
-  [style.height.%]="getBarHeight(dato.valor)"
-  [style.background-color]="
-    dato.rangoMora === 'Bajo' ? '#22C55E' :
-    dato.rangoMora === 'Medio' ? '#EAB308' :
-    dato.rangoMora === 'Alto' ? '#F97316' :
-    dato.rangoMora === 'Crítico' ? '#EF4444' :
-    '#1A4DD6'
-  "
->
-</div>
-
-
-        <!-- ============================================ -->
-        <!-- SEGMENTO -->
-        <!-- ============================================ -->
-
-        <div class="aging-label">
-
-          {{ dato.rangoMora }}
-
-        </div>
+        <div class="grid-line"></div>
+        <div class="grid-line"></div>
+        <div class="grid-line"></div>
+        <div class="grid-line"></div>
+        <div class="grid-line"></div>
 
       </div>
 
-    </div>
-
-  </div>
-
-</div>
-
-
-  <!-- ================================================== -->
-<!-- DIAGRAMA POR RIESGO -->
-<!-- ================================================== -->
-
-<div
-  class="aging-diagram"
-  *ngIf="vistaActual === 'riesgo'"
->
-
-  <!-- ================================================== -->
-  <!-- EJE VERTICAL -->
-  <!-- ================================================== -->
-
-  <div class="aging-y-axis">
-
-    <span>
-      $120.0M
-    </span>
-
-    <span>
-      $90.0M
-    </span>
-
-    <span>
-      $60.0M
-    </span>
-
-    <span>
-      $30.0M
-    </span>
-
-    <span>
-      $0
-    </span>
-
-  </div>
-
-
-  <!-- ================================================== -->
-  <!-- ÁREA DEL GRÁFICO -->
-  <!-- ================================================== -->
-
-  <div class="aging-graph">
-
-    <!-- ================================================== -->
-    <!-- LÍNEAS HORIZONTALES -->
-    <!-- ================================================== -->
-
-    <div class="aging-grid">
-
-      <div class="grid-line"></div>
-
-      <div class="grid-line"></div>
-
-      <div class="grid-line"></div>
-
-      <div class="grid-line"></div>
-
-      <div class="grid-line"></div>
-
-    </div>
-
-
-    <!-- ================================================== -->
-    <!-- BARRAS POR RIESGO -->
-    <!-- ================================================== -->
-
-    <div class="aging-bars">
-
-      <div
-        class="aging-bar-item"
-        *ngFor="let dato of riskData; let i = index"
-      >
-
-        <!-- ============================================ -->
-        <!-- VALOR -->
-        <!-- ============================================ -->
-
-        <div class="aging-value">
-
-          {{ dato.valor }}
-
-        </div>
-
-
-        <!-- ============================================ -->
-        <!-- BARRA -->
-        <!-- ============================================ -->
+      <!-- BARRAS POR SEGMENTO -->
+      <div class="aging-bars">
 
         <div
-          class="aging-bar"
-          [style.height.%]="getBarHeight(dato.valor)"
+          class="aging-bar-item"
+          *ngFor="let dato of segmentData; let i = index"
         >
-        </div>
 
+          <!-- BARRA -->
+          <div
+            class="aging-bar"
+            [style.height.%]="getBarHeight(dato.valor)"
+            [style.background-color]="
+              dato.rangoMora === 'Bajo' ? '#22C55E' :
+              dato.rangoMora === 'Medio' ? '#EAB308' :
+              dato.rangoMora === 'Alto' ? '#F97316' :
+              dato.rangoMora === 'Crítico' ? '#EF4444' :
+              '#1A4DD6'
+            "
+          ></div>
 
-        <!-- ============================================ -->
-        <!-- RIESGO -->
-        <!-- ============================================ -->
+          <!-- INFORMACIÓN AL PASAR EL CURSOR -->
+          <div
+            class="aging-tooltip"
+            [class.tooltip-left]="i >= segmentData.length - 2"
+          >
+            <strong>{{ dato.rangoMora }}</strong>
+            <span>Monto: {{ getFormattedValue(dato.valor) }}</span>
+            <span>Obligaciones: {{ dato.obligaciones }}</span>
+          </div>
 
-        <div class="aging-label">
-
-          {{ dato.rangoMora }}
+          <!-- SEGMENTO -->
+          <div class="aging-label">
+            {{ dato.rangoMora }}
+          </div>
 
         </div>
 
@@ -476,4 +249,75 @@
 
   </div>
 
-</div>
+  <!-- ================================================== -->
+  <!-- DIAGRAMA POR RIESGO -->
+  <!-- ================================================== -->
+
+  <div
+    class="aging-diagram"
+    *ngIf="vistaActual === 'riesgo'"
+  >
+
+    <!-- EJE VERTICAL -->
+    <div class="aging-y-axis">
+
+      <span>$120.0M</span>
+      <span>$90.0M</span>
+      <span>$60.0M</span>
+      <span>$30.0M</span>
+      <span>$0</span>
+
+    </div>
+
+    <!-- ÁREA DEL GRÁFICO -->
+    <div class="aging-graph">
+
+      <!-- LÍNEAS HORIZONTALES -->
+      <div class="aging-grid">
+
+        <div class="grid-line"></div>
+        <div class="grid-line"></div>
+        <div class="grid-line"></div>
+        <div class="grid-line"></div>
+        <div class="grid-line"></div>
+
+      </div>
+
+      <!-- BARRAS POR RIESGO -->
+      <div class="aging-bars">
+
+        <div
+          class="aging-bar-item"
+          *ngFor="let dato of riskData; let i = index"
+        >
+
+          <!-- BARRA -->
+          <div
+            class="aging-bar"
+            [style.height.%]="getBarHeight(dato.valor)"
+          ></div>
+
+          <!-- INFORMACIÓN AL PASAR EL CURSOR -->
+          <div
+            class="aging-tooltip"
+            [class.tooltip-left]="i >= riskData.length - 2"
+          >
+            <strong>{{ dato.rangoMora }}</strong>
+            <span>Monto: {{ getFormattedValue(dato.valor) }}</span>
+            <span>Obligaciones: {{ dato.obligaciones }}</span>
+          </div>
+
+          <!-- RIESGO -->
+          <div class="aging-label">
+            {{ dato.rangoMora }}
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</section>

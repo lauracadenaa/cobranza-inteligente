@@ -1,31 +1,70 @@
+
 /* ================================================== */
-/* CONTENEDOR DE LAS TARJETAS KPI */
+/* CONTENEDOR KPI */
 /* ================================================== */
 
 .kpi-container {
   display: flex;
+  align-items: stretch;
   gap: 15px;
-  width: 100%;
-  margin-top: 20px;
+
+  width: 1128px;
+  min-width: 1128px;
+
   margin-top: 9px;
-}
-
-/* ================================================== */
-/* TARJETA KPI */
-/* ================================================== */
-
-.kpi-card {
-  width: 210px;
-  height: 102px;
-
-  background-color: #FFFFFF;
-
-  border-radius: 16px;
-
-  opacity: 1;
 
   box-sizing: border-box;
 }
+
+
+/* ================================================== */
+/* TARJETAS KPI */
+/* ================================================== */
+
+.kpi-card {
+  position: relative;
+
+  flex: 0 0 210px;
+
+  width: 210px;
+  min-width: 210px;
+  height: 102px;
+
+  background-color: #FFFFFF;
+  border-radius: 16px;
+
+  box-sizing: border-box;
+}
+
+
+/* ================================================== */
+/* ICONOS DE LAS TARJETAS KPI */
+/* ================================================== */
+
+.kpi-icon {
+  position: absolute;
+  top: 10px;
+  right: 12px;
+
+  width: 25px;
+  height: 25px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  z-index: 2;
+}
+
+.kpi-icon img {
+  display: block;
+
+  width: 23px;
+  height: 23px;
+
+  object-fit: contain;
+}
+
 
 /* ================================================== */
 /* TÍTULO DE LA TARJETA KPI */
@@ -39,7 +78,6 @@
 
   font-family: 'Roboto', sans-serif;
   font-weight: 600;
-  font-style: normal;
   font-size: 11px;
 
   line-height: 100%;
@@ -51,26 +89,24 @@
   align-items: center;
 
   white-space: nowrap;
-
   box-sizing: border-box;
 
-  transform: translate(0,10px);
-
+  transform: translateY(10px);
 }
+
 
 /* ================================================== */
 /* VALOR DE LA TARJETA */
 /* ================================================== */
 
 .kpi-value {
-  width: 77px;
+  width: 100%;
   height: 23px;
 
   padding-left: 10px;
 
   font-family: 'Roboto', sans-serif;
   font-weight: 600;
-  font-style: normal;
   font-size: 20px;
 
   line-height: 100%;
@@ -81,8 +117,9 @@
   display: flex;
   align-items: center;
 
-  transform: translate(0,20px);
+  transform: translateY(20px);
 }
+
 
 /* ================================================== */
 /* PORCENTAJE Y PERÍODO */
@@ -93,31 +130,26 @@
   align-items: center;
 
   padding-left: 10px;
-
   gap: 10px;
 
-  transform: translate(0,40px);
+  transform: translateY(40px);
 
   white-space: nowrap;
 }
 
 
 /* ================================================== */
-/* SOMBREADO DEL PORCENTAJE */
+/* PORCENTAJE */
 /* ================================================== */
 
 .kpi-percentage {
-  width: 46px;
+  min-width: 46px;
   height: 20px;
 
+  padding: 3px 8px;
+
   background-color: #EFF6FF;
-
   border-radius: 12px;
-
-  padding-top: 3px;
-  padding-right: 8px;
-  padding-bottom: 3px;
-  padding-left: 13px;
 
   box-sizing: border-box;
 
@@ -127,7 +159,6 @@
 
   font-family: 'Roboto', sans-serif;
   font-weight: 500;
-  font-style: normal;
   font-size: 12px;
 
   line-height: 100%;
@@ -144,12 +175,10 @@
 /* ================================================== */
 
 .kpi-period {
-  width: 74px;
   height: 14px;
 
   font-family: 'Roboto', sans-serif;
   font-weight: 400;
-  font-style: normal;
   font-size: 12px;
 
   line-height: 100%;
@@ -161,54 +190,30 @@
   align-items: center;
 
   white-space: nowrap;
-
-  opacity: 1;
 }
 
-/* ================================================== */
-/* PORCENTAJE DENTRO DEL SOMBREADO */
-/* ================================================== */
-
-.kpi-percentage {
-  width: 30px;
-  height: 14px;
-
-  font-family: 'Roboto', sans-serif;
-  font-weight: 500;
-  font-style: normal;
-  font-size: 12px;
-
-  line-height: 100%;
-  letter-spacing: -0.66px;
-
-  color: #3B82F6;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  white-space: nowrap;
-}
 
 /* ================================================== */
-/* TARJETA RECAUDO DEL PERÍODO */
+/* TARJETA RECAUDO */
 /* ================================================== */
 
 .kpi-card-recaudo {
-  width: 225.33px;
+  flex: 0 0 225px;
+
+  width: 225px;
+  min-width: 225px;
   height: 102px;
 
   border-radius: 16px;
-
-  opacity: 1;
 }
+
 
 /* ================================================== */
 /* VALOR RECAUDO DEL PERÍODO */
 /* ================================================== */
 
 .kpi-value-recaudo {
-  width: 150px;
+  width: 100%;
   height: 23px;
 
   white-space: nowrap;

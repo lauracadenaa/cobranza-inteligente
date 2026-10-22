@@ -1,79 +1,369 @@
+
 <!-- ================================================== -->
 <!-- ESTRUCTURA PRINCIPAL DEL DASHBOARD -->
 <!-- ================================================== -->
 
 <div class="dashboard-layout">
 
-  <!-- ================================================== -->
   <!-- BARRA LATERAL -->
-  <!-- ================================================== -->
-
   <app-sidebar></app-sidebar>
 
-
-  <!-- ================================================== -->
   <!-- CONTENIDO PRINCIPAL -->
-  <!-- ================================================== -->
-
   <main class="dashboard-content">
 
-    <!-- ================================================== -->
     <!-- ENCABEZADO -->
-    <!-- ================================================== -->
-
     <app-dashboard-header></app-dashboard-header>
 
-
-    <!-- ================================================== -->
     <!-- TARJETAS KPI -->
-    <!-- ================================================== -->
-
     <app-kpi-cards></app-kpi-cards>
 
-
-    <!-- ================================================== -->
     <!-- GRÁFICOS PRINCIPALES -->
-    <!-- ================================================== -->
-
     <div class="dashboard-charts">
-
-      <!-- ================================================== -->
-      <!-- CARTERA POR ANTIGÜEDAD -->
-      <!-- ================================================== -->
-
       <app-aging-chart></app-aging-chart>
-
-
-      <!-- ================================================== -->
-      <!-- CASOS POR ESTADO -->
-      <!-- ================================================== -->
-
       <app-case-status-chart></app-case-status-chart>
-
     </div>
 
-
     <!-- ================================================== -->
-    <!-- CASOS GESTIONADOS -->
+    <!-- CONTENEDOR: CASOS GESTIONADOS -->
     <!-- ================================================== -->
 
-    <section class="managed-cases">
+    <section id="managed-cases" class="managed-cases">
 
-      <!-- ================================================== -->
-      <!-- ENCABEZADO -->
-      <!-- ================================================== -->
-
+      <!-- TÍTULO, BUSCADOR Y FILTROS -->
       <div class="managed-cases-header">
 
-        <h2>
-          Casos gestionados
-        </h2>
+        <h2>Casos gestionados</h2>
+
+        <div class="managed-cases-controls">
+
+          <!-- BUSCADOR -->
+          <div class="managed-search">
+            <i class="bi bi-search"></i>
+
+            <input
+              type="text"
+              placeholder="Buscar caso...">
+          </div>
+
+          <!-- BOTÓN Y MODAL DE FILTROS -->
+          <div class="filtros-container">
+
+            <button
+              type="button"
+              class="managed-filter"
+              [class.filtros-activos]="mostrarModalFiltros"
+              (click)="abrirFiltros()">
+
+              <img src="imagenes/Filtro.png" alt="">
+              <span>Filtros</span>
+
+              <span
+                class="filter-count"
+                *ngIf="cantidadFiltrosActivos > 0">
+                {{ cantidadFiltrosActivos }}
+              </span>
+
+            </button>
+
+            <!-- MODAL DE FILTROS -->
+            <div
+              class="filtros-modal"
+              *ngIf="mostrarModalFiltros">
+
+              <!-- ENCABEZADO -->
+              <div class="filtros-header">
+
+                <h3>Filtros</h3>
+
+                <button
+                  type="button"
+                  class="cerrar-filtros"
+                  (click)="cerrarFiltros()">
+                  <i class="bi bi-x"></i>
+                </button>
+
+              </div>
+
+              <!-- CUERPO DEL MODAL -->
+              <div class="filtros-body">
+
+                <!-- RIESGO -->
+                <div class="filtro-grupo filtro-riesgo">
+
+                  <label>Riesgo</label>
+
+                  <div class="filtro-riesgos">
+
+                    <button
+                      type="button"
+                      class="btn-riesgo"
+                      [class.seleccionado]="filtros.riesgos.includes('Bajo')"
+                      [attr.aria-pressed]="filtros.riesgos.includes('Bajo')"
+                      (click)="alternarRiesgo('Bajo', !filtros.riesgos.includes('Bajo'))">
+                      Bajo
+                    </button>
+
+                    <button
+                      type="button"
+                      class="btn-riesgo"
+                      [class.seleccionado]="filtros.riesgos.includes('Medio')"
+                      [attr.aria-pressed]="filtros.riesgos.includes('Medio')"
+                      (click)="alternarRiesgo('Medio', !filtros.riesgos.includes('Medio'))">
+                      Medio
+                    </button>
+
+                    <button
+                      type="button"
+                      class="btn-riesgo"
+                      [class.seleccionado]="filtros.riesgos.includes('Alto')"
+                      [attr.aria-pressed]="filtros.riesgos.includes('Alto')"
+                      (click)="alternarRiesgo('Alto', !filtros.riesgos.includes('Alto'))">
+                      Alto
+                    </button>
+
+                    <button
+                      type="button"
+                      class="btn-riesgo"
+                      [class.seleccionado]="filtros.riesgos.includes('Crítico')"
+                      [attr.aria-pressed]="filtros.riesgos.includes('Crítico')"
+                      (click)="alternarRiesgo('Crítico', !filtros.riesgos.includes('Crítico'))">
+                      Crítico
+                    </button>
+
+                  </div>
+
+                </div>
+
+                <!-- SEGMENTO -->
+                <div class="filtro-grupo">
+
+                  <label for="filtro-segmento">Segmento</label>
+
+                  <div class="filtro-select">
+
+                    <select
+                      id="filtro-segmento"
+                      [(ngModel)]="filtros.segmento">
+
+                      <option value="">Todos los segmentos</option>
+                      <option value="Preventiva">Preventiva</option>
+                      <option value="Administrativa">Administrativa</option>
+                      <option value="Prejurídica">Prejurídica</option>
+                      <option value="Jurídica">Jurídica</option>
+
+                    </select>
+
+                    <img src="/imagenes/flecha.admin.png" alt="Flecha">
+
+                  </div>
+                </div>
+
+                <!-- ESTADO DEL CASO -->
+                <div class="filtro-grupo filtro-estado">
+
+                  <label for="filtro-estado">Estado del caso</label>
+
+                  <div class="filtro-select">
+
+                    <select
+                      id="filtro-estado"
+                      [(ngModel)]="filtros.estado">
+
+                      <option value="">Todos los estados</option>
+                      <option value="NUEVO">Nuevo</option>
+                      <option value="EN_GESTION">En gestión</option>
+                      <option value="ILOCALIZADO">Ilocalizado</option>
+                      <option value="PROMESA_PAGO">Promesas de pago</option>
+                      <option value="PREJURIDICO">Prejurídico</option>
+                      <option value="CERRADO">Cerrado</option>
+
+                    </select>
+
+                    <img src="/imagenes/flecha.admin.png" alt="Flecha">
+
+                  </div>
+                </div>
+
+                <!-- ASESOR -->
+                <div class="filtro-grupo">
+
+                  <label for="filtro-asesor">Asesor</label>
+
+                  <input
+                    id="filtro-asesor"
+                    type="text"
+                    placeholder="Buscar asesor..."
+                    [(ngModel)]="filtros.asesor">
+
+                </div>
+
+                <!-- DÍAS DE MORA -->
+                <div class="filtro-grupo">
+
+                  <label>Días de mora</label>
+
+                  <div class="filtro-dos-columnas">
+
+                    <input
+                      type="number"
+                      min="0"
+                      placeholder="Desde 0"
+                      [(ngModel)]="filtros.diasMoraDesde">
+
+                    <input
+                      type="number"
+                      min="0"
+                      placeholder="Hasta 0"
+                      [(ngModel)]="filtros.diasMoraHasta">
+
+                  </div>
+                </div>
+
+                <!-- FILTROS DE FECHA -->
+                <div class="filtro-grupo filtro-fechas">
+
+                  <label>Fecha</label>
+
+                  <!-- FECHA EXACTA -->
+                  <div class="campo-fecha campo-fecha-creacion">
+
+                    <input
+                      type="date"
+                      [(ngModel)]="filtros.fechaExacta">
+
+                  </div>
+
+                  <!-- RANGO DE FECHAS -->
+                  <div class="filtro-fechas-contenedor">
+
+                    <div class="campo-fecha">
+
+                      <input
+                        type="date"
+                        [(ngModel)]="filtros.fechaDesde">
+
+                      <i class="bi bi-calendar3"></i>
+
+                    </div>
+
+                    <div class="campo-fecha">
+
+                      <input
+                        type="date"
+                        [(ngModel)]="filtros.fechaHasta">
+
+                      <i class="bi bi-calendar3"></i>
+
+                    </div>
+
+                  </div>
+                </div>
+
+                <!-- ORIGEN -->
+                <div class="filtro-grupo filtro-origen">
+
+                  <label>Origen</label>
+
+                  <div class="filtro-origenes">
+
+                    <button
+                      type="button"
+                      class="btn-origen"
+                      [class.seleccionado]="filtros.origenes.desbordeIA"
+                      [attr.aria-pressed]="filtros.origenes.desbordeIA"
+                      (click)="filtros.origenes.desbordeIA = !filtros.origenes.desbordeIA">
+                      Desborde IA
+                    </button>
+
+                    <button
+                      type="button"
+                      class="btn-origen"
+                      [class.seleccionado]="filtros.origenes.reglaAutomatica"
+                      [attr.aria-pressed]="filtros.origenes.reglaAutomatica"
+                      (click)="filtros.origenes.reglaAutomatica = !filtros.origenes.reglaAutomatica">
+                      Regla o política automática
+                    </button>
+
+                    <button
+                      type="button"
+                      class="btn-origen"
+                      [class.seleccionado]="filtros.origenes.integracionCore"
+                      [attr.aria-pressed]="filtros.origenes.integracionCore"
+                      (click)="filtros.origenes.integracionCore = !filtros.origenes.integracionCore">
+                      Integración CORE
+                    </button>
+
+                    <button
+                      type="button"
+                      class="btn-origen"
+                      [class.seleccionado]="filtros.origenes.integracionCartera"
+                      [attr.aria-pressed]="filtros.origenes.integracionCartera"
+                      (click)="filtros.origenes.integracionCartera = !filtros.origenes.integracionCartera">
+                      Integración de cartera
+                    </button>
+
+                  </div>
+                </div>
+
+              </div>
+
+              <!-- PIE DEL MODAL -->
+              <div class="filtros-footer">
+
+                <button
+                  type="button"
+                  class="btn-limpiar-filtros"
+                  (click)="limpiarFiltros()">
+                  Limpiar
+                </button>
+
+                <button
+                  type="button"
+                  class="btn-aplicar-filtros"
+                  (click)="aplicarFiltros()">
+                  Aplicar filtros
+                </button>
+
+              </div>
+
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- ================================================== -->
+      <!-- FILTROS ACTIVOS -->
+      <!-- ================================================== -->
+
+      <div class="managed-active-filters">
+
+        <div
+          class="active-filter-tag"
+          *ngFor="let filtro of filtrosVisibles.slice(0, 3)">
+
+          <span>{{ filtro.texto }}</span>
+
+          <button
+            type="button"
+            class="remove-active-filter"
+            (click)="quitarFiltro(filtro.clave)"
+            aria-label="Quitar filtro">
+            <i class="bi bi-x"></i>
+          </button>
+
+        </div>
+
+        <div
+          class="active-filter-tag filtros-restantes"
+          *ngIf="filtrosVisibles.length > 3">
+          +{{ filtrosVisibles.length - 3 }} filtros
+        </div>
 
       </div>
 
-
       <!-- ================================================== -->
-      <!-- TABLA -->
+      <!-- TABLA DE CASOS -->
       <!-- ================================================== -->
 
       <div class="managed-cases-table">
@@ -81,9 +371,7 @@
         <table>
 
           <thead>
-
             <tr>
-
               <th>Caso</th>
               <th>Asociado</th>
               <th>Obligación</th>
@@ -92,171 +380,183 @@
               <th>Tiempo límite</th>
               <th>Asesor</th>
               <th>Acciones</th>
-
             </tr>
-
           </thead>
-
 
           <tbody>
 
-            <tr *ngFor="let c of cases">
+            <!-- CASOS DE LA PÁGINA ACTUAL -->
+            <tr *ngFor="let c of casosPaginados">
+
+              <td>{{ c.id }}</td>
+              <td>{{ c.asociado }}</td>
+              <td>{{ c.obligacion }}</td>
+
+              <!-- RIESGO CON ETIQUETA DINÁMICA -->
+                <td class="risk-cell">
+                  <span
+                    class="risk-badge"
+                    [class.bajo]="c.riesgo?.toLowerCase().trim() === 'bajo'"
+                    [class.medio]="c.riesgo?.toLowerCase().trim() === 'medio'"
+                    [class.alto]="c.riesgo?.toLowerCase().trim() === 'alto'"
+                    [class.critico]="
+                      c.riesgo?.toLowerCase().trim() === 'crítico' ||
+                      c.riesgo?.toLowerCase().trim() === 'critico'
+                    ">
+                    {{ c.riesgo }}
+                  </span>
+                </td>
+
+              <td>{{ c.diasMora }}</td>
+              <td>{{ c.tiempoLimite }}</td>
+              <td>{{ c.asesor }}</td>
 
               <td>
-                {{ c.id }}
-              </td>
-
-              <td>
-                {{ c.asociado }}
-              </td>
-
-              <td>
-                {{ c.obligacion }}
-              </td>
-
-              <td>
-                {{ c.riesgo }}
-              </td>
-
-              <td>
-                {{ c.diasMora }}
-              </td>
-
-              <td>
-                {{ c.tiempoLimite }}
-              </td>
-
-              <td>
-                {{ c.asesor }}
-              </td>
-
-              <td>
-
                 <button
                   type="button"
-                  class="case-action"
-                >
+                  class="case-action">
                   Ver detalle
                 </button>
+              </td>
 
+            </tr>
+
+            <!-- SIN RESULTADOS -->
+            <tr *ngIf="casosFiltrados.length === 0">
+
+              <td colspan="8" class="sin-resultados">
+                No se encontraron casos con los filtros seleccionados.
               </td>
 
             </tr>
 
           </tbody>
-
         </table>
-
       </div>
 
-
       <!-- ================================================== -->
-      <!-- ACCIONES RÁPIDAS -->
+      <!-- PAGINACIÓN DE CASOS -->
       <!-- ================================================== -->
 
-      <section class="quick-actions">
+      <div class="managed-cases-pagination">
 
-        <!-- ================================================== -->
-        <!-- TÍTULO -->
-        <!-- ================================================== -->
+        <!-- INFORMACIÓN DE REGISTROS -->
+        <p class="pagination-info">
+          Mostrando {{ registroInicial }}
+          a {{ registroFinal }}
+          de {{ casosFiltrados.length }} casos
+        </p>
 
-        <h2>
-          Acciones rápidas
-        </h2>
+        <!-- BOTONES DE PAGINACIÓN -->
+        <div class="pagination-buttons">
 
-
-        <!-- ================================================== -->
-        <!-- OPCIONES -->
-        <!-- ================================================== -->
-
-        <div class="quick-actions-grid">
-
-          <!-- ================================================== -->
-          <!-- CARGAR ARCHIVO -->
-          <!-- ================================================== -->
-
+          <!-- FLECHA ANTERIOR -->
           <button
             type="button"
-            class="quick-card"
-          >
-
-            <div class="quick-icon">
-              <i class="bi bi-upload"></i>
-            </div>
-
-            <span>
-              Cargar archivo
-            </span>
-
+            class="pagination-button pagination-arrow"
+            [disabled]="paginaActual === 1 || totalPaginas === 0"
+            (click)="paginaAnterior()"
+            aria-label="Página anterior">
+            <i class="bi bi-chevron-left"></i>
           </button>
 
-
-          <!-- ================================================== -->
-          <!-- BUSCAR CASO -->
-          <!-- ================================================== -->
-
+          <!-- NÚMEROS DE PÁGINA -->
           <button
             type="button"
-            class="quick-card"
-            (click)="openSearchCase()"
-          >
-
-            <div class="quick-icon">
-              <i class="bi bi-search"></i>
-            </div>
-
-            <span>
-              Buscar caso
-            </span>
-
+            class="pagination-button"
+            *ngFor="let pagina of paginas"
+            [class.active]="paginaActual === pagina"
+            [attr.aria-current]="paginaActual === pagina ? 'page' : null"
+            (click)="cambiarPagina(pagina)">
+            {{ pagina }}
           </button>
 
-
-          <!-- ================================================== -->
-          <!-- CREAR ACUERDO -->
-          <!-- ================================================== -->
-
+          <!-- FLECHA SIGUIENTE -->
           <button
             type="button"
-            class="quick-card"
-          >
-
-            <div class="quick-icon">
-              <i class="bi bi-handshake"></i>
-            </div>
-
-            <span>
-              Crear acuerdo
-            </span>
-
-          </button>
-
-
-          <!-- ================================================== -->
-          <!-- GENERAR REPORTE -->
-          <!-- ================================================== -->
-
-          <button
-            type="button"
-            class="quick-card"
-          >
-
-            <div class="quick-icon">
-              <i class="bi bi-file-earmark-text"></i>
-            </div>
-
-            <span>
-              Generar reporte
-            </span>
-
+            class="pagination-button pagination-arrow"
+            [disabled]="paginaActual === totalPaginas || totalPaginas === 0"
+            (click)="paginaSiguiente()"
+            aria-label="Página siguiente">
+            <i class="bi bi-chevron-right"></i>
           </button>
 
         </div>
-
-      </section>
+      </div>
 
     </section>
 
+    <!-- ================================================== -->
+    <!-- ACCIONES RÁPIDAS -->
+    <!-- ================================================== -->
+
+    <section class="quick-actions">
+
+      <h2>Acciones rápidas</h2>
+
+      <div class="quick-actions-grid">
+
+        <!-- CARGAR ARCHIVO -->
+        <button type="button" class="quick-card">
+
+          <div class="quick-icon">
+            <img src="imagenes/Cargar-archivo.png" alt="Cargar archivo">
+          </div>
+
+          <div class="quick-text">
+            <span>Cargar archivo</span>
+            <p>Nueva carga batch</p>
+          </div>
+
+        </button>
+
+        <!-- BUSCAR CASO -->
+        <button
+          type="button"
+          class="quick-card"
+          (click)="openSearchCase()">
+
+          <div class="quick-icon">
+            <img src="imagenes/Buscar-caso.png" alt="Buscar caso">
+          </div>
+
+          <div class="quick-text">
+            <span>Buscar caso</span>
+            <p>Consultar historial</p>
+          </div>
+
+        </button>
+
+        <!-- CREAR ACUERDO -->
+        <button type="button" class="quick-card">
+
+          <div class="quick-icon">
+            <img src="imagenes/Crear-acuerdo.png" alt="Crear acuerdo">
+          </div>
+
+          <div class="quick-text">
+            <span>Crear acuerdo</span>
+            <p>Nueva promesa de pago</p>
+          </div>
+
+        </button>
+
+        <!-- GENERAR REPORTE -->
+        <button type="button" class="quick-card">
+
+          <div class="quick-icon">
+            <img src="imagenes/Generar-reporte.png" alt="Generar reporte">
+          </div>
+
+          <div class="quick-text">
+            <span>Generar reporte</span>
+            <p>Descargar información</p>
+          </div>
+
+        </button>
+
+      </div>
+    </section>
 
     <!-- ================================================== -->
     <!-- MODAL BUSCAR CASO -->
@@ -264,10 +564,10 @@
 
     <app-search-case
       [isOpen]="isSearchCaseOpen"
+      [cases]="cases"
+      (goToCases)="goToManagedCases()"
       (closed)="closeSearchCase()">
     </app-search-case>
 
-
   </main>
-
 </div>

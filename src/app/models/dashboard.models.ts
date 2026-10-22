@@ -5,6 +5,10 @@ export interface MetricCard {
   changePercentage?: number;  // Ejemplo: 6.6
   periodText?: string;        // Ejemplo: "vs mes anterior"
   status?: 'success' | 'warning' | 'danger' | 'info';
+
+  // Ruta de la imagen de cada KPI
+  image?: string;
+  
 }
 
 // 2. Molde para las barras o datos del gráfico
@@ -21,15 +25,26 @@ export interface StatusDistribution {
   color: string;      // Ejemplo: "#7C3AED" (púrpura)
 }
 
-// 4. Molde para las filas de la tabla de "Casos en gestión"
+// 4. Modelo para las filas de la tabla de casos gestionados
 export interface ManagedCase {
-  id: string;          // Ejemplo: "CAS-2024-12987"
-  asociado: string;    // Ejemplo: "Carlos A. Muñoz"
-  obligacion: string;  // Ejemplo: "OBL-738291"
+
+  id: string;
+  asociado: string;
+  documento?: string;
+  obligacion: string;
+  saldoVencido?: number;
+
   riesgo: 'Bajo' | 'Medio' | 'Alto' | 'Crítico';
-  diasMora: number;    // Ejemplo: 92
-  tiempoLimite: string;// Ejemplo: "2h 1"
-  asesor: string;      // Ejemplo: "Luis R."
+
+  diasMora: number;
+  tiempoLimite: string;
+  asesor: string;
+
+  // Nuevos campos para los filtros
+  estado?: string;
+  segmento?: string;
+  fechaCreacion?: string;
+
 }
 
 // ==================================================
@@ -55,5 +70,7 @@ export interface AgingData {
   rangoMora: string;
 
   valor: number;
+
+  obligaciones: number;
 
 }

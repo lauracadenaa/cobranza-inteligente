@@ -1,3 +1,4 @@
+
 /* ================================================== */
 /* SIDEBAR PRINCIPAL */
 /* ================================================== */
@@ -8,25 +9,20 @@
 
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  justify-content: flex-start;
 
   padding-top: 10px;
-  padding-bottom: 750px;
+  padding-bottom: 20px;
   padding-left: 10px;
+
   border-radius: 20px;
   margin-left: 10px;
 
-
   box-sizing: border-box;
-
   background-color: #FFFFFF;
-
-  opacity: 1;
-
   border-right: 1px solid #FFFFFF;
 
-transform: translateY(10px);
-
+  transform: translateY(10px);
 }
 
 /* ================================================== */
@@ -39,11 +35,9 @@ transform: translateY(10px);
 
   display: flex;
   align-items: center;
-
   gap: 12px;
 
   opacity: 1;
-  
 }
 
 /* ================================================== */
@@ -79,7 +73,6 @@ transform: translateY(10px);
   line-height: 100%;
 }
 
-
 /* ================================================== */
 /* TEXTO BANKVISION */
 /* ================================================== */
@@ -97,10 +90,8 @@ transform: translateY(10px);
   letter-spacing: 0;
 
   color: #173042;
-
   opacity: 1;
 }
-
 
 /* ================================================== */
 /* MENÚ */
@@ -110,9 +101,10 @@ transform: translateY(10px);
   display: flex;
   flex-direction: column;
   gap: 8px;
-  width: 212px;
-}
 
+  width: 212px;
+  margin-top: 10px;
+}
 
 /* ================================================== */
 /* OPCIONES DEL MENÚ */
@@ -125,17 +117,12 @@ transform: translateY(10px);
   width: 212px;
   height: 43px;
 
-  padding-top: 11px;
-  padding-right: 12px;
-  padding-bottom: 11px;
-  padding-left: 12px;
-
+  padding: 11px 12px;
   gap: 12px;
 
   box-sizing: border-box;
 
   background-color: transparent;
-
   border-radius: 12px;
 
   text-decoration: none;
@@ -146,7 +133,6 @@ transform: translateY(10px);
   line-height: 21px;
   letter-spacing: 0;
 }
-
 
 /* ================================================== */
 /* TEXTO NORMAL */
@@ -161,7 +147,6 @@ transform: translateY(10px);
   line-height: 21px;
 }
 
-
 /* ================================================== */
 /* OPCIÓN SELECCIONADA */
 /* ================================================== */
@@ -174,7 +159,6 @@ transform: translateY(10px);
   color: #2563EB;
 }
 
-
 /* ================================================== */
 /* AL PASAR EL MOUSE */
 /* ================================================== */
@@ -185,4 +169,344 @@ transform: translateY(10px);
 
 .menu-item:hover span {
   color: #64748B;
+}
+
+/* ================================================== */
+/* BOTÓN CERRAR SESIÓN DEL SIDEBAR */
+/* ================================================== */
+
+.logout-button {
+  width: 212px;
+  height: 43px;
+
+  display: flex;
+  align-items: center;
+
+  gap: 12px;
+  padding: 11px 12px;
+
+  box-sizing: border-box;
+
+  background-color: transparent;
+  border: none;
+  border-radius: 12px;
+
+  cursor: pointer;
+
+  font-family: 'Roboto', sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  color: #DC2626;
+
+  margin-top: auto;
+  text-align: left;
+}
+
+/* ÍCONO DE SALIDA */
+
+.logout-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  font-size: 17px;
+  color: #DC2626;
+}
+
+/* EFECTO AL PASAR EL MOUSE */
+
+.logout-button:hover {
+  background-color: #FEE2E2;
+  color: #DC2626;
+}
+
+.logout-button:hover .logout-icon {
+  color: #DC2626;
+}
+
+/* ================================================== */
+/* FONDO OSCURO DEL MODAL */
+/* ================================================== */
+
+.logout-modal-overlay {
+  position: fixed;
+  inset: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background-color: rgba(15, 23, 42, 0.45);
+
+  z-index: 9999;
+}
+
+/* ================================================== */
+/* CONTENEDOR DEL MODAL */
+/* ================================================== */
+
+.logout-modal {
+  width: 473px;
+  height: 469px;
+
+  padding: 78px 57px 45px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+
+  gap: 0;
+
+  box-sizing: border-box;
+
+  background-color: #FFFFFF;
+  border: 1px solid #E2E8F0;
+  border-radius: 35px;
+
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
+}
+
+/* ================================================== */
+/* CUADRO DEL ICONO DE SALIDA */
+/* ================================================== */
+
+.logout-modal-icon {
+  width: 65px;
+  height: 81px;
+
+  padding: 21px 13px;
+  box-sizing: border-box;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background-color: #E600001A;
+  border-radius: 8px;
+
+  color: #DC2626;
+  font-size: 27px;
+  margin-bottom: 47px;
+}
+
+/* ================================================== */
+/* IMAGEN DEL ICONO DE SALIDA */
+/* ================================================== */
+
+.logout-modal-icon i {
+  width: 39px;
+  height: 39px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  font-size: 39px;
+}
+
+/* ================================================== */
+/* TÍTULO DEL MODAL */
+/* ================================================== */
+
+.logout-modal h2 {
+  width: 304px;
+  height: 50px;
+
+  margin: 0 0 10px;
+
+  font-family: 'Roboto', sans-serif;
+  font-weight: 700;
+  font-style: normal;
+  font-size: 40px;
+  line-height: 125%;
+  letter-spacing: 0;
+
+  white-space: nowrap;
+
+  color: #0E0E0E;
+  text-align: center;
+
+  opacity: 1;
+}
+
+/* ================================================== */
+/* MENSAJE DEL MODAL */
+/* ================================================== */
+
+.logout-modal p {
+  width: 320px;
+  height: 40px;
+
+  margin: 0 0 47px;
+
+  font-family: 'Roboto', sans-serif;
+  font-weight: 400;
+  font-style: normal;
+  font-size: 16px;
+  line-height: 125%;
+  letter-spacing: 0;
+
+  color: #475569;
+  text-align: center;
+
+  opacity: 1;
+}
+
+/* ================================================== */
+/* CONTENEDOR DE BOTONES */
+/* ================================================== */
+
+.logout-modal-buttons {
+  width: 100%;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 12px;
+}
+
+/* ================================================== */
+/* BOTONES GENERALES */
+/* ================================================== */
+
+.logout-modal-buttons button {
+  height: 56px;
+
+  border: none;
+  border-radius: 16px;
+
+  cursor: pointer;
+}
+
+/* ================================================== */
+/* BOTÓN SEGUIR NAVEGANDO */
+/* ================================================== */
+
+.btn-seguir {
+  width: 179px;
+  height: 56px;
+
+  flex: 0 0 179px;
+
+  padding: 16px 24px;
+  box-sizing: border-box;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 8px;
+
+  background-color: #CBD5E1;
+  color: #64748B;
+
+  font-family: 'Roboto', sans-serif;
+  font-weight: 500;
+  font-style: normal;
+  font-size: 16px;
+  line-height: 24px;
+  letter-spacing: 0;
+
+  white-space: nowrap;
+}
+
+.btn-seguir:hover {
+  background-color: #BFCAD7;
+}
+
+/* ================================================== */
+/* BOTÓN CERRAR SESIÓN */
+/* ================================================== */
+
+.btn-cerrar {
+  width: 146px;
+  height: 56px;
+
+  flex: 0 0 146px;
+
+  padding: 16px 24px;
+  box-sizing: border-box;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background-color: #DC2626;
+  color: #FFFFFF;
+
+  border-radius: 16px;
+
+  font-family: 'Roboto', sans-serif;
+  font-weight: 500;
+  font-style: normal;
+  font-size: 16px;
+  line-height: 24px;
+  letter-spacing: 0;
+
+  white-space: nowrap;
+}
+
+.btn-cerrar:hover {
+  background-color: #B91C1C;
+}
+
+/* ================================================== */
+/* DISEÑO RESPONSIVE */
+/* ================================================== */
+
+@media (max-width: 500px) {
+
+  .logout-modal {
+    width: calc(100% - 32px);
+    height: auto;
+    min-height: 469px;
+    padding: 24px;
+  }
+
+  .logout-modal-buttons {
+    flex-direction: column;
+  }
+
+  .logout-modal-buttons button {
+    width: 100%;
+    flex: none;
+  }
+
+}
+
+/* ================================================== */
+/* BOTÓN X PARA CERRAR EL MODAL */
+/* ================================================== */
+
+.logout-modal {
+  position: relative;
+}
+
+.logout-modal-close {
+  position: absolute;
+  top: 20px;
+  right: 22px;
+
+  width: 32px;
+  height: 32px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 0;
+
+  background-color: transparent;
+  border: none;
+
+  color: #64748B;
+  font-size: 18px;
+
+  cursor: pointer;
+}
+
+.logout-modal-close:hover {
+  color: #0E0E0E;
 }

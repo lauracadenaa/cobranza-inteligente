@@ -1,5 +1,9 @@
+
 import { Injectable } from '@angular/core';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
+import { map } from 'rxjs/operators';
+
 
 import {
   MetricCard,
@@ -8,150 +12,263 @@ import {
   AgingData
 } from '../models/dashboard.models';
 
+import { API_CONFIG } from '../core/config/api.config';
+
+// ==================================================
+// RESPUESTA DEL BACKEND
+// ==================================================
+
+interface CasesPageResponse {
+  content: BackendCase[];
+}
+
+interface BackendCase {
+  id: number;
+  caseNumber?: string;
+  status?: string;
+  createdAt?: string;
+  assignedTo?: string | number | null;
+  advisorId?: number | null;
+
+  client?: {
+    fullName?: string;
+    documentNumber?: string;
+    riskLevel?: string;
+    segment?: string | null;
+  };
+
+  obligation?: {
+    obligationNumber?: string;
+    daysPastDue?: number;
+    totalBalance?: number;
+  };
+}
+
 @Injectable({
   providedIn: 'root'
 })
 export class DashboardService {
 
-  constructor() { }
+  constructor(private http: HttpClient) { }
 
   // ==================================================
-  // DATOS DE PRUEBA PARA EL HEADER DEL DASHBOARD
+  // ESTADO DEL MOTOR IA
+  // ==================================================
+
+  private motorIAActivo = true;
+
+  // ==================================================
+  // DATOS DEL HEADER
   // ==================================================
 
   getDashboardHeader(): Observable<DashboardHeader> {
 
     const header: DashboardHeader = {
-
       titulo: 'Dashboard',
-
       descripcion:
         'Vista general del estado de cartera y gestión de cobranza',
-
-      ultimaActualizacion:
-        'Actualizado hace 8 min',
-
-      motorIAActivo: true,
-
+      ultimaActualizacion: 'Actualizado hace 8 min',
+      motorIAActivo: this.motorIAActivo,
       nombreUsuario: 'Jou Dou',
-
       rolUsuario: 'Administrador'
-
     };
 
     return of(header);
   }
 
-// ==================================================
-// DATOS DE PRUEBA PARA LA CARTERA POR ANTIGÜEDAD
-// ==================================================
-
-getAgingData(): Observable<AgingData[]> {
-
-  const agingData: AgingData[] = [
-
-    {
-      rangoMora: '0 - 30 días',
-      valor: 45000000
-    },
-
-    {
-      rangoMora: '31 - 60 días',
-      valor: 62000000
-    },
-
-    {
-      rangoMora: '61 - 90 días',
-      valor: 78000000
-    },
-
-    {
-      rangoMora: '91 - 180 días',
-      valor: 95000000
-    },
-
-    {
-      rangoMora: '> 180 días',
-      valor: 46000000
-    }
-
-  ];
-
-  return of(agingData);
-}
-
-// ==================================================
-// DATOS DE PRUEBA PARA LA CARTERA POR SEGMENTO
-// ==================================================
-
-getSegmentData(): Observable<AgingData[]> {
-
-  const segmentData: AgingData[] = [
-
-    {
-      rangoMora: 'Preventiva',
-      valor: 72000000
-    },
-
-    {
-      rangoMora: 'Administrativa',
-      valor: 48000000
-    },
-
-    {
-      rangoMora: 'Prejurídica',
-      valor: 30000000
-    },
-
-    {
-      rangoMora: 'Jurídica',
-      valor: 20000000
-    }
-
-  ];
-
-  return of(segmentData);
-}
-
-// ==================================================
-// DATOS DE PRUEBA PARA LA CARTERA POR RIESGO
-// ==================================================
-
-getRiskData(): Observable<AgingData[]> {
-
-  const riskData: AgingData[] = [
-
-    {
-      rangoMora: 'Bajo',
-      valor: 85000000
-    },
-
-    {
-      rangoMora: 'Medio',
-      valor: 45000000
-    },
-
-    {
-      rangoMora: 'Alto',
-      valor: 25000000
-    },
-
-    {
-      rangoMora: 'Crítico',
-      valor: 10000000
-    }
-
-  ];
-
-  return of(riskData);
-}
-
   // ==================================================
-  // DATOS DE PRUEBA PARA LAS TARJETAS SUPERIORES
+  // DESACTIVAR MOTOR IA
   // ==================================================
 
+  desactivarMotorIA(): Observable<boolean> {
+
+    this.motorIAActivo = false;
+
+    return of(true);
+  }
 
   
+  // ==================================================
+  // CARTERA POR ANTIGÜEDAD
+  // ==================================================
+
+  getAgingData(): Observable<AgingData[]> {
+
+    const url = `${API_CONFIG.baseUrl}/management/cases`;
+
+    return this.http.get<CasesPageResponse>(url).pipe(
+
+      map(response => {
+
+        const rangos: AgingData[] = [
+          { rangoMora: '0 - 30 días', valor: 0, obligaciones: 0 },
+          { rangoMora: '31 - 60 días', valor: 0, obligaciones: 0 },
+          { rangoMora: '61 - 90 días', valor: 0, obligaciones: 0 },
+          { rangoMora: '91 - 180 días', valor: 0, obligaciones: 0 },
+          { rangoMora: '> 180 días', valor: 0, obligaciones: 0 }
+        ];
+
+        (response.content ?? []).forEach(caso => {
+
+          const dias = Number(caso.obligation?.daysPastDue ?? 0);
+          const saldo = Number(caso.obligation?.totalBalance ?? 0);
+
+          if (!Number.isFinite(dias) || !Number.isFinite(saldo)) {
+            return;
+          }
+
+          let indiceRango: number;
+
+          if (dias <= 30) {
+            indiceRango = 0;
+          } else if (dias <= 60) {
+            indiceRango = 1;
+          } else if (dias <= 90) {
+            indiceRango = 2;
+          } else if (dias <= 180) {
+            indiceRango = 3;
+          } else {
+            indiceRango = 4;
+          }
+
+          rangos[indiceRango].valor += saldo;
+          rangos[indiceRango].obligaciones += 1;
+
+        });
+
+        return rangos;
+
+      })
+
+    );
+  }
+
+  // ==================================================
+  // CARTERA POR SEGMENTO
+  // ==================================================
+
+  getSegmentData(): Observable<AgingData[]> {
+
+    const url = `${API_CONFIG.baseUrl}/management/cases`;
+
+    return this.http.get<CasesPageResponse>(url).pipe(
+
+      map(response => {
+
+        const segmentos: AgingData[] = [
+          { rangoMora: 'Preventiva', valor: 0, obligaciones: 0 },
+          { rangoMora: 'Administrativa', valor: 0, obligaciones: 0 },
+          { rangoMora: 'Prejudicial', valor: 0, obligaciones: 0 },
+          { rangoMora: 'Jurídica', valor: 0, obligaciones: 0 }
+        ];
+
+        (response.content ?? []).forEach(caso => {
+
+          const diasMora = Number(caso.obligation?.daysPastDue);
+          const saldo = Number(caso.obligation?.totalBalance ?? 0);
+
+          // Evitar clasificar registros sin días de mora válidos.
+          if (
+            !Number.isFinite(diasMora) ||
+            !Number.isFinite(saldo) ||
+            diasMora < 0
+          ) {
+            return;
+          }
+
+          let nombreSegmento: string;
+
+          if (diasMora === 0) {
+            nombreSegmento = 'Preventiva';
+          } else if (diasMora <= 30) {
+            nombreSegmento = 'Administrativa';
+          } else if (diasMora <= 90) {
+            nombreSegmento = 'Prejudicial';
+          } else {
+            nombreSegmento = 'Jurídica';
+          }
+
+          const segmento = segmentos.find(
+            item => item.rangoMora === nombreSegmento
+          );
+
+          if (segmento) {
+            segmento.valor += saldo;
+            segmento.obligaciones += 1;
+          }
+
+        });
+
+        console.log(
+          'RESULTADO FINAL DE CARTERA POR SEGMENTO:',
+          segmentos
+        );
+
+        return segmentos;
+
+      })
+
+    );
+  }
+
+  // ==================================================
+  // CARTERA POR RIESGO
+  // ==================================================
+
+  getRiskData(): Observable<AgingData[]> {
+
+    const url = `${API_CONFIG.baseUrl}/management/cases`;
+
+    return this.http.get<CasesPageResponse>(url).pipe(
+
+      map(response => {
+
+        const riesgos: AgingData[] = [
+          { rangoMora: 'Bajo', valor: 0, obligaciones: 0 },
+          { rangoMora: 'Medio', valor: 0, obligaciones: 0 },
+          { rangoMora: 'Alto', valor: 0, obligaciones: 0 },
+          { rangoMora: 'Crítico', valor: 0, obligaciones: 0 }
+        ];
+
+        const normalizar = (valor?: string): string => {
+
+          return (valor ?? '')
+            .trim()
+            .normalize('NFD')
+            .replace(/[\u0300-\u036f]/g, '')
+            .toUpperCase();
+
+        };
+
+        (response.content ?? []).forEach(caso => {
+
+          const riesgo = normalizar(caso.client?.riskLevel);
+          const saldo = Number(caso.obligation?.totalBalance ?? 0);
+
+          const encontrado = riesgos.find(item =>
+            normalizar(item.rangoMora) === riesgo
+          );
+
+          if (encontrado && Number.isFinite(saldo)) {
+
+            encontrado.valor += saldo;
+            encontrado.obligaciones += 1;
+
+          }
+
+        });
+
+        return riesgos;
+
+      })
+
+    );
+  }
+
+  // ==================================================
+  // TARJETAS KPI
+  // ==================================================
+
   getKPIs(): Observable<MetricCard[]> {
 
     const kpis: MetricCard[] = [
@@ -201,59 +318,154 @@ getRiskData(): Observable<AgingData[]> {
     return of(kpis);
   }
 
-
   // ==================================================
-  // DATOS DE PRUEBA PARA LA TABLA DE CASOS
+  // CONSULTAR CASOS
   // ==================================================
 
   getManagedCases(): Observable<ManagedCase[]> {
 
-    const cases: ManagedCase[] = [
+    const url = `${API_CONFIG.baseUrl}/management/cases`;
 
-      {
-        id: 'CAS-2024-12987',
-        asociado: 'Carlos A. Muñoz',
-        obligacion: 'OBL-738291',
-        riesgo: 'Medio',
-        diasMora: 92,
-        tiempoLimite: '2h 1',
-        asesor: 'Luis R.'
-      },
+    return this.http.get<CasesPageResponse>(url).pipe(
 
-      {
-        id: 'CAS-2024-12988',
-        asociado: 'Carlos A. Muñoz',
-        obligacion: 'OBL-738291',
-        riesgo: 'Medio',
-        diasMora: 92,
-        tiempoLimite: '2h 1',
-        asesor: 'Luis R.'
-      },
+      map(response => (response.content ?? []).map(caso => ({
 
-      {
-        id: 'CAS-2024-12989',
-        asociado: 'Carlos A. Muñoz',
-        obligacion: 'OBL-738291',
-        riesgo: 'Medio',
-        diasMora: 92,
-        tiempoLimite: '2h 1',
-        asesor: 'Luis R.'
-      },
+        id: caso.caseNumber || String(caso.id),
 
-      {
-        id: 'CAS-2024-12990',
-        asociado: 'Carlos A. Muñoz',
-        obligacion: 'OBL-738291',
-        riesgo: 'Medio',
-        diasMora: 92,
-        tiempoLimite: '2h 1',
-        asesor: 'Luis R.'
-      }
+        asociado: caso.client?.fullName || 'Sin información',
 
-    ];
+        documento: caso.client?.documentNumber,
 
-    return of(cases);
+        obligacion:
+          caso.obligation?.obligationNumber || 'Sin información',
+
+        saldoVencido: Number(caso.obligation?.totalBalance ?? 0),
+
+        riesgo: this.mapRisk(caso.client?.riskLevel),
+
+        diasMora: caso.obligation?.daysPastDue ?? 0,
+
+        asesor: String(
+          caso.assignedTo ?? caso.advisorId ?? 'Sin asignar'
+        ),
+
+        estado: caso.status || 'Sin estado',
+
+        segmento: this.mapSegment(caso.obligation?.daysPastDue),
+
+        fechaCreacion: caso.createdAt || '',
+
+        tiempoLimite: 'Sin información'
+
+      })))
+
+    );
+  }
+
+  // ==================================================
+// BUSCAR CASOS EN EL BACKEND
+// ==================================================
+
+searchManagedCases(searchText: string): Observable<ManagedCase[]> {
+
+  const url = `${API_CONFIG.baseUrl}/management/cases/search`;
+
+  const params = new HttpParams()
+    .set('q', searchText.trim());
+
+  return this.http.get<CasesPageResponse>(url, { params }).pipe(
+
+    map(response => (response.content ?? []).map(caso => ({
+
+      id: caso.caseNumber || String(caso.id),
+
+      asociado: caso.client?.fullName || 'Sin información',
+
+      documento: caso.client?.documentNumber,
+
+      obligacion:
+        caso.obligation?.obligationNumber || 'Sin información',
+
+      saldoVencido: Number(caso.obligation?.totalBalance ?? 0),
+
+      riesgo: this.mapRisk(caso.client?.riskLevel),
+
+      diasMora: caso.obligation?.daysPastDue ?? 0,
+
+      asesor: String(
+        caso.assignedTo ?? caso.advisorId ?? 'Sin asignar'
+      ),
+
+      estado: caso.status || 'Sin estado',
+
+      segmento: this.mapSegment(caso.obligation?.daysPastDue),
+
+      fechaCreacion: caso.createdAt || '',
+
+      tiempoLimite: 'Sin información'
+
+    })))
+
+  );
+}
+
+  // ==================================================
+  // CALCULAR SEGMENTO SEGÚN DÍAS DE MORA
+  // ==================================================
+
+  private mapSegment(daysPastDue?: number): string {
+
+    const dias = Number(daysPastDue);
+
+    if (!Number.isFinite(dias) || dias < 0) {
+      return 'Sin segmento';
+    }
+
+    if (dias === 0) {
+      return 'Preventiva';
+    }
+
+    if (dias <= 30) {
+      return 'Administrativa';
+    }
+
+    if (dias <= 90) {
+      return 'Prejudicial';
+    }
+
+    return 'Jurídica';
+  }
+
+  // ==================================================
+  // CONVERTIR NIVEL DE RIESGO
+  // ==================================================
+
+  private mapRisk(risk?: string): ManagedCase['riesgo'] {
+
+    const riesgo = (risk ?? '')
+      .trim()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .toUpperCase();
+
+    switch (riesgo) {
+
+      case 'BAJO':
+        return 'Bajo';
+
+      case 'MEDIO':
+        return 'Medio';
+
+      case 'ALTO':
+        return 'Alto';
+
+      case 'CRITICO':
+        return 'Crítico';
+
+      default:
+        return 'Medio';
+
+    }
   }
 
 }
-

@@ -1,3 +1,4 @@
+
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
@@ -15,6 +16,7 @@ import { MetricCard } from '../../models/dashboard.models';
   templateUrl: './kpi-cards.component.html',
   styleUrl: './kpi-cards.component.css'
 })
+
 export class KpiCardsComponent implements OnInit {
 
   // ==================================================
@@ -22,7 +24,6 @@ export class KpiCardsComponent implements OnInit {
   // ==================================================
 
   kpis: MetricCard[] = [];
-
 
   // ==================================================
   // CONSTRUCTOR
@@ -32,7 +33,6 @@ export class KpiCardsComponent implements OnInit {
     private dashboardService: DashboardService
   ) { }
 
-
   // ==================================================
   // INICIALIZACIÓN
   // ==================================================
@@ -41,7 +41,20 @@ export class KpiCardsComponent implements OnInit {
 
     this.dashboardService.getKPIs().subscribe(data => {
 
-      this.kpis = data;
+      // Imágenes correspondientes a cada tarjeta
+      const imagenes = [
+        '/imagenes/Kpi-total-mora.png',
+        '/imagenes/Kpi-casos-activos.png',
+        '/imagenes/Kpi-casos-criticos.png',
+        '/imagenes/Kpi-recaudo.png',
+        '/imagenes/Kpi-tasa-recuperacion.png',
+      ];
+
+      // Recibimos los datos y asignamos las imágenes
+      this.kpis = data.map((kpi, index) => ({
+        ...kpi,
+        image: imagenes[index] ?? ''
+      }));
 
     });
 

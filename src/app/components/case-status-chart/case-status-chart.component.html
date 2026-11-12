@@ -12,9 +12,12 @@
 
     <h2>Casos por estado</h2>
 
-    <button class="btn-gestion">
-      Ir a gestión de casos
-    </button>
+    <button
+  class="btn-gestion"
+  type="button"
+  (click)="irAGestionCasos()">
+  Ir a gestión de casos
+</button>
 
   </div>
 
@@ -22,7 +25,15 @@
   <!-- CONTENIDO -->
   <!-- ================================================== -->
 
-  <div class="case-status-content">
+  <p class="case-status-message" *ngIf="cargando" role="status">
+    Cargando distribución de casos...
+  </p>
+
+  <p class="case-status-message case-status-error" *ngIf="!cargando && errorCarga" role="alert">
+    No fue posible interpretar la distribución de casos. Verifica la respuesta del servidor.
+  </p>
+
+  <div class="case-status-content" *ngIf="!cargando && !errorCarga">
 
     <!-- ================================================== -->
     <!-- GRÁFICO DE DONA -->
@@ -32,99 +43,35 @@
 
       <svg viewBox="0 0 235 235" class="donut-svg">
 
-        <!-- CERRADO -->
-        <circle cx="117.5" cy="117.5" r="94"
+        <circle
+          *ngFor="let item of caseStatusData; let i = index"
+
+          cx="117.5"
+          cy="117.5"
+          [attr.r]="radio"
+
           fill="none"
-          stroke="#8B5CF6"
+
+          [attr.stroke]="item.color"
           stroke-width="24"
-          stroke-dasharray="71 514.6"
-          stroke-dashoffset="0"
+
+          [attr.stroke-dasharray]="obtenerDashArray(item.porcentaje)"
+          [attr.stroke-dashoffset]="obtenerDashOffset(i)"
+
           stroke-linecap="round"
+
           transform="rotate(-90 117.5 117.5)"
-          (mouseenter)="mostrarInfo('Cerrado', '4.55%')"
-          (mouseleave)="ocultarInfo()">
 
-          <title>Cerrado: 54 (4.55%)</title>
+          (mouseenter)="mostrarInfo(item.estado, item.cantidad, item.porcentaje)"
+          (mouseleave)="ocultarInfo()"
 
-        </circle>
+        >
 
-        <!-- PREJURÍDICO -->
-        <circle cx="117.5" cy="117.5" r="94"
-          fill="none"
-          stroke="#F6B91A"
-          stroke-width="24"
-          stroke-dasharray="71 514.6"
-          stroke-dashoffset="-98"
-          stroke-linecap="round"
-          transform="rotate(-90 117.5 117.5)"
-          (mouseenter)="mostrarInfo('Prejurídico', '9.69%')"
-          (mouseleave)="ocultarInfo()">
-
-          <title>Prejurídico: 115 (9.69%)</title>
-
-        </circle>
-
-        <!-- PROMESAS DE PAGO -->
-        <circle cx="117.5" cy="117.5" r="94"
-          fill="none"
-          stroke="#06B6D4"
-          stroke-width="24"
-          stroke-dasharray="71 514.6"
-          stroke-dashoffset="-196"
-          stroke-linecap="round"
-          transform="rotate(-90 117.5 117.5)"
-          (mouseenter)="mostrarInfo('Promesas de pago', '14.15%')"
-          (mouseleave)="ocultarInfo()">
-
-          <title>Promesas de pago: 168 (14.15%)</title>
-
-        </circle>
-
-        <!-- ILOCALIZADO -->
-        <circle cx="117.5" cy="117.5" r="94"
-          fill="none"
-          stroke="#EF4444"
-          stroke-width="24"
-          stroke-dasharray="71 514.6"
-          stroke-dashoffset="-294"
-          stroke-linecap="round"
-          transform="rotate(-90 117.5 117.5)"
-          (mouseenter)="mostrarInfo('Ilocalizado / sin respuesta', '17.69%')"
-          (mouseleave)="ocultarInfo()">
-
-          <title>Ilocalizado / sin respuesta: 210 (17.69%)</title>
-
-        </circle>
-
-        <!-- EN GESTIÓN -->
-        <circle cx="117.5" cy="117.5" r="94"
-          fill="none"
-          stroke="#B6B7B7"
-          stroke-width="24"
-          stroke-dasharray="71 514.6"
-          stroke-dashoffset="-392"
-          stroke-linecap="round"
-          transform="rotate(-90 117.5 117.5)"
-          (mouseenter)="mostrarInfo('En gestión', '45.66%')"
-          (mouseleave)="ocultarInfo()">
-
-          <title>En gestión: 542 (45.66%)</title>
-
-        </circle>
-
-        <!-- NUEVO -->
-        <circle cx="117.5" cy="117.5" r="94"
-          fill="none"
-          stroke="#2563EB"
-          stroke-width="24"
-          stroke-dasharray="71 514.6"
-          stroke-dashoffset="-490"
-          stroke-linecap="round"
-          transform="rotate(-90 117.5 117.5)"
-          (mouseenter)="mostrarInfo('Nuevo', '8.26%')"
-          (mouseleave)="ocultarInfo()">
-
-          <title>Nuevo: 98 (8.26%)</title>
+          <title>
+            {{ item.estado }}:
+            {{ formatearCantidad(item.cantidad) }}
+            ({{ formatearPorcentaje(item.porcentaje) }})
+          </title>
 
         </circle>
 
@@ -134,16 +81,17 @@
       <!-- TOOLTIP PERSONALIZADO -->
       <!-- ================================================== -->
 
-      <div class="donut-tooltip"
-           [class.visible]="mostrarTooltip">
+      <div
+        class="donut-tooltip"
+        [class.visible]="mostrarTooltip"
+      >
 
-        <span class="tooltip-estado">
+        <strong class="tooltip-estado">
           {{ estadoTooltip }}
-        </span>
-
-        <strong class="tooltip-porcentaje">
-          {{ porcentajeTooltip }}
         </strong>
+
+        <span>Casos: {{ cantidadTooltip }}</span>
+        <span>Porcentaje: {{ porcentajeTooltip }}</span>
 
       </div>
 
@@ -153,9 +101,13 @@
 
       <div class="pie-center">
 
-        <span class="pie-total">1,247</span>
+        <span class="pie-total">
+          {{ formatearCantidad(totalCasos) }}
+        </span>
 
-        <span class="pie-label">Total</span>
+        <span class="pie-label">
+          Total
+        </span>
 
       </div>
 
@@ -167,81 +119,27 @@
 
     <div class="case-status-legend">
 
-      <!-- NUEVO -->
-      <div class="legend-item">
+      <div
+        class="legend-item"
+        *ngFor="let item of caseStatusData"
+      >
 
-        <span class="legend-dot nuevo"></span>
+        <span
+          class="legend-dot"
+          [ngClass]="item.clase"
+        ></span>
 
-        <p>Nuevo</p>
+        <p>
+          {{ item.estado }}
+        </p>
 
-        <span class="legend-value">98</span>
+        <span class="legend-value">
+          {{ formatearCantidad(item.cantidad) }}
+        </span>
 
-        <span class="legend-percent">(8.26%)</span>
-
-      </div>
-
-      <!-- EN GESTIÓN -->
-      <div class="legend-item">
-
-        <span class="legend-dot gestion"></span>
-
-        <p>En gestión</p>
-
-        <span class="legend-value">542</span>
-
-        <span class="legend-percent">(45.66%)</span>
-
-      </div>
-
-      <!-- ILOCALIZADO -->
-      <div class="legend-item">
-
-        <span class="legend-dot ilocalizado"></span>
-
-        <p>Ilocalizado / sin respuesta</p>
-
-        <span class="legend-value">210</span>
-
-        <span class="legend-percent">(17.69%)</span>
-
-      </div>
-
-      <!-- PROMESAS DE PAGO -->
-      <div class="legend-item">
-
-        <span class="legend-dot promesa"></span>
-
-        <p>Promesas de pago</p>
-
-        <span class="legend-value">168</span>
-
-        <span class="legend-percent">(14.15%)</span>
-
-      </div>
-
-      <!-- PREJURÍDICO -->
-      <div class="legend-item">
-
-        <span class="legend-dot prejuridico"></span>
-
-        <p>Prejurídico</p>
-
-        <span class="legend-value">115</span>
-
-        <span class="legend-percent">(9.69%)</span>
-
-      </div>
-
-      <!-- CERRADO -->
-      <div class="legend-item">
-
-        <span class="legend-dot cerrado"></span>
-
-        <p>Cerrado</p>
-
-        <span class="legend-value">54</span>
-
-        <span class="legend-percent">(4.55%)</span>
+        <span class="legend-percent">
+          ({{ formatearPorcentaje(item.porcentaje) }})
+        </span>
 
       </div>
 

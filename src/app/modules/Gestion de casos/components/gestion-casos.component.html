@@ -1,0 +1,41 @@
+
+<div class="dashboard-layout">
+
+  <app-sidebar></app-sidebar>
+
+  <main class="dashboard-content">
+
+    <app-dashboard-header
+      [tituloPersonalizado]="'Gestión de casos'"
+      [descripcionPersonalizada]="'Visualiza y gestiona todos los casos activos de cobranza'"
+      [casoGestion]="casoEnDetalle">
+    </app-dashboard-header>
+
+    <div class="gestion-casos-body">
+
+      <!-- KPIs DE LA VISTA GENERAL -->
+      <div class="kpis-wrapper" *ngIf="!casoEnDetalle">
+
+        <app-casos-kpis [caso]="casoEnDetalle"></app-casos-kpis>
+
+      </div>
+
+      <!-- DETALLE DEL CASO: INCLUYE SUS PROPIOS KPIs -->
+      <app-caso-resumen
+        *ngIf="casoEnDetalle"
+        [caso]="casoEnDetalle"
+        (cerrar)="cerrarDetalle()">
+      </app-caso-resumen>
+
+      <!-- COLA DE CASOS -->
+      <app-cola-casos
+        *ngIf="!casoEnDetalle"
+        [detalleAbierto]="false"
+        (casoDetalleChange)="actualizarCasoEnDetalle($event)">
+      </app-cola-casos>
+
+    </div>
+
+  </main>
+
+</div>

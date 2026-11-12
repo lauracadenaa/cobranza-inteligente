@@ -1,9 +1,8 @@
 
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { Observable, of } from 'rxjs';
-import { map } from 'rxjs/operators';
-
+import { Observable, of, forkJoin } from 'rxjs';
+import { map, catchError } from 'rxjs/operators';
 
 import {
   MetricCard,
@@ -15,7 +14,7 @@ import {
 import { API_CONFIG } from '../core/config/api.config';
 
 // ==================================================
-// RESPUESTA DEL BACKEND
+// RESPUESTA DE CASOS
 // ==================================================
 
 interface CasesPageResponse {
@@ -44,9 +43,66 @@ interface BackendCase {
   };
 }
 
+// ==================================================
+// RESPUESTA DE /admin/dashboard
+// ==================================================
+
+interface AdminDashboardResponse {
+
+  kpis: {
+    totalPortfolioValue: number;
+    totalObligations: number;
+    activeObligations: number;
+    clientsInDefault: number;
+    totalClients: number;
+    openCases: number;
+    inProgressCases: number;
+    escalatedCases: number;
+    resolvedCases: number;
+    totalCases: number;
+    activeAdvisors: number;
+    activePaymentAgreements: number;
+    batchesThisMonth: number;
+    totalRecordsThisMonth: number;
+    criticalClientsCount: number;
+  };
+
+  agingAnalysis: {
+    bucket: string;
+    daysFrom: number;
+    daysTo: number;
+    obligationCount: number;
+    totalAmount: number;
+    percentageOfPortfolio: number;
+  }[];
+
+}
+
+// ==================================================
+// RESPUESTA DE /analytics/recovery
+// ==================================================
+
+interface RecoveryResponse {
+
+  totalCollected: number;
+
+  byChannel: Record<string, number>;
+
+  byRiskLevel: Record<string, number>;
+
+  topClients: {
+    clientId: number;
+    clientName: string;
+    amountRecovered: number;
+    paymentCount: number;
+  }[];
+
+}
+
 @Injectable({
   providedIn: 'root'
 })
+
 export class DashboardService {
 
   constructor(private http: HttpClient) { }
@@ -87,7 +143,6 @@ export class DashboardService {
     return of(true);
   }
 
-  
   // ==================================================
   // CARTERA POR ANTIGÜEDAD
   // ==================================================
@@ -167,7 +222,6 @@ export class DashboardService {
           const diasMora = Number(caso.obligation?.daysPastDue);
           const saldo = Number(caso.obligation?.totalBalance ?? 0);
 
-          // Evitar clasificar registros sin días de mora válidos.
           if (
             !Number.isFinite(diasMora) ||
             !Number.isFinite(saldo) ||
@@ -266,56 +320,186 @@ export class DashboardService {
   }
 
   // ==================================================
-  // TARJETAS KPI
+  // TARJETAS KPI - CONEXIÓN CON BACKEND
   // ==================================================
 
   getKPIs(): Observable<MetricCard[]> {
 
-    const kpis: MetricCard[] = [
+    const dashboardUrl =
+      `${API_CONFIG.baseUrl}/admin/dashboard`;
 
-      {
-        title: 'Cartera total en mora',
-        value: '$326.1M',
-        changePercentage: 6.6,
-        periodText: 'vs mes anterior',
-        status: 'info'
-      },
+    const recoveryUrl =
+      `${API_CONFIG.baseUrl}/analytics/recovery`;
 
-      {
-        title: 'Casos activos',
-        value: '1.247',
-        changePercentage: 8.6,
-        periodText: 'vs ayer',
-        status: 'info'
-      },
+    // Período: 1 de octubre hasta el día actual.
 
-      {
-        title: 'Casos críticos',
-        value: '87',
-        changePercentage: 12,
-        periodText: 'vs ayer',
-        status: 'warning'
-      },
+    const fechaActual = new Date();
 
-      {
-        title: 'Recaudo del período',
-        value: '$14.519.512 COP',
-        changePercentage: 18,
-        periodText: 'vs mes anterior',
-        status: 'success'
-      },
+    const fechaDesde = '2026-10-01T00:00:00';
 
-      {
-        title: 'Tasa de recuperación',
-        value: '4.3%',
-        changePercentage: 8.6,
-        periodText: 'vs mes anterior',
-        status: 'info'
-      }
+    const fechaHasta =
+      `${fechaActual.getFullYear()}-${String(
+        fechaActual.getMonth() + 1
+      ).padStart(2, '0')}-${String(
+        fechaActual.getDate()
+      ).padStart(2, '0')}T23:59:59`;
 
-    ];
+    const params = new HttpParams()
+      .set('from', fechaDesde)
+      .set('to', fechaHasta);
 
-    return of(kpis);
+    // Formato de moneda colombiana.
+
+    const formatoMoneda = (valor: number): string => {
+
+      return '$' + new Intl.NumberFormat('es-CO', {
+        maximumFractionDigits: 0
+      }).format(valor);
+
+    };
+
+    return forkJoin({
+
+      dashboard: this.http.get<AdminDashboardResponse>(
+        dashboardUrl
+      ),
+
+      recovery: this.http.get<RecoveryResponse>(
+        recoveryUrl,
+        { params }
+      ).pipe(
+
+        catchError(error => {
+
+          console.error(
+            'ERROR AL CONSULTAR EL RECAUDO:',
+            error
+          );
+
+          return of({
+            totalCollected: 0,
+            byChannel: {},
+            byRiskLevel: {},
+            topClients: []
+          } as RecoveryResponse);
+
+        })
+
+      )
+
+    }).pipe(
+
+      map(({ dashboard, recovery }) => {
+
+        const datosKpi = dashboard.kpis;
+
+        // ------------------------------------------
+        // 1. CARTERA TOTAL EN MORA
+        // ------------------------------------------
+
+        const carteraEnMora = (
+          dashboard.agingAnalysis ?? []
+        ).filter(rango => {
+          const bucket = rango.bucket
+            .normalize('NFD')
+            .replace(/[\u0300-\u036f]/g, '')
+            .trim()
+            .toLocaleLowerCase('es-CO');
+
+          return !['sin mora', 'no mora', 'al dia', 'current']
+            .includes(bucket);
+        })
+          .reduce(
+            (total, rango) => {
+              const monto = Number(rango.totalAmount ?? 0);
+              return total + (Number.isFinite(monto) ? monto : 0);
+            },
+            0
+          );
+
+        // ------------------------------------------
+        // 2. CASOS ACTIVOS
+        // ------------------------------------------
+
+        const casosActivos =
+          Number(datosKpi.openCases ?? 0) +
+          Number(datosKpi.inProgressCases ?? 0);
+
+        // ------------------------------------------
+        // 3. CLIENTES CRÍTICOS
+        // ------------------------------------------
+
+        const clientesCriticos =
+          Number(datosKpi.criticalClientsCount ?? 0);
+
+        // ------------------------------------------
+        // 4. RECAUDO DEL PERÍODO
+        // ------------------------------------------
+
+        const recaudo =
+          Number(recovery.totalCollected ?? 0);
+
+        // ------------------------------------------
+        // 5. TASA DE RECUPERACIÓN
+        // ------------------------------------------
+
+        // El endpoint de recuperación no devuelve
+        // una tasa. No inventamos un porcentaje.
+
+        const kpis: MetricCard[] = [
+
+          {
+            title: 'Cartera total en mora',
+            value: formatoMoneda(carteraEnMora),
+            periodText: 'Saldo total en mora',
+            status: 'info'
+          },
+
+          {
+            title: 'Casos activos',
+            value: new Intl.NumberFormat('es-CO').format(
+              casosActivos
+            ),
+            periodText: 'Casos abiertos y en gestión',
+            status: 'info'
+          },
+
+          {
+            title: 'Clientes críticos',
+            value: new Intl.NumberFormat('es-CO').format(
+              clientesCriticos
+            ),
+            periodText: 'Clientes con riesgo crítico',
+            status: 'warning'
+          },
+
+          {
+            title: 'Recaudo del período',
+            value: formatoMoneda(recaudo),
+            periodText: 'Desde el 1 de octubre de 2026',
+            status: 'success'
+          },
+
+          {
+            title: 'Tasa de recuperación',
+            value: 'No disponible',
+            periodText: 'Pendiente de indicador del backend',
+            status: 'info'
+          }
+
+        ];
+
+        console.log(
+          'KPIs RECIBIDOS DEL BACKEND:',
+          kpis
+        );
+
+        return kpis;
+
+      })
+
+    );
+
   }
 
   // ==================================================
@@ -362,52 +546,69 @@ export class DashboardService {
     );
   }
 
-  // ==================================================
-// BUSCAR CASOS EN EL BACKEND
+// ==================================================
+// DISTRIBUCIÓN DE CASOS POR ESTADO
 // ==================================================
 
-searchManagedCases(searchText: string): Observable<ManagedCase[]> {
+getCasesByStatus(): Observable<CaseStatusResponse[]> {
 
-  const url = `${API_CONFIG.baseUrl}/management/cases/search`;
+  const url =
+    `${API_CONFIG.baseUrl}/admin/dashboard/cases/status`;
 
-  const params = new HttpParams()
-    .set('q', searchText.trim());
+  return this.http.get<CaseStatusResponse[]>(url).pipe(
 
-  return this.http.get<CasesPageResponse>(url, { params }).pipe(
-
-    map(response => (response.content ?? []).map(caso => ({
-
-      id: caso.caseNumber || String(caso.id),
-
-      asociado: caso.client?.fullName || 'Sin información',
-
-      documento: caso.client?.documentNumber,
-
-      obligacion:
-        caso.obligation?.obligationNumber || 'Sin información',
-
-      saldoVencido: Number(caso.obligation?.totalBalance ?? 0),
-
-      riesgo: this.mapRisk(caso.client?.riskLevel),
-
-      diasMora: caso.obligation?.daysPastDue ?? 0,
-
-      asesor: String(
-        caso.assignedTo ?? caso.advisorId ?? 'Sin asignar'
-      ),
-
-      estado: caso.status || 'Sin estado',
-
-      segmento: this.mapSegment(caso.obligation?.daysPastDue),
-
-      fechaCreacion: caso.createdAt || '',
-
-      tiempoLimite: 'Sin información'
-
-    })))
+    map(response => response ?? [])
 
   );
+
 }
+
+  // ==================================================
+  // BUSCAR CASOS EN EL BACKEND
+  // ==================================================
+
+  searchManagedCases(searchText: string): Observable<ManagedCase[]> {
+
+    const url = `${API_CONFIG.baseUrl}/management/cases/search`;
+
+    const params = new HttpParams()
+      .set('q', searchText.trim());
+
+    return this.http.get<CasesPageResponse>(url, { params }).pipe(
+
+      map(response => (response.content ?? []).map(caso => ({
+
+        id: caso.caseNumber || String(caso.id),
+
+        asociado: caso.client?.fullName || 'Sin información',
+
+        documento: caso.client?.documentNumber,
+
+        obligacion:
+          caso.obligation?.obligationNumber || 'Sin información',
+
+        saldoVencido: Number(caso.obligation?.totalBalance ?? 0),
+
+        riesgo: this.mapRisk(caso.client?.riskLevel),
+
+        diasMora: caso.obligation?.daysPastDue ?? 0,
+
+        asesor: String(
+          caso.assignedTo ?? caso.advisorId ?? 'Sin asignar'
+        ),
+
+        estado: caso.status || 'Sin estado',
+
+        segmento: this.mapSegment(caso.obligation?.daysPastDue),
+
+        fechaCreacion: caso.createdAt || '',
+
+        tiempoLimite: 'Sin información'
+
+      })))
+
+    );
+  }
 
   // ==================================================
   // CALCULAR SEGMENTO SEGÚN DÍAS DE MORA
@@ -468,4 +669,15 @@ searchManagedCases(searchText: string): Observable<ManagedCase[]> {
     }
   }
 
+}
+
+// ==================================================
+// RESPUESTA DE DISTRIBUCIÓN DE CASOS POR ESTADO
+// ==================================================
+
+export interface CaseStatusResponse {
+  status: string;
+  label: string;
+  count: number;
+  percentage: number;
 }

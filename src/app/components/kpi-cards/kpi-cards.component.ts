@@ -1,5 +1,5 @@
 
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 import { DashboardService } from '../../service/dashboard.service';
@@ -30,7 +30,8 @@ export class KpiCardsComponent implements OnInit {
   // ==================================================
 
   constructor(
-    private dashboardService: DashboardService
+    private dashboardService: DashboardService,
+    private changeDetectorRef: ChangeDetectorRef
   ) { }
 
   // ==================================================
@@ -56,6 +57,7 @@ export class KpiCardsComponent implements OnInit {
         image: imagenes[index] ?? ''
       }));
 
+      this.changeDetectorRef.markForCheck();
     });
 
   }

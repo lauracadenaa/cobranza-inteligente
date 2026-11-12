@@ -1,29 +1,30 @@
+
 /* ================================================== */
 /* HEADER DEL DASHBOARD */
 /* ================================================== */
 
 .dashboard-header {
+  position: relative;
+  z-index: 10;
+
   display: flex;
-
   align-items: center;
-
   justify-content: space-between;
 
-   width : 1130px;
-
-  height: 82px;
+  width: 100%;
+  min-width: 0;
+  height: 81px;
 
   padding: 10px 10px 10px 34px;
 
   background-color: #FFFFFF;
-
   border: 1px solid #E2E8F0;
-
-  border-radius: 10px;
+  border-radius: 16px;
 
   box-sizing: border-box;
 
   transform: translateY(-20px);
+
 }
 
 
@@ -33,9 +34,7 @@
 
 .dashboard-info {
   display: flex;
-
   flex-direction: column;
-
   justify-content: center;
 
   transform: translate(-10px, -2px);
@@ -47,31 +46,22 @@
 /* ================================================== */
 
 .dashboard-info h1 {
-  margin: 0;
+  margin: 0 0 -4px;
 
   font-family: 'Roboto', sans-serif;
-
   font-size: 18px;
-
   font-weight: 800;
-
   font-style: normal;
-
   line-height: 36px;
-
   letter-spacing: -0.72px;
 
   color: #0A3B4E;
 
-  width: 82px;
-
-  height: 36px;
+  width: auto;
+  height: auto;
 
   display: flex;
-
   align-items: center;
-
-  margin-bottom: -4px;
 }
 
 
@@ -83,25 +73,16 @@
   margin: 0;
 
   font-family: 'Roboto', sans-serif;
-
   font-size: 14px;
-
   font-weight: 500;
-
-  font-style: normal;
-
   line-height: 21px;
-
-  letter-spacing: 0;
 
   color: #64748B;
 
-  width: 359px;
-
-  height: 21px;
+  width: auto;
+  height: auto;
 
   display: flex;
-
   align-items: center;
 }
 
@@ -112,294 +93,150 @@
 
 .dashboard-actions {
   display: flex;
-
   align-items: center;
 }
 
 /* ================================================== */
-/* ACTUALIZACIÓN */
+/* ACTUALIZACIÓN DEL DASHBOARD */
 /* ================================================== */
 
-.last-update {
+.dashboard-refresh {
   display: flex;
-
-  align-items: flex-start;
-
-  transform: translateX(-150px);
-}
-
-
-/* ================================================== */
-/* LOGO + INFORMACIÓN */
-/* ================================================== */
-
-.update-info {
-  display: flex;
-
-  align-items: center;
-
-  gap: 6px;
-}
-
-
-/* ================================================== */
-/* LOGO ACTUALIZAR */
-/* ================================================== */
-
-.update-icon {
-  width: 16px;
-
-  height: 16px;
-
-  object-fit: contain;
-
-  display: block;
-
-  flex-shrink: 0;
-}
-
-
-/* ================================================== */
-/* TEXTO + BOTÓN */
-/* ================================================== */
-
-.update-content {
-  display: flex;
-
   flex-direction: column;
-
   align-items: flex-start;
+  justify-content: center;
 
-  gap: 3px;
-}
+  gap: 5px;
 
-
-/* ================================================== */
-/* TEXTO ACTUALIZACIÓN */
-/* ================================================== */
-
-.update-content span {
-  font-family: 'Roboto', sans-serif;
-
-  font-size: 12px;
-
-  font-weight: 400;
-
-  line-height: 11px;
-
-  letter-spacing: 0.5px;
-
-  color: #64748B;
-
-  white-space: nowrap;
-}
-
-
-/* ================================================== */
-/* BOTÓN ACTUALIZAR */
-/* ================================================== */
-
-.update-content button {
-  padding: 0;
-
-  border: none;
-
-  background: transparent;
-
-  font-family: 'Roboto', sans-serif;
-
-  font-size: 14px;
-
-  font-weight: 500;
-
-  line-height: 20px;
-
-  color: #2563EB;
-
-  height: 20px;
-
-  display: flex;
-
-  align-items: center;
-
-  cursor: pointer;
-}
-
-/* ================================================== */
-/* POSICIÓN DEL LOGO ACTUALIZAR */
-/* ================================================== */
-
-.update-icon {
-  width: 16px;
-  height: 16px;
-
-  object-fit: contain;
-
-  display: block;
-
+  height: 56px;
   flex-shrink: 0;
+  margin-right: 34px;
 
-  transform: translateY(-7px);
+  transform: translateX(-56px);
 }
+
+
 /* ================================================== */
 /* INFORMACIÓN DE ACTUALIZACIÓN */
 /* ================================================== */
 
-.update-info {
-  width: 180px;
-  height: 20px;
-
+.refresh-info {
   display: flex;
-
   align-items: center;
-
-  justify-content: flex-start;
-
   gap: 6px;
-
-  position: relative;
 }
 
+
 /* ================================================== */
-/* ÍCONO ACTUALIZAR */
+/* IMAGEN DE ACTUALIZACIÓN */
 /* ================================================== */
 
-.update-icon {
+.refresh-icon {
   width: 16px;
   height: 16px;
 
   object-fit: contain;
-
   display: block;
 
+  transform: translateY(12px);
+
   flex-shrink: 0;
-
-  position: relative;
-
-  top: 7px;
-}
-
-/* ================================================== */
-/* BOTÓN ACTUALIZAR */
-/* ================================================== */
-
-.last-update button {
-  padding: 0;
-
-  border: none;
-
-  background: transparent;
-
-  font-family: 'Roboto', sans-serif;
-
-  font-size: 14px;
-
-  font-weight: 500;
-
-  font-style: normal;
-
-  line-height: 20px;
-
-  letter-spacing: 0;
-
-  color: #2563EB;
-
-  width: 65px;
-
-  height: 20px;
-
-  display: flex;
-
-  align-items: center;
-
-  cursor: pointer;
-
-
 }
 
 
 /* ================================================== */
-/* TEXTO DE ACTUALIZACIÓN */
+/* TEXTO: ACTUALIZADO HACE 3 MINUTOS */
 /* ================================================== */
 
-.last-update span {
+.refresh-info span {
+  width: 136px;
+  height: 11px;
+
   font-family: 'Roboto', sans-serif;
-
-  font-size: 12px;
-
   font-weight: 400;
-
   font-style: normal;
-
+  font-size: 12px;
   line-height: 11px;
-
   letter-spacing: 0.5px;
 
   color: #64748B;
 
-  width: 136px;
-
-  height: 11px;
-
   display: flex;
-
   align-items: center;
-
   white-space: nowrap;
-}
-
-
-/* ================================================== */
-/* TEXTO MOTOR IA */
-/* ================================================== */
-
-.ia-status span {
-  font-family: 'Roboto', sans-serif;
-
-  font-weight: 500;
-
-  font-style: normal;
-
-  font-size: 14px;
-
-  line-height: 20px;
-
-  letter-spacing: 0.1px;
-
-  text-align: center;
-
-  color: #64748B;
-}
-
-
-/* ================================================== */
-/* CONTENEDOR MOTOR IA */
-/* ================================================== */
-
-.ia-status {
-  width: 199px;
-
-  height: 56px;
-
-  background-color: #F0FDFA;
-
-  border-radius: 16px;
-
-  display: flex;
-
-  align-items: center;
-
-  gap: 10px;
-
-  padding: 8px 12px;
-
-  box-sizing: border-box;
 
   opacity: 1;
-
-  transform: translateX(-100px);
 }
 
+/* ================================================== */
+/* TEXTO: ACTUALIZAR */
+/* ================================================== */
+
+.refresh-action {
+  width: 65px;
+  height: 20px;
+
+  padding: 0;
+  margin-left: 20px;
+
+  border: none;
+  background: transparent;
+
+  font-family: 'Roboto', sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  font-style: normal;
+  line-height: 20px;
+  letter-spacing: 0;
+
+  color: #2563EB;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  white-space: nowrap;
+  cursor: pointer;
+  opacity: 1;
+
+}
+
+/* ================================================== */
+/* MOTOR IA */
+/* ================================================== */
+.ia-status {
+  width: 201px;
+  height: 56px;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background: #F0FDFA;
+  border: 1px solid #E2E8F0;
+  border-radius: 16px;
+  opacity: 1;
+  transform: translateX(-34px);
+}
+
+.ia-status.desactivado {
+  width: 211px;
+  height: 56px;
+  box-sizing: border-box;
+
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  padding: 8px 16px;
+
+  background: #F4F7FA;
+  border: 1px solid #E2E8F0;
+  border-radius: 16px;
+
+  opacity: 1;
+  
+}
 
 /* ================================================== */
 /* CÍRCULO DEL MOTOR IA */
@@ -410,7 +247,6 @@
   height: 40px;
 
   background-color: #10B98121;
-
   border-radius: 100px;
 
   padding: 8px;
@@ -424,6 +260,7 @@
   flex-shrink: 0;
 }
 
+
 /* ================================================== */
 /* IMAGEN DEL MOTOR IA */
 /* ================================================== */
@@ -433,86 +270,7 @@
   height: 24px;
 
   object-fit: contain;
-
   display: block;
-}
-
-/* ================================================== */
-/* TEXTO MOTOR IA */
-/* ================================================== */
-
-.ia-title span {
-  font-family: 'Roboto', sans-serif;
-
-  font-weight: 500;
-
-  font-style: normal;
-
-  font-size: 14px;
-
-  line-height: 20px;
-
-  letter-spacing: 0.1px;
-
-  color: #0A3B4E;
-
-  white-space: nowrap;
-}
-
-
-/* ================================================== */
-/* BOTÓN ACTIVO */
-/* ================================================== */
-
-.ia-estado-boton {
-  border: none;
-
-  background: transparent;
-
-  padding: 0;
-
-  margin: 0;
-
-  font-family: 'Roboto', sans-serif;
-
-  font-weight: 500;
-
-  font-style: normal;
-
-  font-size: 14px;
-
-  line-height: 20px;
-
-  letter-spacing: 0.1px;
-
-  color: #10B981;
-
-  cursor: pointer;
-
-  white-space: nowrap;
-}
-
-
-/* ================================================== */
-/* VERSIÓN DEL MODELO */
-/* ================================================== */
-
-.ia-version {
-  font-family: 'Roboto', sans-serif;
-
-  font-weight: 400;
-
-  font-style: normal;
-
-  font-size: 12px;
-
-  line-height: 16px;
-
-  letter-spacing: 0;
-
-  color: #94A3B8;
-
-  transform: translateX(-18px);
 }
 
 
@@ -522,65 +280,134 @@
 
 .ia-content {
   display: flex;
-
   flex-direction: column;
 
   gap: 2px;
 
   flex: 1;
-
   min-width: 0;
 
   transform: translateX(-5px);
 }
 
-
 /* ================================================== */
-/* MOTOR IA + ACTIVO */
+/* MOTOR IA + ESTADO */
 /* ================================================== */
 
 .ia-title {
+  width: 75px;
+  height: 20px;
+  margin: 0;
+  padding: 0;
+
   display: flex;
-
   align-items: center;
+}
 
-  justify-content: space-between;
+/* ================================================== */
+/* TEXTO MOTOR DE IA */
+/* ================================================== */
 
-  width: 100%;
+.dashboard-header .ia-content .ia-title {
+  width: 75px !important;
+  height: 20px !important;
 
+  display: flex !important;
+  align-items: center !important;
+}
+
+.dashboard-header .ia-content .ia-title span {
+  display: block !important;
+
+  width: 75px !important;
+  min-width: 75px !important;
+  height: 20px !important;
+
+  margin: 0 !important;
+  padding: 0 !important;
+
+  font-family: 'Roboto', sans-serif !important;
+  font-size: 14px !important;
+  font-weight: 500 !important;
+  font-style: medium !important;
+
+  line-height: 20px !important;
+  letter-spacing: 0.1px !important;
+
+  color: #64748B !important;
+
+  text-align: center !important;
+  white-space: nowrap !important;
+}
+
+/* ================================================== */
+/* BOTÓN ACTIVO */
+/* ================================================== */
+
+.ia-estado-boton {
+  border: none;
+  background: transparent;
+
+  padding: 0;
+  margin: 0;
+
+  font-family: 'Roboto', sans-serif;
+  font-weight: 700;
+  font-style: normal;
+  font-size: 14px;
+  line-height: 20px;
+  letter-spacing: 0.1px;
+
+  color: #10B981;
+
+  cursor: pointer;
   white-space: nowrap;
-
 }
 
 
 /* ================================================== */
+/* VERSIÓN DEL MODELO */
+/* ================================================== */
+
+.ia-version {
+  width: 65px;
+  height: 20px;
+  
+  font-family: 'Roboto', sans-serif;
+  font-weight: 400;
+  font-style: normal;
+  font-size: 12px;
+  line-height: 16px;
+  letter-spacing: 0;
+  white-space: nowrap;
+  color: #94A3B8;
+
+  transform: translateX(10px);
+}
+
+
 /* ================================================== */
 /* USUARIO */
 /* ================================================== */
-/* ================================================== */
+
+.user-menu {
+  position: relative;
+  width: 180px;
+  flex-shrink: 0;
+  transform: translateX(-10px);
+}
 
 .user-info {
   width: 180px;
-
   height: 48px;
-
   display: flex;
-
   align-items: center;
-
   gap: 10px;
-
   background-color: transparent;
-
   box-sizing: border-box;
-
   opacity: 1;
-
   flex-shrink: 0;
-
-  transform: translateX(-20px);
 }
-
 
 /* ================================================== */
 /* CUADRO JD */
@@ -588,21 +415,16 @@
 
 .user-icon {
   width: 36px;
-
   height: 36px;
 
   background-color: #055177;
-
   border-radius: 12px;
 
   display: flex;
-
   align-items: center;
-
   justify-content: center;
 
   flex-shrink: 0;
-
   box-sizing: border-box;
 
   opacity: 1;
@@ -615,25 +437,19 @@
 
 .user-icon span {
   width: 18px;
-
   height: 20px;
 
   margin: 0;
 
   font-family: 'Montserrat', sans-serif;
-
   font-size: 13px;
-
   font-weight: 700;
-
   line-height: 20px;
 
   color: #FFFFFF;
 
   display: flex;
-
   align-items: center;
-
   justify-content: center;
 }
 
@@ -644,111 +460,273 @@
 
 .user-details {
   width: 84px;
-
-  height: 40px;
+  height: 16px;
 
   display: flex;
-
   flex-direction: column;
-
   justify-content: center;
 
   gap: 2px;
 
   flex-shrink: 0;
-
   box-sizing: border-box;
 }
 
+@media (max-width: 760px) {
+  .dashboard-header {
+    height: auto;
+    min-height: 81px;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .dashboard-info {
+    flex: 1 1 100%;
+  }
+
+  .dashboard-actions {
+    width: 100%;
+    justify-content: flex-end;
+    gap: 10px;
+  }
+}
+
+@media (max-width: 1280px) {
+  .dashboard-header {
+    height: auto;
+    min-height: 81px;
+    flex-wrap: wrap;
+    gap: 12px;
+    padding: 12px 16px;
+    transform: none;
+  }
+
+  .dashboard-info {
+    flex: 1 1 100%;
+    min-width: 0;
+    transform: none;
+  }
+
+  .dashboard-info h1,
+  .dashboard-info p {
+    max-width: 100%;
+    overflow-wrap: anywhere;
+  }
+
+  .dashboard-actions {
+    width: 100%;
+    min-width: 0;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .dashboard-refresh,
+  .ia-status,
+  .ia-status.inactivo,
+  .user-info {
+    transform: none;
+  }
+
+  .dashboard-refresh {
+    min-width: 0;
+  }
+
+  .ia-status,
+  .ia-status.inactivo {
+    width: min(201px, 100%);
+  }
+
+  .user-info {
+    width: auto;
+    min-width: 0;
+  }
+}
+
+@media (max-width: 520px) {
+  .dashboard-header {
+    align-items: flex-start;
+    padding: 12px 16px;
+  }
+
+  .dashboard-info {
+    transform: none;
+  }
+
+  .dashboard-info h1 {
+    font-size: 16px;
+    line-height: 24px;
+  }
+
+  .dashboard-info p {
+    font-size: 12px;
+    line-height: 18px;
+  }
+
+  .dashboard-actions {
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
+
+  .ia-status,
+  .ia-status.inactivo {
+    width: 180px;
+  }
+
+  .user-info {
+    width: auto;
+  }
+}
+
 
 /* ================================================== */
-/* NOMBRE JOU DOU */
+/* NOMBRE DEL USUARIO */
 /* ================================================== */
 
 .user-details strong {
+  width: 52px;
+  height: 16px;
   margin: 0;
 
   font-family: 'Roboto', sans-serif;
-
   font-size: 14px;
-
-  font-weight: 600;
-
+  font-weight: 700;
   line-height: 20px;
+  font-style: Bold;
 
-  color: #0A3B4E;
+  color: #001822;
 
   white-space: nowrap;
 }
 
 
 /* ================================================== */
-/* ROL ADMINISTRADOR */
+/* ROL DEL USUARIO */
 /* ================================================== */
 
 .user-details span {
+  width: 76px;
+  height: 14px;
   margin: 0;
 
   font-family: 'Roboto', sans-serif;
-
   font-size: 12px;
-
   font-weight: 400;
-
   line-height: 16px;
 
-  color: #64748B;
+  color: #94A3B8;
 
   white-space: nowrap;
 }
 
 
 /* ================================================== */
-/* CHEVRON EN FORMA DE V */
+/* CHEVRON DEL USUARIO */
 /* ================================================== */
 
 .user-chevron {
-  width: 8px;
-
-  height: 8px;
-
-  border-right: 2px solid #64748B;
-
-  border-bottom: 2px solid #64748B;
-
-  transform: rotate(45deg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border: 0;
+  border-radius: 12px;
+  background: transparent;
 
   flex-shrink: 0;
-
+  cursor: pointer;
   margin-left: auto;
+  transition: background-color 0.2s ease;
+}
 
-  margin-right: 2px;
+.user-chevron::before {
+  content: '';
+  width: 8px;
+  height: 8px;
+  border-right: 2px solid #64748B;
+  border-bottom: 2px solid #64748B;
+  transform: translateY(-2px) rotate(45deg);
+  transition: transform 0.2s ease;
+}
 
-  margin-top: -4px;
+.user-chevron:hover,
+.user-chevron[aria-expanded='true'] {
+  background-color: #DBEAFE;
+}
+
+.user-chevron:hover::before,
+.user-chevron[aria-expanded='true']::before {
+  border-color: #0A3B4E;
+}
+
+.user-chevron[aria-expanded='true']::before {
+  transform: translateY(2px) rotate(225deg);
+}
+
+.user-chevron:focus-visible {
+  outline: 2px solid #2563EB;
+  outline-offset: 5px;
+}
+
+.user-dropdown {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  z-index: 1000;
+  min-width: 180px;
+  padding: 6px;
+  border: 1px solid #E2E8F0;
+  border-radius: 10px;
+  background: #FFFFFF;
+  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.12);
+  box-sizing: border-box;
+}
+
+.user-dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  min-height: 40px;
+  padding: 0 10px;
+  border: 0;
+  border-radius: 7px;
+  background: transparent;
+  color: #DC2626;
+  font: 500 14px 'Roboto', sans-serif;
+  text-align: left;
+  cursor: pointer;
+}
+
+.user-dropdown-item:hover {
+  background: #FEE2E2;
+}
+
+.user-dropdown-item:focus-visible {
+  outline: 2px solid #2563EB;
+  outline-offset: -2px;
 }
 
 
 /* ================================================== */
-/* FONDO DEL MODAL */
+/* FONDO DEL MODAL MOTOR IA */
 /* ================================================== */
 
 .ia-modal-overlay {
   position: fixed;
 
   top: 0;
-
   left: 0;
 
   width: 100vw;
-
   height: 100vh;
 
   background-color: rgba(0, 0, 0, 0.55);
 
   display: flex;
-
   align-items: center;
-
   justify-content: center;
 
   z-index: 9999;
@@ -761,27 +739,18 @@
 
 .ia-modal {
   width: 559px;
-
   height: 561px;
 
   background-color: #FFFFFF;
 
   border: 1px solid #E2E8F0;
-
   border-radius: 35px;
 
   box-sizing: border-box;
 
-  padding-top: 19px;
-
-  padding-right: 57px;
-
-  padding-bottom: 45px;
-
-  padding-left: 57px;
+  padding: 19px 57px 45px;
 
   display: flex;
-
   flex-direction: column;
 
   gap: 26px;
@@ -796,7 +765,6 @@
 
 .ia-modal-content {
   display: flex;
-
   flex-direction: column;
 }
 
@@ -809,9 +777,7 @@
   margin: 0;
 
   font-family: 'Roboto', sans-serif;
-
   font-size: 20px;
-
   font-weight: 700;
 
   color: #0A3B4E;
@@ -826,9 +792,7 @@
   margin: 10px 0 0;
 
   font-family: 'Roboto', sans-serif;
-
   font-size: 14px;
-
   font-weight: 400;
 
   color: #64748B;
@@ -841,11 +805,9 @@
 
 .ia-modal-close {
   width: 100px;
-
   height: 40px;
 
   border: none;
-
   border-radius: 10px;
 
   background-color: #0A3B4E;

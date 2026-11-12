@@ -15,7 +15,17 @@ import { AgingData } from '../../models/dashboard.models';
   templateUrl: './aging-chart.component.html',
   styleUrl: './aging-chart.component.css'
 })
+
 export class AgingChartComponent implements OnInit {
+  get segmentDataFiltrada(): AgingData[] {
+    return this.segmentData.filter(dato =>
+      dato.rangoMora
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .trim()
+        .toLowerCase() !== 'juridica'
+    );
+  }
 
   // ==================================================
   // DATOS DE LA CARTERA POR ANTIGÜEDAD
@@ -57,7 +67,7 @@ get maxAgingValue(): number {
   if (this.vistaActual === 'antiguedad') {
     datosActuales = this.agingData;
   } else if (this.vistaActual === 'segmento') {
-    datosActuales = this.segmentData;
+    datosActuales = this.segmentDataFiltrada;
   } else {
     datosActuales = this.riskData;
   }

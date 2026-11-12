@@ -1,0 +1,29 @@
+<section class="kpi-container">
+
+  <div class="kpi-card" *ngFor="let kpi of kpisActuales">
+
+    <div class="kpi-icon">
+      <img [src]="kpi.imagen" [alt]="kpi.alt">
+    </div>
+
+    <div class="kpi-title">
+      {{ kpi.titulo }}
+    </div>
+
+    <div class="kpi-value">
+      {{ kpi.valor }}
+    </div>
+
+    <div class="kpi-change" *ngIf="kpi.porcentaje">
+      <span class="kpi-percentage">
+        {{ kpi.porcentaje }}
+      </span>
+
+      <span class="kpi-period">
+        {{ kpi.periodo }}
+      </span>
+    </div>
+
+  </div>
+
+</section>

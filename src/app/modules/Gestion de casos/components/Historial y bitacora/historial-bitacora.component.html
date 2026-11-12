@@ -1,0 +1,192 @@
+<div class="historial-layout">
+
+  <!-- =====================================
+  1. HISTORIAL Y BITÁCORA
+  ====================================== -->
+
+  <section class="historial-card">
+
+    <div class="historial-header">
+      <div>
+        <h3>Historial y bitácora</h3>
+        <p>Consulta los movimientos y gestiones realizados en este caso.</p>
+      </div>
+
+      <span class="total-eventos">
+        {{ totalEventos }} eventos
+      </span>
+    </div>
+
+    <div class="historial-divider"></div>
+    
+    <div class="timeline-container">
+
+      <div
+        class="timeline-item"
+        *ngFor="let evento of eventosOrdenados; let primero = first">
+
+        <div class="timeline-indicator">
+          <span
+            class="timeline-dot"
+            [class.timeline-dot-active]="evento.id === eventoSeleccionadoId">
+          </span>
+
+          <span
+            class="timeline-line"
+            *ngIf="!primero || eventosOrdenados.length > 1">
+          </span>
+        </div>
+
+        <div
+          class="evento-card"
+          [class.evento-seleccionado]="evento.id === eventoSeleccionadoId"
+          (click)="seleccionarEvento(evento)"
+          role="button"
+          tabindex="0"
+          (keydown.enter)="seleccionarEvento(evento)"
+          (keydown.space)="seleccionarEvento(evento); $event.preventDefault()">
+
+          <div class="evento-card-header">
+            <div class="evento-title-group">
+              <span class="evento-type">
+                {{ evento.tipo }}
+              </span>
+              <h4>{{ evento.titulo }}</h4>
+            </div>
+
+            <span class="evento-date">
+              {{ evento.fecha }}
+            </span>
+          </div>
+
+          <p class="evento-description">
+            {{ evento.descripcion }}
+          </p>
+
+          <div class="evento-footer">
+            <span class="evento-responsable">
+              <span class="footer-label">Responsable:</span>
+              {{ evento.responsable }}
+            </span>
+
+            <span
+              class="evento-result"
+              [class.resultado-efectivo]="evento.resultado === 'Contacto efectivo'">
+              {{ evento.resultado }}
+            </span>
+          </div>
+
+        </div>
+
+      </div>
+
+      <div
+        class="historial-empty"
+        *ngIf="eventosOrdenados.length === 0">
+        <p>No hay registros aún.</p>
+        <span>Cuando existan movimientos, aparecerán aquí.</span>
+      </div>
+
+    </div>
+
+  </section> <!-- Cierre correcto de .historial-card -->
+
+
+  <!-- =====================================
+       2. CONTENEDORES DEL LADO DERECHO
+  ====================================== -->
+
+  <aside class="historial-sidebar">
+
+    <!-- DETALLE DEL EVENTO -->
+    <section class="detalle-evento-card">
+
+      <div class="sidebar-card-header">
+        <h3>Detalle del evento</h3>
+      </div>
+
+      <div class="sidebar-divider"></div>
+
+      <ng-container *ngIf="eventoSeleccionado as evento; else sinEvento">
+
+        <div class="detalle-evento-content">
+
+          <div class="detalle-evento-title">
+            <span class="detalle-evento-type">
+              {{ evento.tipo }}
+            </span>
+            <h4>{{ evento.titulo }}</h4>
+          </div>
+
+          <div class="detalle-data-item">
+            <span>Fecha y hora</span>
+            <strong>{{ evento.fecha }}</strong>
+          </div>
+
+          <div class="detalle-data-item">
+            <span>Responsable</span>
+            <strong>{{ evento.responsable }}</strong>
+          </div>
+
+          <div class="detalle-data-item">
+            <span>Canal</span>
+            <strong>{{ evento.canal }}</strong>
+          </div>
+
+          <div class="detalle-data-item">
+            <span>Resultado</span>
+            <strong>{{ evento.resultado }}</strong>
+          </div>
+
+          <div class="detalle-description">
+            <span>Descripción</span>
+            <p>{{ evento.descripcion }}</p>
+          </div>
+
+          <div class="detalle-observacion">
+            <span>Observaciones</span>
+            <p>{{ evento.observacion }}</p>
+          </div>
+
+        </div>
+
+      </ng-container>
+
+      <ng-template #sinEvento>
+        <div class="detalle-empty">
+          <p>Selecciona un evento para consultar su detalle.</p>
+        </div>
+      </ng-template>
+
+    </section>
+
+
+    <!-- RESUMEN DE LA BITÁCORA -->
+    <section class="resumen-bitacora-card">
+
+      <div class="sidebar-card-header">
+        <h3>Resumen de la bitácora</h3>
+      </div>
+
+      <div class="resumen-bitacora-content">
+        <div class="resumen-item">
+          <span>Total de eventos</span>
+          <strong>{{ totalEventos }}</strong>
+        </div>
+
+        <div class="resumen-item">
+          <span>Contactos efectivos</span>
+          <strong>{{ contactosEfectivos }}</strong>
+        </div>
+      </div>
+
+      <div class="ultima-actividad">
+        <span>Última actividad:</span>
+        <strong>{{ ultimaActividad }}</strong>
+      </div>
+
+    </section>
+
+  </aside>
+
+</div>

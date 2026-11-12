@@ -1,0 +1,222 @@
+
+/* ================================================== */
+/* CONTENEDOR KPI */
+/* ================================================== */
+
+:host {
+  display: block;
+  width: 100%;
+  min-width: 0;
+}
+
+.kpi-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 190px), 1fr));
+  align-items: stretch;
+  gap: 15px;
+  width: 100%;
+  min-width: 0;
+
+  margin-top: 12px;
+  margin-left: 0;
+
+  box-sizing: border-box;
+}
+
+/* ================================================== */
+/* TARJETAS KPI */
+/* ================================================== */
+
+.kpi-card {
+  position: relative;
+  width: 100%;
+  min-width: 0;
+  height: 102px;
+
+  padding: 13px 16px;
+
+  background-color: #FFFFFF;
+  border: 1px solid #CBD5E1;
+  border-radius: 16px;
+
+  box-sizing: border-box;
+}
+
+/* ================================================== */
+/* ICONOS KPI */
+/* ================================================== */
+
+.kpi-icon {
+  position: absolute;
+  top: 10px;
+  right: 12px;
+
+  width: 25px;
+  height: 25px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  z-index: 2;
+}
+
+.kpi-icon img {
+  display: block;
+  width: 23px;
+  height: 23px;
+  object-fit: contain;
+}
+
+/* ================================================== */
+/* TÍTULO KPI */
+/* ================================================== */
+
+.kpi-title {
+  position: absolute;
+  top: 13px;
+  left: 13px;
+
+  width: calc(100% - 55px);
+  min-height: 13px;
+  height: auto;
+
+  margin: 0;
+  padding: 0;
+
+  font-family: 'Roboto', sans-serif;
+  font-weight: 600;
+  font-style: SemiBold;
+  font-size: 11px;
+  line-height: 100%;
+  letter-spacing: 0.44px;
+  vertical-align: middle;
+
+  color: #0A3B4E;
+
+  display: flex;
+  align-items: center;
+  white-space: normal;
+}
+
+/* ================================================== */
+/* ICONO KPI */
+/* ================================================== */
+
+.kpi-icon {
+  position: absolute;
+  top: 10px;
+  right: 12px;
+
+  width: 25px;
+  height: 25px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  z-index: 2;
+}
+
+/* ================================================== */
+/* VALOR KPI */
+/* ================================================== */
+
+.kpi-value {
+  position: absolute;
+  top: 39px;
+  left: 13px;
+
+  width: 81px;
+  height: 23px;
+
+  font-family: 'Roboto', sans-serif;
+  font-weight: 600;
+  font-size: 20px;
+  font-style: SemiBold;
+  line-height: 100%;
+  letter-spacing: -0.66px;
+  vertical-align: middle;
+
+  color: #0A3B4E;
+
+  display: flex;
+  align-items: center;
+  white-space: nowrap;
+}
+
+/* ================================================== */
+/* PORCENTAJE Y PERÍODO */
+/* ================================================== */
+
+.kpi-change {
+  position: absolute;
+  top: 67px;
+  left: 13px;
+
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  margin: 0;
+  white-space: nowrap;
+}
+
+/* ================================================== */
+/* PORCENTAJE */
+/* ================================================== */
+
+.kpi-percentage {
+  width: 30px;
+  height: 14px;
+
+  padding: 3px 8px;
+
+  background-color: #EFF6FF;
+  border-radius: 12px;
+
+  font-family: 'Roboto', sans-serif;
+  font-weight: 500;
+  font-style: medium;
+  font-size: 12px;
+  line-height: 100%;
+  letter-spacing: -0.66px;
+  vertical-align: middle;
+
+  color: #3B82F6;
+  opacity: 1;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  box-sizing: border-box;
+  white-space: nowrap;
+}
+
+/* ================================================== */
+/* PERÍODO VS MES ANTERIOR */
+/* ================================================== */
+
+.kpi-period {
+  width: 74px;
+  height: 14px;
+
+  font-family: 'Roboto', sans-serif;
+  font-weight: 400;
+  font-style: regular;
+  font-size: 12px;
+  line-height: 100%;
+  letter-spacing: -0.66px;
+  vertical-align: middle;
+
+  color: #64748B;
+  opacity: 1;
+
+  display: flex;
+  align-items: center;
+
+  vertical-align: middle;
+  white-space: nowrap;
+  box-sizing: border-box;
+}

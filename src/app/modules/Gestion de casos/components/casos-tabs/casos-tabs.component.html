@@ -1,0 +1,15 @@
+
+<nav class="casos-tabs">
+
+  <button
+    *ngFor="let pestana of pestanas"
+    type="button"
+    class="casos-tab"
+    [class.activa]="pestanaActiva === pestana"
+    (click)="seleccionarPestana(pestana)">
+
+    {{ pestana }}
+
+  </button>
+
+</nav>

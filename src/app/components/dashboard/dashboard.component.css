@@ -1,3 +1,4 @@
+
 /* ================================================== */
 /* ESTRUCTURA PRINCIPAL */
 /* ================================================== */
@@ -15,10 +16,10 @@
 .dashboard-content {
   flex: 1;
   min-width: 0;
-  width: 100%;
-  padding: 30px 30px 30px 34px;
+  width: 0;
+  padding: 30px 8px 30px 28px;
   box-sizing: border-box;
-  overflow-x: auto;
+  overflow-x: hidden;
   background-color: #D9E3EA;
 }
 
@@ -28,9 +29,48 @@
 
 .dashboard-content h1 {
   margin: 0;
-  font-size: 28px;
-  font-weight: 700;
-  color: #1E293B;
+
+  width: max-content;
+  min-height: 36px;
+  height: 36px;
+
+  font-family: 'Roboto', sans-serif;
+  font-weight: 800;
+  font-style: normal;
+  font-size: 18px;
+  line-height: 36px;
+  letter-spacing: -0.72px;
+  min-height: 36px;
+  box-sizing: border-box;
+
+  color: #0A3B4E;
+
+  display: flex;
+  align-items: center;
+}
+
+/* ================================================== */
+/* DESCRIPCIÓN DEBAJO DEL TÍTULO */
+/* ================================================== */
+
+.dashboard-content > p {
+  width: 359px;
+  height: 21px;
+  margin: 0;
+
+  font-family: 'Roboto', sans-serif;
+  font-weight: 500;
+  font-style: normal;
+  font-size: 14px;
+  line-height: 21px;
+  letter-spacing: 0;
+
+  color: #64748B;
+
+  display: flex;
+  align-items: center;
+  vertical-align: middle;
+  opacity: 1;
 }
 
 /* ================================================== */
@@ -38,14 +78,18 @@
 /* ================================================== */
 
 .kpi-container {
-  display: flex;
-  gap: 20px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 180px), 1fr));
+  gap: 16px;
+  width: 100%;
+  min-width: 0;
   margin: 30px 0;
+  box-sizing: border-box;
 }
 
 .kpi-card {
-  flex: 1;
-  min-width: 180px;
+  width: 100%;
+  min-width: 0;
   padding: 20px;
   background-color: #FFFFFF;
   border: 1px solid #E2E8F0;
@@ -58,6 +102,7 @@
   font-size: 14px;
   font-weight: 500;
   color: #64748B;
+  overflow-wrap: anywhere;
 }
 
 .kpi-card strong {
@@ -71,6 +116,7 @@
   margin: 10px 0 0;
   font-size: 13px;
   color: #10989B;
+  overflow-wrap: anywhere;
 }
 
 /* ================================================== */
@@ -127,11 +173,12 @@ tbody tr:hover {
 /* ================================================== */
 
 .dashboard-charts {
-  display: flex;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   align-items: flex-start;
   gap: 24px;
-  width: 1128px;
-  max-width: 100%;
+  width: 100%;
+  min-width: 0;
   box-sizing: border-box;
 }
 
@@ -140,12 +187,15 @@ tbody tr:hover {
 /* ================================================== */
 
 .managed-cases {
-  width: 1128px;
-  min-width: 1128px;
-  height: 488px;
+  width: 100%;
+  min-width: 0;
+  height: auto;
   margin-top: 24px;
-  padding: 20px;
+  padding: 0 0 20px;
   box-sizing: border-box;
+
+  overflow: visible;
+
   background: #FFFFFF;
   border: 1px solid #E2E8F0;
   border-radius: 12px;
@@ -156,30 +206,39 @@ tbody tr:hover {
 /* ================================================== */
 
 .managed-cases-header {
-  width: 1128px;
+  width: 100%;
   height: 72px;
   min-height: 72px;
+
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin: -21px -21px 20px;
+
+  margin: 0;
   padding: 16px 24px;
+
   box-sizing: border-box;
-  border: 1px solid #E2E8F0;
-  border-radius: 12px 12px 0 0;
+
   background: #FFFFFF;
+  border: none;
+  border-bottom: 1px solid #E2E8F0;
+  border-radius: 12px 12px 0 0;
+
+  opacity: 1;
 }
 
 .managed-cases-header h2 {
-  width: 124px;
-  height: 19px;
+  width: auto;
+  height: auto;
   margin: 0;
+
   font-family: 'Roboto', sans-serif;
-  font-size: 16px;
+  font-size: clamp(14px, 0.875rem + 0.15vw, 16px);
   font-weight: 600;
   font-style: normal;
   line-height: 100%;
   letter-spacing: 0;
+
   color: #1E293B;
   white-space: nowrap;
 }
@@ -189,20 +248,25 @@ tbody tr:hover {
 /* ================================================== */
 
 .managed-active-filters {
-  width: 1132px;
-  min-width: 1132px;
-  height: 40px;
+  width: 100%;
+  min-width: 0;
   min-height: 40px;
-  margin-left: -21px;
+  height: auto;
+  margin: 0;
+
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: 8px;
+
   padding: 2px 20px;
   box-sizing: border-box;
+
   background: transparent;
-  border-right: 1px solid #E2E8F0;
+  border-right: none;
   border-bottom: 1px solid #E2E8F0;
-  border-left: 1px solid #E2E8F0;
+  border-left: none;
+
   overflow: hidden;
 }
 
@@ -215,19 +279,24 @@ tbody tr:hover {
   align-items: center;
   justify-content: center;
   gap: 6px;
+
   width: fit-content;
   min-width: 0;
   max-width: 100%;
   height: 29px;
+
   padding: 0 8px;
   box-sizing: border-box;
+
   background-color: #DBEAFE;
   border: 1px solid #BFDBFE;
   border-radius: 6px;
+
   color: #001822;
   font-family: 'Roboto', sans-serif;
   font-size: 12px;
   font-weight: 400;
+
   white-space: nowrap;
   flex-shrink: 0;
 }
@@ -236,11 +305,14 @@ tbody tr:hover {
   display: flex;
   align-items: center;
   justify-content: center;
+
   width: 16px;
   height: 16px;
+
   padding: 0;
   border: none;
   background: transparent;
+
   color: #64748B;
   cursor: pointer;
 }
@@ -266,11 +338,14 @@ tbody tr:hover {
 .managed-search {
   width: 360px;
   height: 40px;
+
   display: flex;
   align-items: center;
   gap: 8px;
+
   padding: 0 12px;
   box-sizing: border-box;
+
   background: #F8FAFC;
   border: 1px solid #CBD5E1;
   border-radius: 8px;
@@ -285,9 +360,11 @@ tbody tr:hover {
 .managed-search input {
   width: 100%;
   height: 100%;
+
   border: none;
   outline: none;
   background: transparent;
+
   font-family: 'Roboto', sans-serif;
   font-size: 14px;
   font-weight: 400;
@@ -308,19 +385,24 @@ tbody tr:hover {
   width: 126px;
   min-width: 126px;
   height: 40px;
+
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
+
   padding: 0;
   box-sizing: border-box;
+
   background-color: #FFFFFF;
   border: 1px solid #CBD5E1;
   border-radius: 8px;
+
   font-family: 'Roboto', sans-serif;
   font-size: 14px;
   font-weight: 600;
   color: #475569;
+
   cursor: pointer;
 }
 
@@ -341,6 +423,7 @@ tbody tr:hover {
   height: 16px;
   object-fit: contain;
   flex-shrink: 0;
+
   filter: brightness(0) saturate(100%)
           invert(31%) sepia(14%)
           saturate(747%) hue-rotate(176deg)
@@ -361,23 +444,27 @@ tbody tr:hover {
   width: 20px;
   height: 18px;
   min-width: 20px;
+
   display: inline-flex;
   align-items: center;
   justify-content: center;
+
   padding: 0 6px;
   box-sizing: border-box;
   flex-shrink: 0;
+
   border-radius: 100px;
   border: none;
   background-color: #3B82F6;
+
   font-family: 'Roboto', sans-serif;
   font-size: 11px;
   font-weight: 500;
-  font-style: normal;
   line-height: 16px;
   letter-spacing: 0;
   text-align: center;
   color: #FFFFFF;
+
   opacity: 1;
 }
 
@@ -386,23 +473,27 @@ tbody tr:hover {
 /* ================================================== */
 
 .managed-cases-table {
-  width: 1128px;
-  height: 304px;
+  width: 100%;
+  height: auto;
   min-height: 304px;
-  margin-left: -21px;
+
+  margin: 0;
   box-sizing: border-box;
+
   background: transparent;
   border: none;
   box-shadow: none;
-  overflow: hidden;
+
+  overflow-x: auto;
 }
 
 /* ================================================== */
-/* CONTENEDOR DE TÍTULOS DE LA TABLA */
+/* TABLA DE CASOS */
 /* ================================================== */
 
 .managed-cases-table table {
-  width: 1126px;
+  width: 100%;
+  min-width: 850px;
 }
 
 .managed-cases-table thead {
@@ -413,13 +504,30 @@ tbody tr:hover {
   height: 44px;
 }
 
+/* ================================================== */
+/* TÍTULOS DE LAS COLUMNAS */
+/* ================================================== */
+
 .managed-cases-table thead th {
   height: 44px;
   padding: 0 16px;
   box-sizing: border-box;
+
   text-align: left;
   vertical-align: middle;
-  border-bottom: 0 solid #E2E8F0;
+
+  font-family: 'Roboto', sans-serif;
+  font-size: clamp(11px, 0.6875rem + 0.1vw, 12px);
+  font-weight: 500;
+  line-height: 140%;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+
+  color: #63768A;
+  white-space: nowrap;
+  opacity: 1;
+
+  border-bottom: 0;
 }
 
 /* ================================================== */
@@ -427,26 +535,29 @@ tbody tr:hover {
 /* ================================================== */
 
 .managed-cases-table tbody tr {
-  width: 1126px;
   height: 52px;
   min-height: 52px;
   box-sizing: border-box;
 }
 
-/* ESTILO GENERAL DE LAS CELDAS */
+/* ================================================== */
+/* CELDAS */
+/* ================================================== */
 
 .managed-cases-table tbody td {
   height: 52px;
   padding: 0 16px;
   box-sizing: border-box;
+
   text-align: left;
   vertical-align: middle;
+
   font-family: 'Roboto', sans-serif;
-  font-size: 14px;
+  font-size: clamp(12px, 0.75rem + 0.15vw, 14px);
   font-weight: 400;
-  font-style: normal;
   line-height: 140%;
   letter-spacing: 0;
+
   color: #173042;
   border-bottom: 1px solid #CBD5E1;
   white-space: nowrap;
@@ -460,17 +571,16 @@ tbody tr:hover {
 .managed-cases-table tbody td:first-child a {
   width: 137px;
   height: 20px;
+
   font-family: 'Roboto', sans-serif;
   font-weight: 500;
-  font-style: normal;
-  font-size: 14px;
+  font-size: clamp(12px, 0.75rem + 0.15vw, 14px);
   line-height: 140%;
   letter-spacing: 0;
+
   color: #2764E7;
   text-decoration: underline;
-  text-decoration-style: solid;
-  text-decoration-thickness: 0;
-  text-underline-offset: 0;
+
   opacity: 1;
 }
 
@@ -494,7 +604,6 @@ tbody tr:hover {
 
   font-family: 'Roboto', sans-serif;
   font-weight: 500;
-  font-style: normal;
   font-size: 14px;
   line-height: 140%;
   letter-spacing: 0;
@@ -533,7 +642,6 @@ tbody tr:hover {
   font-family: 'Roboto', sans-serif;
   font-size: 12px;
   font-weight: 500;
-  font-style: normal;
   line-height: 140%;
   letter-spacing: 0;
 
@@ -542,28 +650,20 @@ tbody tr:hover {
   text-decoration: none;
 }
 
-/* RIESGO BAJO */
-
 .managed-cases-table .risk-badge.bajo {
   background-color: #F0FDF4 !important;
   color: #16A34A !important;
 }
-
-/* RIESGO MEDIO */
 
 .managed-cases-table .risk-badge.medio {
   background-color: #FEF3C7 !important;
   color: #D97706 !important;
 }
 
-/* RIESGO ALTO */
-
 .managed-cases-table .risk-badge.alto {
   background-color: #FEECDC !important;
   color: #EF4444 !important;
 }
-
-/* RIESGO CRÍTICO */
 
 .managed-cases-table .risk-badge.critico {
   background-color: #FEE2E2 !important;
@@ -580,15 +680,19 @@ tbody tr:hover {
 /* ================================================== */
 
 .quick-actions {
-  width: 1128px;
-  min-width: 1128px;
+  width: 100%;
+  min-width: 0;
   height: 139px;
+
   margin-top: 24px;
   padding: 12px 16px;
+
   display: flex;
   flex-direction: column;
   gap: 12px;
+
   box-sizing: border-box;
+
   background: #FFFFFF;
   border: 1px solid #E2E8F0;
   border-radius: 12px;
@@ -596,8 +700,9 @@ tbody tr:hover {
 
 .quick-actions h2 {
   margin: 0;
+
   font-family: 'Roboto', sans-serif;
-  font-size: 14px;
+  font-size: clamp(13px, 0.8125rem + 0.1vw, 14px);
   font-weight: 600;
   line-height: 16px;
   color: #0F172A;
@@ -605,26 +710,34 @@ tbody tr:hover {
 
 .quick-actions-grid {
   width: 100%;
+
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 12px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
 }
 
 .quick-card {
-  height: 72px;
+  width: 100%;
+  max-width: 360px;
+  height: 67px;
   min-width: 0;
+
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 10px;
+  gap: 8px;
+
+  padding: 16px 12px;
   box-sizing: border-box;
+
   background: #E2E8F0;
   border: 1px solid #E2E8F0;
-  border-radius: 10px;
+  border-radius: 8px;
+
   font-family: 'Roboto', sans-serif;
   font-size: 12px;
   font-weight: 500;
   color: #0F172A;
+
   cursor: pointer;
   transition: 0.2s;
 }
@@ -645,7 +758,7 @@ tbody tr:hover {
 
 .quick-text span {
   font-family: 'Roboto', sans-serif;
-  font-size: 12px;
+  font-size: clamp(11px, 0.6875rem + 0.1vw, 12px);
   font-weight: 600;
   color: #0F172A;
   line-height: 16px;
@@ -654,7 +767,7 @@ tbody tr:hover {
 .quick-text p {
   margin: 0;
   font-family: 'Roboto', sans-serif;
-  font-size: 10px;
+  font-size: clamp(10px, 0.625rem + 0.1vw, 11px);
   font-weight: 400;
   color: #64748B;
   line-height: 14px;
@@ -664,9 +777,11 @@ tbody tr:hover {
   width: 36px;
   height: 36px;
   flex-shrink: 0;
+
   display: flex;
   align-items: center;
   justify-content: center;
+
   border-radius: 8px;
   overflow: hidden;
 }
@@ -674,9 +789,11 @@ tbody tr:hover {
 .quick-icon img {
   width: 16.67px;
   height: 15.10px;
+
   position: relative;
   top: 2.5px;
   left: 1.67px;
+
   object-fit: contain;
   opacity: 1;
   display: block;
@@ -696,16 +813,29 @@ tbody tr:hover {
   position: absolute;
   top: calc(100% + 8px);
   right: 0;
+
   width: 440px;
   height: 462px;
+  min-width: 440px;
+  min-height: 462px;
+
   padding: 0;
+  margin: 0;
+
   box-sizing: border-box;
+
   display: flex;
   flex-direction: column;
+
   background-color: #FFFFFF;
+
   border: 1px solid #E2E8F0;
   border-radius: 12px;
+
+  opacity: 1;
+
   z-index: 100;
+
   box-shadow: 0px 4px 12px rgba(15, 23, 42, 0.12);
 }
 
@@ -717,33 +847,51 @@ tbody tr:hover {
   width: 100%;
   height: 51px;
   min-height: 51px;
+
   display: flex;
   align-items: center;
   justify-content: space-between;
+
   padding: 16px 24px;
   box-sizing: border-box;
+
   border-bottom: 1px solid #E2E8F0;
   flex-shrink: 0;
 }
 
 .filtros-header h3 {
+  width: 46px;
+  height: 19px;
   margin: 0;
+
   font-family: 'Roboto', sans-serif;
-  font-size: 16px;
   font-weight: 600;
-  line-height: 19px;
+  font-style: normal;
+  font-size: 16px;
+  line-height: 100%;
+  letter-spacing: 0;
+
   color: #1E293B;
+
+  opacity: 1;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  box-sizing: border-box;
 }
 
 .cerrar-filtros {
   width: 24px;
   height: 24px;
+
   display: flex;
   align-items: center;
   justify-content: center;
+
   padding: 0;
   background: transparent;
   border: none;
+
   color: #64748B;
   font-size: 20px;
   cursor: pointer;
@@ -760,13 +908,17 @@ tbody tr:hover {
 .filtros-body {
   flex: 1;
   min-height: 0;
+
   display: flex;
   flex-direction: column;
   gap: 15px;
+
   padding: 24px;
   box-sizing: border-box;
+
   overflow-y: auto;
   overflow-x: hidden;
+
   scrollbar-width: none;
   -ms-overflow-style: none;
 }
@@ -792,17 +944,22 @@ tbody tr:hover {
 .filtro-grupo > label,
 .filtro-fechas > label,
 .filtro-riesgo > label {
-  width: auto;
+  width: 41px;
   height: 15px;
   margin: 0;
+
   font-family: 'Roboto', sans-serif;
-  font-size: 13px;
   font-weight: 600;
-  font-style: normal;
+  font-style: semibold;
+  font-size: 13px;
   line-height: 100%;
   letter-spacing: 0;
+
   color: #001822;
+
   opacity: 1;
+  white-space: nowrap;
+  box-sizing: border-box;
 }
 
 /* ================================================== */
@@ -813,16 +970,20 @@ tbody tr:hover {
   width: 100%;
   height: 40px;
   min-height: 40px;
+
   padding: 8px 16px;
   box-sizing: border-box;
+
   background-color: #F5F5F5;
   border: 1px solid #E2E8F0;
   border-radius: 8px;
+
   outline: none;
+
   font-family: 'Roboto', sans-serif;
   font-size: 12px;
   font-weight: 400;
-  color: #334155;
+  color: #94A3B8;
 }
 
 .filtro-grupo input::placeholder {
@@ -834,6 +995,29 @@ tbody tr:hover {
   border-color: #E2E8F0;
 }
 
+.filtros-modal input,
+.filtros-modal select {
+  font-family: 'Roboto', sans-serif;
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 100%;
+  letter-spacing: 0;
+}
+
+.filtros-modal .con-valor {
+  color: #1E293B;
+}
+
+#filtro-asesor {
+  background-color: #FFFFFF;
+  border-color: #D9E3EA;
+}
+
+#filtro-asesor:focus {
+  border-color: #D9E3EA;
+}
+
 /* ================================================== */
 /* CONTENEDOR DE RIESGO */
 /* ================================================== */
@@ -841,9 +1025,11 @@ tbody tr:hover {
 .filtro-riesgo {
   width: 100%;
   min-height: 50px;
+
   display: flex;
   flex-direction: column;
   gap: 8px;
+
   box-sizing: border-box;
 }
 
@@ -859,22 +1045,27 @@ tbody tr:hover {
 }
 
 .btn-riesgo {
-  width: 62px;
+  width: 50px;
   height: 27px;
   min-width: 62px;
+
   display: flex;
   align-items: center;
   justify-content: center;
+
   padding: 6px 12px;
   box-sizing: border-box;
+
   background: #F1F5F9;
   border: 1px solid #F1F5F9;
   border-radius: 100px;
+
   font-family: 'Roboto', sans-serif;
   font-size: 12px;
   font-weight: 500;
   line-height: 100%;
   color: #475569;
+
   cursor: pointer;
   transition: background-color 0.2s ease,
               border-color 0.2s ease,
@@ -882,34 +1073,42 @@ tbody tr:hover {
 }
 
 .btn-riesgo.seleccionado {
-  background-color: #2764E7;
+  background-color: #EAF2FF;
   border-color: #2764E7;
-  color: #FFFFFF;
+  color: #2764E7;
 }
 
 /* ================================================== */
-/* CAMPOS EN DOS COLUMNAS */
+/* CAMPOS DE DÍAS DE MORA */
 /* ================================================== */
 
 .filtro-dos-columnas {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(2, 188px);
   gap: 10px;
 }
 
 .filtro-dos-columnas input {
-  width: 100%;
+  width: 188px;
+  height: 38px;
   min-width: 0;
-  height: 40px;
+
+  display: flex;
+  align-items: center;
+
   padding: 8px 12px;
   box-sizing: border-box;
-  background: #FFFFFF;
-  border: 1px solid #CBD5E1;
+
+  background-color: #FFFFFF;
+  border: 1px solid #D9E3EA;
   border-radius: 8px;
+
   outline: none;
+
   font-family: 'Roboto', sans-serif;
   font-size: 12px;
-  color: #334155;
+  font-weight: 400;
+  color: #94A3B8;
 }
 
 /* ================================================== */
@@ -925,73 +1124,102 @@ tbody tr:hover {
 
 .filtro-origenes {
   width: 100%;
+
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   gap: 8px;
 }
 
+/* ================================================== */
+/* BOTONES DE ORIGEN */
+/* ================================================== */
+
 .btn-origen {
-  min-height: 27px;
+  min-width: 37px;
+  width: auto;
+  height: 27px;
+
   display: flex;
   align-items: center;
   justify-content: center;
+
   padding: 6px 12px;
   box-sizing: border-box;
+
   background: #F1F5F9;
   border: 1px solid #F1F5F9;
   border-radius: 100px;
+
   font-family: 'Roboto', sans-serif;
-  font-size: 12px;
   font-weight: 500;
+  font-style: normal;
+  font-size: 13px;
   line-height: 100%;
+  letter-spacing: 0;
+
   color: #475569;
+  white-space: nowrap;
+
   cursor: pointer;
   transition: background-color 0.2s ease,
               border-color 0.2s ease,
               color 0.2s ease;
 }
 
+/* ORIGEN SELECCIONADO */
+
 .btn-origen.seleccionado {
-  background-color: #2764E7;
+  background-color: #EAF2FF;
   border-color: #2764E7;
-  color: #FFFFFF;
+  color: #2764E7;
 }
 
 /* ================================================== */
-/* CAMPOS CON FLECHA: SEGMENTO Y ESTADO */
+/* CAMPOS DE SELECCIÓN: SEGMENTO, ESTADO Y ASESOR */
 /* ================================================== */
 
 .filtro-select {
   position: relative;
+
   display: flex;
   align-items: center;
   justify-content: space-between;
+
   width: 392px;
   max-width: 100%;
   height: 40px;
-  padding: 10px 14px;
+
+  padding: 8px 16px;
   box-sizing: border-box;
+
   background-color: #FFFFFF;
-  border: 1px solid #CBD5E1;
+  border: 1px solid #D9E3EA;
   border-radius: 8px;
+
+  opacity: 1;
 }
 
 .filtro-select input,
 .filtro-select select {
   display: block;
   flex: 1;
+
   min-width: 0;
   width: 100%;
   height: 100%;
-  padding: 0 24px 0 0;
+
+  padding: 0;
   box-sizing: border-box;
+
   border: none;
   outline: none;
   background: transparent;
+
   font-family: 'Roboto', sans-serif;
   font-size: 12px;
-  color: #334155;
+  font-weight: 400;
+  color: #94A3B8;
 }
 
 .filtro-select select {
@@ -1009,9 +1237,11 @@ tbody tr:hover {
   position: absolute;
   width: 12px;
   height: 12px;
+
   top: 50%;
-  right: 14px;
+  right: 16px;
   transform: translateY(-50%);
+
   object-fit: contain;
   pointer-events: none;
   z-index: 5;
@@ -1023,9 +1253,11 @@ tbody tr:hover {
 
 .filtro-fechas {
   width: 100%;
+
   display: flex;
   flex-direction: column;
   gap: 8px;
+
   box-sizing: border-box;
 }
 
@@ -1044,16 +1276,20 @@ tbody tr:hover {
   display: block;
   width: 100%;
   height: 40px;
+
   padding: 8px 40px 8px 16px;
   box-sizing: border-box;
+
   background-color: #FFFFFF;
-  border: 1px solid #CBD5E1;
+  border: 1px solid #D9E3EA;
   border-radius: 8px;
+
   outline: none;
+
   font-family: 'Roboto', sans-serif;
   font-size: 12px;
   font-weight: 400;
-  color: #334155;
+  color: #94A3B8;
 }
 
 .campo-fecha-creacion input::placeholder {
@@ -1065,61 +1301,66 @@ tbody tr:hover {
   position: absolute;
   width: 12px;
   height: 12px;
+
   top: 50%;
   right: 16px;
   transform: translateY(-50%);
+
   object-fit: contain;
   pointer-events: none;
   z-index: 5;
 }
 
 /* ================================================== */
-/* FECHA DESDE Y FECHA HASTA */
+/* CONTENEDOR DE FECHA DESDE Y FECHA HASTA */
 /* ================================================== */
 
 .filtro-fechas-contenedor {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(2, 188px);
   gap: 10px;
   width: 100%;
 }
 
 .filtro-fechas-contenedor .campo-fecha {
   position: relative;
-  width: 100%;
+  width: 188px;
   min-width: 0;
-  height: 40px;
+  height: 38px;
 }
 
 .filtro-fechas-contenedor .campo-fecha input {
   display: block;
-  width: 100%;
-  height: 40px;
+  width: 188px;
+  height: 38px;
+
   padding: 8px 35px 8px 12px;
   box-sizing: border-box;
-  background: #FFFFFF;
-  border: 1px solid #CBD5E1;
+
+  background-color: #FFFFFF;
+  border: 1px solid #D9E3EA;
   border-radius: 8px;
+
   outline: none;
+
   font-family: 'Roboto', sans-serif;
   font-size: 12px;
-  color: #334155;
+  font-weight: 400;
+  color: #94A3B8;
+
   cursor: pointer;
 }
 
 .filtro-fechas-contenedor .campo-fecha i {
   position: absolute;
+
   top: 50%;
   right: 12px;
   transform: translateY(-50%);
-  font-size: 14px;
-  color: #64748B;
-  pointer-events: none;
-}
 
-.filtro-fechas-contenedor .campo-fecha input::-webkit-calendar-picker-indicator {
-  opacity: 0;
-  cursor: pointer;
+  font-size: 14px;
+  color: #94A3B8;
+  pointer-events: none;
 }
 
 /* ================================================== */
@@ -1130,18 +1371,23 @@ tbody tr:hover {
   width: 100%;
   height: 80px;
   min-height: 80px;
+
   box-sizing: border-box;
+
   display: flex;
   align-items: center;
   justify-content: space-between;
+
   padding: 16px;
+
   background-color: transparent;
   border-top: 1px solid #E2E8F0;
+
   flex-shrink: 0;
 }
 
 /* ================================================== */
-/* FILTROS RESTANTES (+2 FILTROS) */
+/* FILTROS RESTANTES */
 /* ================================================== */
 
 .filtros-restantes {
@@ -1161,7 +1407,6 @@ tbody tr:hover {
 
   font-family: 'Roboto', sans-serif;
   font-weight: 500;
-  font-style: normal;
   font-size: 13px;
   line-height: 100%;
   letter-spacing: 0;
@@ -1178,10 +1423,13 @@ tbody tr:hover {
 .btn-aplicar-filtros {
   height: 36px;
   padding: 0 16px;
+
   border-radius: 7px;
+
   font-family: 'Roboto', sans-serif;
   font-size: 13px;
   font-weight: 500;
+
   cursor: pointer;
 }
 
@@ -1220,33 +1468,43 @@ tbody tr:hover {
 /* ================================================== */
 
 .managed-cases-pagination {
-  width: 1128px;
-  height: 52px;
+  width: 100%;
+  min-width: 0;
   min-height: 52px;
-  margin-left: -21px;
+  height: auto;
+
+  margin: 0;
+
   display: flex;
   align-items: center;
   justify-content: space-between;
+
   padding: 0 16px;
   box-sizing: border-box;
+
   background-color: transparent;
   border-top: 1px solid #E2E8F0;
   border-bottom-left-radius: 12px;
   border-bottom-right-radius: 12px;
 }
 
+/* ================================================== */
 /* INFORMACIÓN DE REGISTROS */
+/* ================================================== */
 
 .pagination-info {
   margin: 0;
+
   font-family: 'Roboto', sans-serif;
-  font-size: 12px;
+  font-size: clamp(11px, 0.6875rem + 0.1vw, 12px);
   font-weight: 400;
   line-height: 100%;
   color: #64748B;
 }
 
+/* ================================================== */
 /* CONTENEDOR DE BOTONES */
+/* ================================================== */
 
 .pagination-buttons {
   display: flex;
@@ -1262,27 +1520,29 @@ tbody tr:hover {
   width: 32px;
   height: 32px;
   min-width: 32px;
+
   display: flex;
   align-items: center;
   justify-content: center;
+
   padding: 0;
   box-sizing: border-box;
+
   border: 1px solid #CBD5E1;
   border-radius: 6px;
   background-color: #F1F5F9;
+
   font-family: 'Roboto', sans-serif;
   font-size: 12px;
   font-weight: 400;
-  font-style: normal;
   line-height: 12px;
   letter-spacing: 0;
   text-align: center;
+
   color: #001822;
   opacity: 1;
   cursor: pointer;
 }
-
-/* PÁGINA ACTIVA */
 
 .pagination-button.active {
   background-color: #2764E7;
@@ -1297,32 +1557,135 @@ tbody tr:hover {
 .pagination-arrow {
   width: 32px;
   height: 32px;
+
   display: flex;
   align-items: center;
   justify-content: center;
+
   padding: 0;
 }
 
 .pagination-arrow i {
   width: 5px;
   height: 10px;
+
   font-size: 10px;
   line-height: 10px;
+
   color: #64748B;
   -webkit-text-stroke: 0.3px;
 }
 
-/* FLECHA DESHABILITADA */
-
 .pagination-arrow:disabled i {
   color: #94A3B8;
 }
-
-/* BOTONES DESHABILITADOS */
 
 .pagination-button:disabled {
   cursor: not-allowed;
   background-color: #F1F5F9;
   border-color: #F1F5F9;
   color: #FFFFFF;
+}
+
+/* ================================================== */
+/* RESPONSIVE */
+/* ================================================== */
+
+@media (max-width: 1280px) {
+  .dashboard-charts {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 1100px) {
+  .managed-cases-header {
+    flex-wrap: wrap;
+    gap: 12px;
+    height: auto;
+    min-height: 72px;
+  }
+
+  .managed-cases-controls {
+    min-width: 0;
+  }
+
+  .managed-search {
+    width: min(360px, 40vw);
+    min-width: 0;
+  }
+}
+
+@media (max-width: 900px) {
+  .quick-actions {
+    height: auto;
+  }
+
+  .quick-actions-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .quick-card {
+    height: 67px;
+    min-height: 67px;
+  }
+
+  .quick-text {
+    flex: 1 1 0;
+  }
+}
+
+@media (max-width: 700px) {
+  .dashboard-content {
+    padding: 20px 16px;
+  }
+
+  .managed-cases {
+    padding: 0 0 16px;
+  }
+
+  .managed-cases-header {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 12px;
+    height: auto;
+    min-height: 72px;
+    padding: 16px;
+  }
+
+  .managed-cases-controls {
+    width: 100%;
+    min-width: 0;
+    flex-wrap: wrap;
+  }
+
+  .managed-search {
+    flex: 1 1 180px;
+    width: auto;
+    min-width: 0;
+  }
+
+  .managed-cases-pagination {
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 8px 12px;
+  }
+
+  .quick-actions-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 500px) {
+  .quick-actions {
+    height: auto;
+  }
+
+  .quick-actions-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .quick-card {
+    height: 67px;
+    min-height: 67px;
+  }
 }

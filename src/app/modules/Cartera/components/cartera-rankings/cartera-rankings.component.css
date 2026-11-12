@@ -1,0 +1,297 @@
+
+/* ================================================== */
+/* CONTENEDOR GENERAL */
+/* ================================================== */
+
+:host {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  margin-top: 12px;
+  box-sizing: border-box;
+}
+
+/* ================================================== */
+/* DISTRIBUCIÓN DE LAS TRES TARJETAS */
+/* ================================================== */
+
+.cartera-ranking {
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 340px), 1fr));
+  gap: 14px;
+  align-items: stretch;
+  box-sizing: border-box;
+}
+
+/* ================================================== */
+/* TARJETAS */
+/* ================================================== */
+
+.cartera-ranking-card {
+  min-width: 0;
+  height: 448px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  background: #FFFFFF;
+  border: 1px solid #CBD5E1;
+  border-radius: 16px;
+  box-sizing: border-box;
+}
+
+/* ================================================== */
+/* ANCHOS INDIVIDUALES */
+/* ================================================== */
+
+.cartera-top-carteras {
+  width: 100%;
+}
+
+.cartera-top-clientes {
+  width: 100%;
+}
+
+.cartera-acciones {
+  width: 100%;
+}
+
+/* ================================================== */
+/* TÍTULOS */
+/* ================================================== */
+
+.cartera-ranking-titulo {
+  margin: 0;
+  color: #0A3B4E;
+  font-family: 'Roboto', sans-serif;
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 20px;
+  flex-shrink: 0;
+}
+
+/* ================================================== */
+/* CONTENIDO */
+/* ================================================== */
+
+.ranking-contenido {
+  width: 100%;
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+}
+
+/* ================================================== */
+/* TABLAS */
+/* ================================================== */
+
+.ranking-tabla {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+  font-family: 'Roboto', sans-serif;
+}
+
+.ranking-tabla th {
+  padding: 9px 4px;
+  background: #F1F5F9;
+  color: #475569;
+  font-size: 10px;
+  font-weight: 600;
+  text-align: left;
+  white-space: normal;
+  line-height: 13px;
+}
+
+.ranking-tabla td {
+  padding: 12px 4px;
+  border-bottom: 1px solid #EDF1F5;
+  color: #334155;
+  font-size: 10px;
+  font-weight: 500;
+  text-align: left;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ================================================== */
+/* ANCHOS DE COLUMNAS: TOP CARTERAS */
+/* ================================================== */
+
+.cartera-top-carteras .ranking-tabla th:first-child,
+.cartera-top-carteras .ranking-tabla td:first-child {
+  width: 6%;
+}
+
+.cartera-top-carteras .ranking-tabla th:nth-child(2),
+.cartera-top-carteras .ranking-tabla td:nth-child(2) {
+  width: 24%;
+}
+
+.cartera-top-carteras .ranking-tabla th:nth-child(3),
+.cartera-top-carteras .ranking-tabla td:nth-child(3) {
+  width: 24%;
+}
+
+.cartera-top-carteras .ranking-tabla th:nth-child(4),
+.cartera-top-carteras .ranking-tabla td:nth-child(4) {
+  width: 18%;
+}
+
+.cartera-top-carteras .ranking-tabla th:nth-child(5),
+.cartera-top-carteras .ranking-tabla td:nth-child(5) {
+  width: 28%;
+}
+
+/* ================================================== */
+/* ANCHOS DE COLUMNAS: TOP CLIENTES */
+/* ================================================== */
+
+.cartera-top-clientes .ranking-tabla th:first-child,
+.cartera-top-clientes .ranking-tabla td:first-child {
+  width: 35%;
+}
+
+.cartera-top-clientes .ranking-tabla th:nth-child(2),
+.cartera-top-clientes .ranking-tabla td:nth-child(2) {
+  width: 26%;
+}
+
+.cartera-top-clientes .ranking-tabla th:nth-child(3),
+.cartera-top-clientes .ranking-tabla td:nth-child(3) {
+  width: 19.5%;
+}
+
+.cartera-top-clientes .ranking-tabla th:nth-child(4),
+.cartera-top-clientes .ranking-tabla td:nth-child(4) {
+  width: 19.5%;
+}
+
+/* ================================================== */
+/* ETIQUETAS DE RIESGO */
+/* ================================================== */
+
+.riesgo {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 43px;
+  padding: 4px 5px;
+  border-radius: 10px;
+  font-size: 9px;
+  font-weight: 600;
+  box-sizing: border-box;
+}
+
+.riesgo.bajo {
+  color: #0F766E;
+  background: #CCFBF1;
+}
+
+.riesgo.medio {
+  color: #A16207;
+  background: #FEF3C7;
+}
+
+.riesgo.alto {
+  color: #C2410C;
+  background: #FFEDD5;
+}
+
+.riesgo.critico {
+  color: #B91C1C;
+  background: #FEE2E2;
+}
+
+/* ================================================== */
+/* BOTONES DE LAS TABLAS */
+/* ================================================== */
+
+.ranking-boton {
+  width: 100%;
+  min-height: 34px;
+  margin-top: auto;
+  padding: 7px 10px;
+  background: #EFF6FF;
+  border: 1px solid #BFDBFE;
+  border-radius: 8px;
+  color: #1D4ED8;
+  font-family: 'Roboto', sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease;
+  box-sizing: border-box;
+}
+
+.ranking-boton:hover {
+  background: #DBEAFE;
+}
+
+/* ================================================== */
+/* CONTENIDO DE ACCIONES */
+/* ================================================== */
+
+.acciones-contenido {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+}
+
+/* ================================================== */
+/* BOTONES DE ACCIONES */
+/* ================================================== */
+
+.accion-boton {
+  width: 100%;
+  min-height: 48px;
+  padding: 8px 10px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: #FFFFFF;
+  border: 1px solid #CBD5E1;
+  border-radius: 9px;
+  color: #334155;
+  font-family: 'Roboto', sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.2s ease, border-color 0.2s ease;
+  box-sizing: border-box;
+}
+
+.accion-boton:hover {
+  background: #EFF6FF;
+  border-color: #93C5FD;
+  color: #1D4ED8;
+}
+
+/* ================================================== */
+/* ICONOS DE ACCIONES */
+/* ================================================== */
+
+.accion-icono {
+  width: 27px;
+  height: 27px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 7px;
+  background: #DBEAFE;
+  color: #1D4ED8;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+/* ================================================== */
+/* RESPONSIVE */
+/* ================================================== */

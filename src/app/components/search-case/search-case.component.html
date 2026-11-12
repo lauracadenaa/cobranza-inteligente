@@ -204,14 +204,24 @@
 
         <div class="search-results-header">
           <span>Resultados</span>
-          <span class="results-count">
+          <span class="results-count" *ngIf="!isLoading">
             {{ filteredCases.length }} coincidencias
           </span>
+          <span class="results-count" *ngIf="isLoading">Buscando...</span>
+        </div>
+
+        <div
+          class="search-pending"
+          *ngIf="isLoading"
+          role="status"
+          aria-live="polite">
+          <span class="search-pending-spinner" aria-hidden="true"></span>
+          <span>Buscando casos...</span>
         </div>
 
         <div
           class="search-results-list"
-          *ngIf="filteredCases.length > 0"
+          *ngIf="filteredCases.length > 0 && !isLoading"
         >
 
           <div
@@ -263,7 +273,7 @@
 
         <div
           class="search-no-results"
-          *ngIf="filteredCases.length === 0 && !searchError"
+          *ngIf="filteredCases.length === 0 && !searchError && !isLoading"
         >
           <div class="no-results-icon">
             <i class="bi bi-x-lg"></i>

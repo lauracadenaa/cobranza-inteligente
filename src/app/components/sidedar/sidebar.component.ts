@@ -1,6 +1,9 @@
-import { Component, inject } from '@angular/core';
-import { Router } from '@angular/router';
+
+import { Component, inject, OnDestroy } from '@angular/core';
+import { Router, NavigationEnd } from '@angular/router';
 import { CommonModule } from '@angular/common';
+import { filter, Subject, takeUntil } from 'rxjs';
+import { CaseService } from '../../service/case.service';
 
 @Component({
   selector: 'app-sidebar',
@@ -9,70 +12,127 @@ import { CommonModule } from '@angular/common';
   styleUrl: './sidebar.component.css',
   imports: [CommonModule],
 })
-
-export class SidebarComponent {
-
-  // ==================================================
-  // NAVEGACIÓN
-  // ==================================================
+export class SidebarComponent implements OnDestroy {
 
   private router = inject(Router);
+  private caseService = inject(CaseService);
+  private destruir$ = new Subject<void>();
 
+  // ==============================================
+  // ESTADO DEL SIDEBAR
+  // ==============================================
 
-  // ==================================================
+  sidebarContraido = false;
+
+  alternarSidebar(): void {
+    this.sidebarContraido = !this.sidebarContraido;
+  }
+
+  // ==============================================
   // OPCIÓN DEL MENÚ SELECCIONADA
-  // ==================================================
+  // ==============================================
 
   opcionSeleccionada = 'Inicio';
 
+  constructor() {
 
-  // ==================================================
-  // CAMBIAR OPCIÓN SELECCIONADA
-  // ==================================================
+    this.actualizarOpcionSeleccionada();
 
-  seleccionarOpcion(opcion: string): void {
-    this.opcionSeleccionada = opcion;
+    this.router.events
+      .pipe(
+        filter(event => event instanceof NavigationEnd),
+        takeUntil(this.destruir$)
+      )
+      .subscribe(() => {
+        this.actualizarOpcionSeleccionada();
+      });
+
   }
 
+  // ==============================================
+  // DESTRUIR SUSCRIPCIÓN
+  // ==============================================
 
-  // ==================================================
-// MODAL CERRAR SESIÓN
-// ==================================================
+  ngOnDestroy(): void {
+    this.destruir$.next();
+    this.destruir$.complete();
+  }
 
-// Controla si el modal está visible
-mostrarModalCerrarSesion = false;
+  // ==============================================
+  // ACTUALIZAR OPCIÓN SEGÚN LA RUTA
+  // ==============================================
 
+  actualizarOpcionSeleccionada(): void {
 
-// ==================================================
-// ABRIR MODAL
-// ==================================================
+    const ruta = this.router.url;
 
-cerrarSesion(): void {
-  this.mostrarModalCerrarSesion = true;
-}
+    if (ruta.startsWith('/cartera')) {
 
+      this.opcionSeleccionada = 'Cartera';
 
-// ==================================================
-// CANCELAR CIERRE DE SESIÓN
-// ==================================================
+    } else if (ruta.startsWith('/gestion-casos')) {
 
-cancelarCerrarSesion(): void {
-  this.mostrarModalCerrarSesion = false;
-}
+      this.opcionSeleccionada = 'Gestión de casos';
 
+    } else if (ruta.startsWith('/dashboard')) {
 
-// ==================================================
-// CONFIRMAR CIERRE DE SESIÓN
-// ==================================================
+      this.opcionSeleccionada = 'Inicio';
 
-confirmarCerrarSesion(): void {
+    }
 
-  // Eliminar los datos de autenticación
-  sessionStorage.removeItem('token');
-  sessionStorage.removeItem('refreshToken');
+  }
 
-  // Redirigir al login
-  void this.router.navigateByUrl('/login');
+  // ==============================================
+  // CAMBIAR OPCIÓN Y NAVEGAR
+  // ==============================================
 
-}
+  seleccionarOpcion(opcion: string): void {
+
+    this.opcionSeleccionada = opcion;
+
+    switch (opcion) {
+
+      case 'Inicio':
+        void this.router.navigateByUrl('/dashboard');
+        break;
+
+      case 'Cartera':
+        void this.router.navigateByUrl('/cartera');
+        break;
+
+      case 'Gestión de casos':
+        void this.router.navigateByUrl('/gestion-casos');
+        break;
+
+      default:
+        break;
+
+    }
+
+  }
+
+  // ==============================================
+  // MODAL CERRAR SESIÓN
+  // ==============================================
+
+  mostrarModalCerrarSesion = false;
+
+  cerrarSesion(): void {
+    this.mostrarModalCerrarSesion = true;
+  }
+
+  cancelarCerrarSesion(): void {
+    this.mostrarModalCerrarSesion = false;
+  }
+
+  confirmarCerrarSesion(): void {
+
+    this.caseService.invalidarCache();
+    sessionStorage.removeItem('token');
+    sessionStorage.removeItem('refreshToken');
+
+    void this.router.navigateByUrl('/login');
+
+  }
+
 }

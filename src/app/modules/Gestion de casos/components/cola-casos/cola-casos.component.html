@@ -1,0 +1,1081 @@
+
+<!-- ========================================= -->
+<!-- COLA DE CASOS -->
+<!-- ========================================= -->
+
+<div
+  class="cases-workspace"
+  *ngIf="!mostrarCasoCompleto"
+  [class.con-resumen]="casoSeleccionado">
+
+  <!-- ========================================= -->
+  <!-- COLUMNA IZQUIERDA -->
+  <!-- ========================================= -->
+
+  <div class="cases-main-column">
+
+    <section class="cases-panel">
+
+      <!-- ENCABEZADO -->
+      <div class="managed-cases-header">
+
+        <h2>Cola de casos</h2>
+
+        <div class="managed-cases-controls">
+
+          <!-- BUSCADOR -->
+          <div class="managed-search">
+
+            <i class="bi bi-search"></i>
+
+            <input
+              type="text"
+              placeholder="Buscar caso..."
+              [(ngModel)]="busqueda"
+              (ngModelChange)="buscarCasos()">
+
+          </div>
+
+          <!-- FILTROS -->
+          <div class="filtros-container">
+
+            <button
+              type="button"
+              class="managed-filter"
+              [class.filtros-activos]="mostrarModalFiltros"
+              (click)="abrirFiltros()">
+
+              <img src="imagenes/Filtro.png" alt="">
+
+              <span>Filtros</span>
+
+              <span
+                class="filter-count"
+                *ngIf="cantidadFiltrosActivos > 0">
+                {{ cantidadFiltrosActivos }}
+              </span>
+
+            </button>
+
+            <!-- MODAL DE FILTROS -->
+            <div
+              class="filtros-modal"
+              *ngIf="mostrarModalFiltros">
+
+              <div class="filtros-modal-header">
+
+                <h3>Filtrar casos</h3>
+
+                <button
+                  type="button"
+                  class="close-filters"
+                  (click)="cerrarFiltros()">
+
+                  <i class="bi bi-x"></i>
+
+                </button>
+
+              </div>
+
+              <div class="filtros-modal-body">
+
+                <!-- RIESGO -->
+                <div class="filter-group">
+
+                  <label>Riesgo</label>
+
+                  <div class="filter-options">
+
+                    <label
+                      *ngFor="let riesgo of ['Bajo', 'Medio', 'Alto', 'Crítico']">
+
+                      <input
+                        type="checkbox"
+                        [checked]="filtros.riesgos.includes($any(riesgo))"
+                        (change)="alternarRiesgo($any(riesgo))">
+
+                      {{ riesgo }}
+
+                    </label>
+
+                  </div>
+
+                </div>
+
+                <!-- ASESOR -->
+                <div class="filter-group">
+
+                  <label for="filtro-asesor">Asesor</label>
+
+                  <input
+                    id="filtro-asesor"
+                    type="text"
+                    placeholder="Nombre del asesor"
+                    [(ngModel)]="filtros.asesor">
+
+                </div>
+
+                <!-- DÍAS DE MORA -->
+                <div class="filter-group">
+
+                  <label>Días de mora</label>
+
+                  <div class="filter-range">
+
+                    <input
+                      type="number"
+                      min="0"
+                      placeholder="Desde"
+                      [(ngModel)]="filtros.diasMoraDesde">
+
+                    <input
+                      type="number"
+                      min="0"
+                      placeholder="Hasta"
+                      [(ngModel)]="filtros.diasMoraHasta">
+
+                  </div>
+
+                </div>
+
+                <!-- SEGMENTO -->
+                <div class="filter-group">
+
+                  <label for="filtro-segmento">Segmento</label>
+
+                  <select
+                    id="filtro-segmento"
+                    [(ngModel)]="filtros.segmento">
+
+                    <option value="">Todos</option>
+                    <option value="Preventiva">Preventiva</option>
+                    <option value="Administrativa">Administrativa</option>
+                    <option value="Prejudicial">Prejudicial</option>
+                    <option value="Jurídica">Jurídica</option>
+
+                  </select>
+
+                </div>
+
+                <!-- ESTADO -->
+                <div class="filter-group">
+
+                  <label for="filtro-estado">Estado</label>
+
+                  <select
+                    id="filtro-estado"
+                    [(ngModel)]="filtros.estado">
+
+                    <option value="">Todos</option>
+                    <option value="NUEVO">Nuevo</option>
+                    <option value="EN_GESTION">En gestión</option>
+                    <option value="ILOCALIZADO">Ilocalizado</option>
+                    <option value="PROMESA_PAGO">Promesa de pago</option>
+                    <option value="PREJURIDICO">Prejurídico</option>
+                    <option value="CERRADO">Cerrado</option>
+
+                  </select>
+
+                </div>
+
+                <!-- FECHAS -->
+                <div class="filter-group">
+
+                  <label>Fecha de creación</label>
+
+                  <input
+                    type="date"
+                    [(ngModel)]="filtros.fechaExacta">
+
+                  <div class="filter-range">
+
+                    <input
+                      type="date"
+                      [(ngModel)]="filtros.fechaDesde">
+
+                    <input
+                      type="date"
+                      [(ngModel)]="filtros.fechaHasta">
+
+                  </div>
+
+                </div>
+
+              </div>
+
+              <!-- ACCIONES DE FILTROS -->
+              <div class="filtros-modal-footer">
+
+                <button
+                  type="button"
+                  class="clear-filters"
+                  (click)="limpiarFiltros()">
+
+                  Limpiar
+
+                </button>
+
+                <button
+                  type="button"
+                  class="apply-filters"
+                  (click)="aplicarFiltros()">
+
+                  Aplicar filtros
+
+                </button>
+
+              </div>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+      <!-- ========================================= -->
+      <!-- FILTROS ACTIVOS -->
+      <!-- ========================================= -->
+
+      <div
+        class="managed-active-filters"
+        *ngIf="filtrosVisibles.length > 0">
+
+        <div
+          class="active-filter-tag"
+          *ngFor="let filtro of filtrosVisibles.slice(0, 3)">
+
+          <span>{{ filtro.texto }}</span>
+
+          <button
+            type="button"
+            class="remove-active-filter"
+            (click)="quitarFiltro(filtro.clave)"
+            aria-label="Quitar filtro">
+
+            <i class="bi bi-x"></i>
+
+          </button>
+
+        </div>
+
+        <div
+          class="active-filter-tag filtros-restantes"
+          *ngIf="filtrosVisibles.length > 3">
+
+          +{{ filtrosVisibles.length - 3 }} filtros
+
+        </div>
+
+      </div>
+
+      <!-- ========================================= -->
+      <!-- TABLA DE CASOS -->
+      <!-- ========================================= -->
+
+      <section class="cases-table-container">
+
+        <table class="cases-table">
+
+          <thead>
+
+            <tr>
+
+              <th class="col-seleccion"></th>
+
+              <th>Caso</th>
+              <th>Asociado</th>
+              <th>Obligación</th>
+              <th>Riesgo</th>
+              <th>Días de mora</th>
+              <th>Tiempo límite</th>
+              <th>Asesor</th>
+              <th>Última gestión</th>
+              <th>Acciones</th>
+
+            </tr>
+
+          </thead>
+
+          <tbody>
+
+            <tr *ngFor="let caso of casosPaginados">
+
+              <!-- SELECCIÓN -->
+              <td class="col-seleccion">
+
+                <input
+                  type="checkbox"
+                  [checked]="estaSeleccionado(caso)"
+                  (change)="seleccionarCaso(caso)"
+                  [attr.aria-label]="'Seleccionar caso ' + caso.id">
+
+              </td>
+
+              <!-- CASO -->
+              <td
+                class="case-id-cell"
+                [attr.title]="caso.id">
+
+                <span>{{ caso.id }}</span>
+
+              </td>
+
+              <!-- ASOCIADO -->
+              <td
+                class="case-person-cell"
+                [attr.title]="caso.asociado">
+
+                <span>{{ caso.asociado }}</span>
+
+                <small *ngIf="caso.documento">
+                  CC {{ caso.documento }}
+                </small>
+
+              </td>
+
+              <!-- OBLIGACIÓN -->
+              <td
+                class="case-obligation-cell"
+                [attr.title]="caso.obligacion">
+
+                <span>{{ caso.obligacion }}</span>
+
+                <small *ngIf="caso.segmento">
+                  {{ caso.segmento }}
+                </small>
+
+              </td>
+
+              <!-- RIESGO -->
+              <td class="case-risk-cell">
+
+                <span
+                  class="riesgo-label"
+                  [attr.title]="caso.riesgo"
+                  [ngClass]="'riesgo-' + caso.riesgo.toLowerCase()">
+
+                  {{ caso.riesgo }}
+
+                </span>
+
+              </td>
+
+              <!-- DÍAS DE MORA -->
+              <td class="case-days-cell">
+                {{ caso.diasMora }}
+              </td>
+
+              <!-- TIEMPO LÍMITE -->
+              <td
+                class="case-deadline-cell"
+                [attr.title]="caso.tiempoLimite">
+
+                <span>{{ caso.tiempoLimite }}</span>
+
+                <span
+                  class="deadline-indicator"
+                  [ngClass]="obtenerClaseTiempoLimite(caso.tiempoLimite)"
+                  aria-hidden="true">
+                </span>
+
+              </td>
+
+              <!-- ASESOR -->
+              <td
+                class="case-advisor-cell"
+                [attr.title]="caso.asesor">
+
+                <span
+                  class="advisor-avatar"
+                  [class.unassigned]="caso.asesor.toLowerCase() === 'sin asignar'">
+
+                  {{ caso.asesor.toLowerCase() === 'sin asignar'
+                    ? '—'
+                    : obtenerIniciales(caso.asesor) }}
+
+                </span>
+
+                <span>{{ caso.asesor }}</span>
+
+              </td>
+
+              <!-- ÚLTIMA GESTIÓN -->
+              <td class="case-last-action-cell">
+
+                <span>—</span>
+
+                <small>Sin información</small>
+
+              </td>
+
+              <!-- ACCIONES -->
+              <td class="col-acciones">
+
+                <button
+                  type="button"
+                  class="btn-acciones"
+                  [attr.aria-label]="'Más acciones para ' + caso.id">
+
+                  <i class="bi bi-three-dots-vertical"></i>
+
+                </button>
+
+              </td>
+
+            </tr>
+
+            <!-- CARGANDO -->
+            <tr *ngIf="cargando">
+
+              <td colspan="10" class="sin-casos" role="status">
+                Cargando casos...
+              </td>
+
+            </tr>
+
+            <!-- ERROR -->
+            <tr *ngIf="!cargando && errorCarga">
+
+              <td
+                colspan="10"
+                class="sin-casos sin-casos-error"
+                role="alert">
+
+                {{ errorCarga }}
+
+                <button
+                  type="button"
+                  class="btn-recargar-casos"
+                  (click)="recargarCasos()">
+
+                  Reintentar
+
+                </button>
+
+              </td>
+
+            </tr>
+
+            <!-- SIN CASOS -->
+            <tr
+              *ngIf="!cargando && !errorCarga && casosPaginados.length === 0">
+
+              <td colspan="10" class="sin-casos">
+                No hay casos para mostrar
+              </td>
+
+            </tr>
+
+          </tbody>
+
+        </table>
+
+      </section>
+
+      <!-- ========================================= -->
+      <!-- PAGINACIÓN -->
+      <!-- ========================================= -->
+
+      <div class="cases-pagination">
+
+        <p class="pagination-info">
+
+          Mostrando {{ registroInicial }} a {{ registroFinal }}
+          de {{ casosFiltrados.length }} casos
+
+        </p>
+
+        <div
+          class="pagination-buttons"
+          aria-label="Paginación de casos">
+
+          <button
+            type="button"
+            class="pagination-button pagination-arrow"
+            [disabled]="paginaActual === 1 || totalPaginas === 0"
+            (click)="cambiarPagina(paginaActual - 1)"
+            aria-label="Página anterior">
+
+            <i class="bi bi-chevron-left"></i>
+
+          </button>
+
+          <ng-container *ngFor="let pagina of paginas">
+
+            <span
+              *ngIf="pagina === '...'; else numeroPagina"
+              class="pagination-ellipsis"
+              aria-hidden="true">
+
+              ...
+
+            </span>
+
+            <ng-template #numeroPagina>
+
+              <button
+                type="button"
+                class="pagination-button"
+                [class.active]="paginaActual === pagina"
+                [attr.aria-current]="paginaActual === pagina ? 'page' : null"
+                [attr.aria-label]="'Página ' + pagina"
+                (click)="cambiarPagina(+pagina)">
+
+                {{ pagina }}
+
+              </button>
+
+            </ng-template>
+
+          </ng-container>
+
+          <button
+            type="button"
+            class="pagination-button pagination-arrow"
+            [disabled]="paginaActual === totalPaginas || totalPaginas === 0"
+            (click)="cambiarPagina(paginaActual + 1)"
+            aria-label="Página siguiente">
+
+            <i class="bi bi-chevron-right"></i>
+
+          </button>
+
+        </div>
+
+      </div>
+
+    </section>
+
+  </div>
+
+  <!-- ========================================= -->
+  <!-- PANEL DERECHO: RESUMEN RÁPIDO -->
+  <!-- ========================================= -->
+
+  <aside
+    class="quick-summary"
+    *ngIf="casoSeleccionado as caso">
+
+    <div class="quick-summary-header">
+
+      <h3>Resumen rápido del caso</h3>
+
+      <button
+        type="button"
+        class="close-summary"
+        aria-label="Cerrar resumen"
+        (click)="seleccionarCaso(caso)">
+
+        <i class="bi bi-dash-lg"></i>
+
+      </button>
+
+    </div>
+
+    <!-- IDENTIFICACIÓN -->
+    <div class="summary-case-heading">
+
+      <strong>{{ caso.id }}</strong>
+
+      <span
+        class="summary-status"
+        [class.status-open]="caso.estado === 'EN_GESTION'">
+
+        {{ caso.estado ? obtenerEstadoLabel(caso.estado) : caso.riesgo }}
+
+      </span>
+
+    </div>
+
+    <!-- CONTACTO -->
+    <div class="summary-contact">
+
+      <span class="summary-contact-avatar">
+        {{ obtenerIniciales(caso.asociado) }}
+      </span>
+
+      <div class="summary-contact-details">
+
+        <strong>{{ caso.asociado }}</strong>
+
+        <span>
+          {{ caso.documento
+            ? 'CC ' + caso.documento
+            : 'Documento sin información' }}
+        </span>
+
+      </div>
+
+      <i class="bi bi-telephone summary-contact-action"></i>
+
+      <i class="bi bi-chat-square summary-contact-action"></i>
+
+    </div>
+
+    <!-- OBLIGACIÓN -->
+    <section class="summary-obligation">
+
+      <span class="summary-label">Obligación</span>
+
+      <div class="summary-obligation-values">
+
+        <div>
+
+          <strong>{{ caso.obligacion }}</strong>
+
+          <span>{{ caso.segmento || 'Sin segmento' }}</span>
+
+        </div>
+
+        <div class="summary-balance">
+
+          <strong>
+            {{ caso.saldoVencido != null
+              ? formatearMoneda(caso.saldoVencido)
+              : 'Sin información' }}
+          </strong>
+
+          <span>Saldo vencido</span>
+
+        </div>
+
+      </div>
+
+      <div class="summary-obligation-values summary-arrears">
+
+        <div>
+
+          <strong>{{ caso.diasMora }}</strong>
+
+          <span>Días de mora</span>
+
+        </div>
+
+        <div class="summary-balance">
+
+          <strong>Sin información</strong>
+
+          <span>Cuota mínima</span>
+
+        </div>
+
+      </div>
+
+    </section>
+
+    <!-- CONTEXTO IA -->
+    <section class="summary-ai">
+
+      <div class="summary-ai-heading">
+
+        <strong>Contexto IA</strong>
+
+        <span>Sin análisis</span>
+
+      </div>
+
+      <p>
+        No hay recomendaciones disponibles para este caso.
+      </p>
+
+    </section>
+
+    <!-- ÚLTIMA GESTIÓN -->
+    <section class="summary-last-management">
+
+      <h4>Última gestión</h4>
+
+      <p>Sin registro de gestión</p>
+
+      <span>
+        La información de seguimiento aún no está disponible.
+      </span>
+
+    </section>
+
+    <!-- BOTONES -->
+    <div class="summary-actions">
+
+      <button
+        type="button"
+        class="btn-open-case"
+        (click)="abrirCasoCompleto()">
+
+        <i class="bi bi-box-arrow-up-right"></i>
+
+        Abrir caso
+
+      </button>
+
+      <button
+        type="button"
+        class="btn-assign-case"
+        (click)="abrirModalAsignacion()">
+
+        <i class="bi bi-person-gear"></i>
+
+        Asignar / Reasignar
+
+      </button>
+
+    </div>
+
+  </aside>
+
+</div>
+
+<!-- ========================================= -->
+<!-- MODAL ASIGNAR / REASIGNAR CASO -->
+<!-- ========================================= -->
+
+<div
+  class="assignment-overlay"
+  *ngIf="mostrarModalAsignacion && casoSeleccionado"
+  (click)="cerrarModalAsignacion()">
+
+  <section
+    class="assignment-modal"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="assignment-title"
+    (click)="$event.stopPropagation()">
+
+    <!-- CERRAR -->
+    <button
+      type="button"
+      class="assignment-close"
+      aria-label="Cerrar modal"
+      (click)="cerrarModalAsignacion()">
+
+      <i class="bi bi-x-lg"></i>
+
+    </button>
+
+    <!-- ========================================= -->
+    <!-- COLUMNA IZQUIERDA -->
+    <!-- ========================================= -->
+
+    <div class="assignment-left">
+
+      <div class="assignment-icon">
+        <i class="bi bi-person-gear"></i>
+      </div>
+
+      <h2 id="assignment-title">
+
+        {{ casoSeleccionado.asesor &&
+           casoSeleccionado.asesor.toLowerCase() !== 'sin asignar'
+           ? 'Reasignar caso'
+           : 'Asignar caso' }}
+
+      </h2>
+
+      <p class="assignment-description">
+        Selecciona la cola y el asesor que continuará la gestión.
+      </p>
+
+      <!-- DATOS DEL CASO -->
+      <div class="assignment-case-card">
+
+        <div class="assignment-card-header">
+
+          <strong>Datos del caso</strong>
+
+          <span class="assignment-priority">
+            Prioridad: {{ casoSeleccionado.riesgo || 'Sin información' }}
+          </span>
+
+        </div>
+
+        <div class="assignment-data-row">
+
+          <span>Caso</span>
+
+          <strong>{{ casoSeleccionado.id }}</strong>
+
+        </div>
+
+        <div class="assignment-data-row">
+
+          <span>Asociado</span>
+
+          <strong>{{ casoSeleccionado.asociado }}</strong>
+
+        </div>
+
+        <div class="assignment-data-row">
+
+          <span>Obligación</span>
+
+          <strong>{{ casoSeleccionado.obligacion }}</strong>
+
+        </div>
+
+        <div class="assignment-data-divider"></div>
+
+        <div class="assignment-data-row">
+
+          <span>Cola actual</span>
+
+          <strong>General</strong>
+
+        </div>
+
+        <div class="assignment-data-row">
+
+          <span>Asesor actual</span>
+
+          <strong>{{ casoSeleccionado.asesor || 'Sin asignar' }}</strong>
+
+        </div>
+
+        <div class="assignment-data-row">
+
+          <span>Motivo desborde</span>
+
+          <strong class="assignment-overflow">
+            {{ motivoDesborde || 'Sin información' }}
+          </strong>
+
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- ========================================= -->
+    <!-- COLUMNA DERECHA -->
+    <!-- ========================================= -->
+
+    <div class="assignment-right">
+
+      <!-- COLA DESTINO -->
+      <div class="assignment-field">
+
+        <label for="assignment-queue">
+          Cola de destino *
+        </label>
+
+        <div class="assignment-select-wrapper">
+
+          <select
+            id="assignment-queue"
+            name="colaDestino"
+            [(ngModel)]="asignacion.colaDestino">
+
+            <option value="" disabled>
+              Selecciona una cola
+            </option>
+
+            <option value="CASOS_CRITICOS">
+              Casos críticos
+            </option>
+
+            <option value="GENERAL">
+              General
+            </option>
+
+            <option value="PREVENTIVA">
+              Preventiva
+            </option>
+
+            <option value="ADMINISTRATIVA">
+              Administrativa
+            </option>
+
+            <option value="PREJURIDICA">
+              Prejurídica
+            </option>
+
+          </select>
+
+          <i class="bi bi-chevron-down"></i>
+
+        </div>
+
+      </div>
+
+      <!-- CRITERIO -->
+      <div class="assignment-field">
+
+        <label for="assignment-criteria">
+          Criterio de asignación *
+        </label>
+
+        <div class="assignment-select-wrapper">
+
+          <select
+            id="assignment-criteria"
+            name="criterio"
+            [(ngModel)]="asignacion.criterio">
+
+            <option value="" disabled>
+              Selecciona un criterio
+            </option>
+
+            <option value="AUTOMATICA">
+              Asignación automática por nivelador
+            </option>
+
+            <option value="MANUAL">
+              Asignación manual
+            </option>
+
+          </select>
+
+          <i class="bi bi-chevron-down"></i>
+
+        </div>
+
+      </div>
+
+      <!-- REGLA DE ASIGNACIÓN -->
+      <div class="assignment-rule">
+
+        <div class="assignment-rule-title">
+
+          <span class="rule-dot"></span>
+
+          <strong>
+            REGLA: Distribución por capacidad y skill
+          </strong>
+
+        </div>
+
+        <div class="assignment-rule-row">
+
+          <span>Skill requerido</span>
+
+          <strong>Cobranza avanzada</strong>
+
+        </div>
+
+        <div class="assignment-rule-row">
+
+          <span>Producto / Región</span>
+
+          <strong>Tarjeta de crédito / Bogotá</strong>
+
+        </div>
+
+        <div class="assignment-rule-row">
+
+          <span>Capacidad máxima / Sin disp.</span>
+
+          <strong>45 casos / Mantener en cola</strong>
+
+        </div>
+
+      </div>
+
+      <!-- MOTIVO -->
+      <div class="assignment-field">
+
+        <label for="assignment-reason">
+          Motivo de reasignación *
+        </label>
+
+        <div class="assignment-select-wrapper">
+
+          <select
+            id="assignment-reason"
+            name="motivo"
+            [(ngModel)]="asignacion.motivo">
+
+            <option value="" disabled>
+              Selecciona un motivo
+            </option>
+
+            <option value="BALANCEO_CARGA">
+              Balanceo de carga
+            </option>
+
+            <option value="CAMBIO_SEGMENTO">
+              Cambio de segmento
+            </option>
+
+            <option value="ESPECIALIZACION">
+              Especialización del asesor
+            </option>
+
+            <option value="ESCALAMIENTO">
+              Escalamiento
+            </option>
+
+            <option value="OTRO">
+              Otro
+            </option>
+
+          </select>
+
+          <i class="bi bi-chevron-down"></i>
+
+        </div>
+
+      </div>
+
+      <!-- COMENTARIO -->
+      <div class="assignment-field">
+
+        <label for="assignment-comment">
+          Comentario (opcional)
+        </label>
+
+        <textarea
+          id="assignment-comment"
+          name="comentario"
+          [(ngModel)]="asignacion.comentario"
+          placeholder="Escribe observaciones adicionales sobre el cambio...">
+        </textarea>
+
+      </div>
+      <!-- ERROR DE VALIDACIÓN -->
+<div
+
+  class="assignment-error"
+  *ngIf="errorAsignacion">
+
+  <i class="bi bi-exclamation-circle"></i>
+
+  <span>{{ errorAsignacion }}</span>
+
+</div>
+
+
+      <!-- BOTONES -->
+      <div class="assignment-footer">
+
+        <button
+          type="button"
+          class="assignment-cancel"
+          (click)="cerrarModalAsignacion()">
+
+          Cancelar
+
+        </button>
+
+        <button
+          type="button"
+          class="assignment-review"
+          [disabled]="
+            !asignacion.colaDestino ||
+            !asignacion.criterio ||
+            !asignacion.motivo
+          "
+          (click)="revisarAsignacion()">
+
+          <i class="bi bi-check2-circle"></i>
+
+          Revisar asignación
+
+        </button>
+
+      </div>
+
+    </div>
+
+  </section>
+
+</div>

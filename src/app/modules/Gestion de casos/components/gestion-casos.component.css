@@ -1,0 +1,87 @@
+
+/* ================================================== */
+/* ESTRUCTURA PRINCIPAL */
+/* ================================================== */
+
+:host {
+  display: block;
+  width: 100%;
+  min-height: 100vh;
+}
+
+.dashboard-layout {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+
+  width: 100%;
+  min-height: 100vh;
+
+  background-color: #D9E3EA;
+  box-sizing: border-box;
+}
+
+/* ================================================== */
+/* CONTENIDO PRINCIPAL */
+/* ================================================== */
+
+.dashboard-content {
+  display: block;
+
+  flex: 1 1 0;
+  min-width: 0;
+
+  padding: 30px 8px 30px 28px;
+
+  box-sizing: border-box;
+  overflow-x: hidden;
+
+  background-color: #D9E3EA;
+}
+
+/* ================================================== */
+/* TÍTULOS */
+/* ================================================== */
+
+.dashboard-content h1 {
+  margin: 0;
+
+  font-family: 'Roboto', sans-serif;
+  font-size: 28px;
+  font-weight: 700;
+
+  color: #1E293B;
+}
+
+app-dashboard-header {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  margin-bottom: -24px;
+}
+
+.gestion-casos-body {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+
+  width: 100%;
+  min-width: 0;
+  margin: 0;
+}
+
+app-casos-kpis,
+app-cola-casos {
+  display: block;
+  width: 100%;
+  min-width: 0;
+}
+
+/* Separación entre los dos cuadros */
+.kpis-wrapper,
+.cola-wrapper {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  margin: 0;
+}

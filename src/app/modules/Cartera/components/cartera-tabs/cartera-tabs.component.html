@@ -1,0 +1,15 @@
+
+<div class="cartera-tabs">
+
+  <button
+    *ngFor="let pestana of pestanas"
+    type="button"
+    class="tab"
+    [class.active]="pestanaActiva === pestana"
+    (click)="seleccionarPestana(pestana)">
+
+    {{ pestana }}
+
+  </button>
+
+</div>

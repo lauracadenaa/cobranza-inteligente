@@ -2,7 +2,7 @@
 export const API_CONFIG = {
 
   // ==================================================
-  // DIRECCIONES DEL BACKEND
+  // DIRECCIONES DEL BACKENDAuthorization
   // ==================================================
 
   urls: {

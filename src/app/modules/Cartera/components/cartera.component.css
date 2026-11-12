@@ -1,0 +1,449 @@
+
+/* ================================================== */
+/* ESTRUCTURA PRINCIPAL */
+/* ================================================== */
+
+.dashboard-layout {
+  display: flex;
+  min-height: 100vh;
+  background-color: #D9E3EA;
+}
+
+/* ================================================== */
+/* CONTENIDO PRINCIPAL */
+/* ================================================== */
+
+.dashboard-content {
+  flex: 1;
+  min-width: 0;
+  width: 0;
+  padding: 30px 8px 30px 28px;
+  box-sizing: border-box;
+  overflow-x: auto;
+  background-color: #D9E3EA;
+}
+
+/* ================================================== */
+/* TÍTULO */
+/* ================================================== */
+
+.dashboard-content h1 {
+  margin: 0;
+  font-size: 28px;
+  font-weight: 700;
+  color: #1E293B;
+}
+
+/* ================================================== */
+/* CONTENEDOR DE PESTAÑAS */
+/* ================================================== */
+
+.cartera-tabs {
+  width: 1126px;
+  height: 48px;
+
+  display: flex;
+  align-items: center;
+
+  padding: 5px 8px;
+  gap: 4px;
+
+  background-color: #FFFFFF;
+  border-radius: 16px;
+
+  box-sizing: border-box;
+  margin-top: 6px;
+}
+
+/* ================================================== */
+/* BOTONES DE NAVEGACIÓN */
+/* ================================================== */
+
+.cartera-tabs .tab {
+  height: 38px;
+  padding: 0 12px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border: none;
+  border-radius: 8px;
+
+  background-color: transparent;
+
+  color: #475569;
+  font-family: Roboto, sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+
+  cursor: pointer;
+  white-space: nowrap;
+  box-sizing: border-box;
+
+  flex-shrink: 0;
+}
+
+/* ================================================== */
+/* PESTAÑA SELECCIONADA */
+/* ================================================== */
+
+.cartera-tabs .tab.active {
+  background-color: #DBEAFE;
+  color: #1D4ED8;
+  border-radius: 8px;
+}
+
+
+
+/* ================================================== */
+/* CONTENEDOR KPI */
+/* ================================================== */
+
+.kpi-container {
+  display: flex;
+  align-items: stretch;
+  justify-content: space-between;
+  gap: 15px;
+  width: 1126px;
+  min-width: 1126px;
+  margin-top: 12px;
+  margin-left: 0;
+  box-sizing: border-box;
+}
+
+/* ================================================== */
+/* TARJETAS KPI */
+/* ================================================== */
+
+.kpi-card {
+  position: relative;
+
+  flex: 0 0 212.8px;
+
+  width: 212.8px;
+  min-width: 212.8px;
+  height: 102px;
+
+  padding-top: 13px;
+  padding-right: 16px;
+  padding-bottom: 13px;
+  padding-left: 16px;
+
+  background-color: #FFFFFF;
+  border: 1px solid #CBD5E1;
+  border-radius: 16px;
+
+  box-sizing: border-box;
+}
+
+/* ================================================== */
+/* ICONOS KPI */
+/* ================================================== */
+
+.kpi-icon {
+  position: absolute;
+  top: 10px;
+  right: 12px;
+
+  width: 25px;
+  height: 25px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  z-index: 2;
+}
+
+.kpi-icon img {
+  display: block;
+  width: 23px;
+  height: 23px;
+  object-fit: contain;
+}
+
+/* ================================================== */
+/* TÍTULO KPI */
+/* ================================================== */
+
+.kpi-title {
+  width: 100%;
+  height: 13px;
+
+  padding-left: 10px;
+
+  font-family: 'Roboto', sans-serif;
+  font-weight: 600;
+  font-size: 11px;
+
+  line-height: 100%;
+  letter-spacing: 0.44px;
+
+  color: #0A3B4E;
+
+  display: flex;
+  align-items: center;
+
+  white-space: nowrap;
+  box-sizing: border-box;
+
+  transform: translateY(10px);
+}
+
+/* ================================================== */
+/* VALOR KPI */
+/* ================================================== */
+
+.kpi-value {
+  width: 100%;
+  height: 23px;
+
+  padding-left: 10px;
+
+  font-family: 'Roboto', sans-serif;
+  font-weight: 600;
+  font-size: 20px;
+
+  line-height: 100%;
+  letter-spacing: -0.66px;
+
+  color: #0A3B4E;
+
+  display: flex;
+  align-items: center;
+
+  transform: translateY(20px);
+}
+
+/* ================================================== */
+/* PORCENTAJE Y PERÍODO */
+/* ================================================== */
+
+.kpi-change {
+  display: flex;
+  align-items: center;
+
+  padding-left: 10px;
+  gap: 10px;
+
+  transform: translateY(40px);
+
+  white-space: nowrap;
+}
+
+/* ================================================== */
+/* PORCENTAJE */
+/* ================================================== */
+
+.kpi-percentage {
+  min-width: 46px;
+  height: 20px;
+
+  padding: 3px 8px;
+
+  background-color: #EFF6FF;
+  border-radius: 12px;
+
+  box-sizing: border-box;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  font-family: 'Roboto', sans-serif;
+  font-weight: 500;
+  font-size: 12px;
+
+  line-height: 100%;
+  letter-spacing: -0.66px;
+
+  color: #3B82F6;
+
+  white-space: nowrap;
+}
+
+/* ================================================== */
+/* TEXTO VS MES ANTERIOR */
+/* ================================================== */
+
+.kpi-period {
+  height: 14px;
+
+  font-family: 'Roboto', sans-serif;
+  font-weight: 400;
+  font-size: 12px;
+
+  line-height: 100%;
+  letter-spacing: -0.66px;
+
+  color: #64748B;
+
+  display: flex;
+  align-items: center;
+
+  white-space: nowrap;
+}
+
+/* ========================================= */
+/* CONTENEDORES DE ANÁLISIS DE CARTERA */
+/* ========================================= */
+
+.cartera-graficos {
+  display: grid;
+  grid-template-columns: 391px 377px 332px;
+  column-gap: 14px;
+
+  width: 1128px;
+  margin-top: 12px;
+  margin-left: 0;
+
+  box-sizing: border-box;
+}
+
+/* ========================================= */
+/* DISTRIBUCIÓN POR SEGMENTOS */
+/* ========================================= */
+
+.cartera-grafico-segmentos {
+  width: 391px;
+  height: 273px;
+
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+
+  padding: 15px 14px;
+
+  background-color: #FFFFFF;
+  border: 1px solid #CBD5E1;
+  border-radius: 16px;
+
+  box-sizing: border-box;
+}
+
+/* ========================================= */
+/* CARTERA POR NIVEL DE RIESGO */
+/* ========================================= */
+
+.cartera-grafico-riesgo {
+  width: 377px;
+  height: 273px;
+
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+
+  padding: 15px 14px;
+
+  background-color: #FFFFFF;
+  border: 1px solid #CBD5E1;
+  border-radius: 16px;
+
+  box-sizing: border-box;
+}
+
+/* ========================================= */
+/* ANTIGÜEDAD DE MORA */
+/* ========================================= */
+
+.cartera-grafico-antiguedad {
+  width: 332px;
+  height: 273px;
+
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+
+  padding: 20px 14px;
+
+  background-color: #FFFFFF;
+  border: 1px solid #CBD5E1;
+  border-radius: 16px;
+
+  box-sizing: border-box;
+}
+
+/* ========================================= */
+/* TÍTULOS */
+/* ========================================= */
+
+.cartera-grafico-titulo {
+  margin: 0;
+
+  font-family: 'Roboto', sans-serif;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 20px;
+
+  color: #0A3B4E;
+}
+
+
+/* ================================================== */
+/* OPCIONES DE CONSULTA: ASOCIADOS Y OBLIGACIONES */
+/* ================================================== */
+
+.cartera-tipo-consulta {
+  width: 1126px;
+  height: 48px;
+
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  margin-top: 12px;
+  margin-bottom: 12px;
+
+  box-sizing: border-box;
+}
+
+/* ================================================== */
+/* BOTONES DE CONSULTA */
+/* ================================================== */
+
+.cartera-tipo-opcion {
+  height: 40px;
+  min-width: 130px;
+
+  padding: 0 18px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background-color: #FFFFFF;
+  border: 1px solid #CBD5E1;
+  border-radius: 8px;
+
+  color: #475569;
+
+  font-family: 'Roboto', sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+
+  cursor: pointer;
+  box-sizing: border-box;
+
+  transition: background-color 0.2s ease,
+              border-color 0.2s ease,
+              color 0.2s ease;
+}
+
+/* ================================================== */
+/* OPCIÓN AL PASAR EL CURSOR */
+/* ================================================== */
+
+.cartera-tipo-opcion:hover {
+  background-color: #F1F5F9;
+}
+
+/* ================================================== */
+/* OPCIÓN SELECCIONADA */
+/* ================================================== */
+
+.cartera-tipo-opcion.activa {
+  background-color: #DBEAFE;
+  border: 1px solid #1D4ED8;
+  color: #1D4ED8;
+}

@@ -1,0 +1,89 @@
+
+:host {
+  display: block;
+  width: 100%;
+}
+
+/* ================================================== */
+/* CONTENEDOR DE PESTAÑAS */
+/* ================================================== */
+
+.cartera-tabs {
+  width: 100%;
+  min-height: 48px;
+  height: auto;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  padding: 5px 8px;
+  gap: 4px;
+  background-color: #FFFFFF;
+  border: 1px solid #E2E8F0;
+  border-radius: 12px;
+  box-sizing: border-box;
+  margin-top: 6px;
+}
+
+/* ================================================== */
+/* PESTAÑAS */
+/* ================================================== */
+
+.cartera-tabs .tab {
+  flex: 0 0 172px;
+  width: 172px;
+  height: 38px;
+  padding: 0 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: #475569;
+  font-family: 'Roboto', sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+  box-sizing: border-box;
+  min-width: 0;
+
+  transition: background-color 0.2s ease,
+              color 0.2s ease;
+}
+
+/* ================================================== */
+/* PESTAÑA ACTIVA */
+/* ================================================== */
+
+.cartera-tabs .tab.active {
+  background-color: #DBEAFE;
+  color: #1D4ED8;
+}
+
+/* ================================================== */
+/* HOVER DE PESTAÑAS INACTIVAS */
+/* ================================================== */
+
+.cartera-tabs .tab:not(.active):hover {
+  background-color: #F1F5F9;
+  color: #1D4ED8;
+}
+
+/* ================================================== */
+/* HOVER DE PESTAÑA ACTIVA */
+/* ================================================== */
+
+.cartera-tabs .tab.active:hover {
+  background-color: #BFDBFE;
+  color: #1D4ED8;
+}
+
+/* ================================================== */
+/* ACCESIBILIDAD */
+/* ================================================== */
+
+.cartera-tabs .tab:focus-visible {
+  outline: 2px solid #2563EB;
+  outline-offset: 2px;
+}

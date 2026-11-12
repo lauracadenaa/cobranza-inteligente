@@ -1,0 +1,170 @@
+<section class="cartera-graficos">
+
+  <!-- ====================================== -->
+  <!-- DISTRIBUCIÓN POR SEGMENTO -->
+  <!-- ====================================== -->
+
+  <article class="cartera-grafico-card">
+
+    <h3 class="cartera-grafico-titulo">
+      Distribución por segmento
+    </h3>
+
+    <div class="grafico-contenido">
+
+      <div class="grafico-dona">
+        <div
+          class="dona dona-segmentos"
+          [style.background]="gradienteSegmentos">
+        </div>
+      </div>
+
+      <div class="grafico-detalle">
+
+        <div
+          class="detalle-fila"
+          *ngFor="let segmento of segmentos">
+
+          <span
+            class="punto"
+            [style.background]="segmento.color">
+          </span>
+
+          <span class="detalle-nombre">
+            {{ segmento.nombre }}
+          </span>
+
+          <strong>
+            {{ segmento.porcentaje | number:'1.1-1' }}%
+          </strong>
+
+          <span>
+            {{ formatearSaldo(segmento.valor) }}
+          </span>
+
+        </div>
+
+        <div class="detalle-total">
+          <strong>Total</strong>
+          <strong>
+            {{ totalSegmentos > 0 ? '100%' : '0%' }}
+          </strong>
+          <strong>
+            {{ formatearSaldo(totalSegmentos) }}
+          </strong>
+        </div>
+
+      </div>
+
+    </div>
+
+  </article>
+
+
+  <!-- ====================================== -->
+  <!-- CARTERA POR NIVEL DE RIESGO -->
+  <!-- ====================================== -->
+
+  <article class="cartera-grafico-card">
+
+    <h3 class="cartera-grafico-titulo">
+      Cartera por nivel de riesgo
+    </h3>
+
+    <div class="grafico-contenido">
+
+      <div class="grafico-dona">
+
+        <div
+          class="dona dona-riesgo"
+          [style.background]="gradienteRiesgos">
+        </div>
+
+      </div>
+
+      <div class="grafico-detalle">
+
+        <div
+          class="detalle-fila"
+          *ngFor="let riesgo of riesgos">
+
+          <span
+            class="punto"
+            [style.background]="riesgo.color">
+          </span>
+
+          <span class="detalle-nombre">
+            {{ riesgo.nombre }}
+          </span>
+
+          <strong>
+            {{ riesgo.porcentaje | number:'1.1-1' }}%
+          </strong>
+
+          <span>
+            {{ formatearSaldo(riesgo.valor) }}
+          </span>
+
+        </div>
+
+        <div class="detalle-total">
+          <strong>Total</strong>
+          <strong>
+            {{ totalRiesgos > 0 ? '100%' : '0%' }}
+          </strong>
+          <strong>
+            {{ formatearSaldo(totalRiesgos) }}
+          </strong>
+        </div>
+
+      </div>
+
+    </div>
+
+  </article>
+
+
+  <!-- ====================================== -->
+  <!-- ANTIGÜEDAD DE MORA -->
+  <!-- ====================================== -->
+
+  <article class="cartera-grafico-card">
+
+    <h3 class="cartera-grafico-titulo">
+      Antigüedad de mora (días)
+    </h3>
+
+    <div class="antiguedad-lista">
+
+      <div
+        class="antiguedad-fila"
+        *ngFor="let antiguedad of antiguedades">
+
+        <span class="antiguedad-rango">
+          {{ antiguedad.rango }}
+        </span>
+
+        <div class="antiguedad-barra" aria-hidden="true">
+
+          <span
+            class="antiguedad-barra-valor"
+            [style.width.%]="antiguedad.porcentaje">
+          </span>
+
+        </div>
+
+        <strong class="antiguedad-porcentaje">
+          {{ antiguedad.porcentaje | number:'1.1-1' }}%
+        </strong>
+
+        <span class="antiguedad-monto">
+          {{ formatearSaldo(antiguedad.valor) }}
+        </span>
+
+      </div>
+
+    </div>
+
+  </article>
+
+</section>

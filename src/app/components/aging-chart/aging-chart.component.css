@@ -3,24 +3,31 @@
 /* CARTERA POR ANTIGÜEDAD */
 /* ================================================== */
 
+:host {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  container-type: inline-size;
+}
+
+/* ================================================== */
+/* CONTENEDOR PRINCIPAL */
+/* ================================================== */
+
 .aging-chart {
-  width: 552px;
+  position: relative;
+  width: 100%;
+  min-width: 0;
   height: 390px;
 
   display: flex;
   flex-direction: column;
+  gap: 0;
 
-  gap: 16px;
-
-  padding-top: 11px;
-  padding-right: 14px;
-  padding-bottom: 11px;
-  padding-left: 14px;
+  padding: 11px 14px 6.8px;
 
   box-sizing: border-box;
-
   background: #FFFFFF;
-
   border: 1px solid #E2E8F0;
   border-radius: 16px;
 
@@ -35,34 +42,29 @@
 .aging-header {
   display: flex;
   flex-direction: column;
-
   align-items: flex-start;
 
   width: 100%;
+  min-width: 0;
 
-  gap: 16px;
+  row-gap: 16px;
+  flex: 0 0 auto;
 }
 
-/* ================================================== */
-/* TÍTULO */
-/* ================================================== */
-
 .aging-header h2 {
-  margin: 0;
-
   font-family: 'Roboto', sans-serif;
-  font-size: 18px;
+  font-size: 16px;
   font-weight: 700;
-  font-style: normal;
   line-height: 24px;
   letter-spacing: -0.32px;
 
-  width: 220px;
   height: 24px;
-
   color: #0A3B4E;
+  flex: 0 0 auto;
+  margin: 0;
 
   white-space: nowrap;
+  transform: translateY(3px);
 }
 
 /* ================================================== */
@@ -71,96 +73,64 @@
 
 .aging-title-row {
   width: 100%;
+  height: 40px;
 
   display: flex;
   align-items: center;
   justify-content: space-between;
-}
+  gap: 12px;
 
-/* ================================================== */
-/* CONTENEDOR DEL FILTRO */
-/* ================================================== */
+  box-sizing: border-box;
+}
 
 .asesor-filtro {
   position: relative;
-  margin-left: 100px;
+  margin-left: 0;
+  flex: 0 0 auto;
 }
-
-/* ================================================== */
-/* BOTÓN ASESOR */
-/* ================================================== */
 
 .asesor-filtro-button {
   width: 140px;
   height: 40px;
 
-  padding-right: 12px;
-  padding-left: 12px;
-
-  box-sizing: border-box;
-
-  border: 1px solid #E2E8F0;
-  border-radius: 8px;
-
-  background: #FFFFFF;
+  padding: 12px;
 
   display: flex;
   align-items: center;
   justify-content: space-between;
-
   gap: 8px;
+
+  border: 1px solid #E2E8F0;
+  border-radius: 8px;
+  background: #FFFFFF;
 
   font-family: 'Roboto', sans-serif;
   font-size: 12px;
   font-weight: 500;
-  font-style: normal;
   line-height: 20px;
-  letter-spacing: 0;
 
   color: #64748B;
-
   cursor: pointer;
-  white-space: nowrap;
 }
-
-/* ================================================== */
-/* FLECHA */
-/* ================================================== */
 
 .asesor-flecha {
   font-size: 14px;
-  line-height: 1;
 }
-
-/* ================================================== */
-/* MENÚ DE ASESOR */
-/* ================================================== */
 
 .asesor-menu {
   position: absolute;
-
-  bottom: auto;
   top: 44px;
-
   right: 0;
 
   width: 140px;
 
   background: #FFFFFF;
-
   border: 1px solid #E2E8F0;
   border-radius: 8px;
 
-  padding: 4px 0;
-
-  box-sizing: border-box;
-
+  padding: 4px;
   z-index: 100;
 }
-
-/* ================================================== */
-/* OPCIONES DEL MENÚ */
-/* ================================================== */
 
 .asesor-menu button {
   width: 100%;
@@ -174,22 +144,12 @@
   font-family: 'Roboto', sans-serif;
   font-size: 12px;
   font-weight: 400;
-  font-style: normal;
   line-height: 20px;
-  letter-spacing: 0;
 
   color: #64748B;
-
   text-align: left;
-
   cursor: pointer;
-
-  box-sizing: border-box;
 }
-
-/* ================================================== */
-/* OPCIÓN AL PASAR EL MOUSE */
-/* ================================================== */
 
 .asesor-menu button:hover {
   background: #F8FAFC;
@@ -197,58 +157,85 @@
 }
 
 /* ================================================== */
-/* OPCIONES */
+/* CONTENEDOR DE BOTONES DE VISTA */
 /* ================================================== */
 
 .aging-options {
   display: flex;
+  flex-wrap: nowrap;
   align-items: center;
 
-  gap: 16px;
+  width: 100%;
+  height: 48px;
+  margin-bottom: 0;
+  gap: 0;
+
+  box-sizing: border-box;
+  opacity: 1;
+  transform: translateY(-16px);
 }
 
 /* ================================================== */
-/* BOTONES TRANSPARENTES */
+/* BOTONES DE VISTA */
 /* ================================================== */
 
 .aging-options button {
+  width: 0;
+  min-width: 0;
+  height: 48px;
+
+  flex: 1 1 0;
+
+  padding: 10px 6px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
   border: none;
   outline: none;
   background: transparent;
-
-  width: 174px;
-  height: 48px;
-
-  padding: 14px 16px;
-
-  box-sizing: border-box;
 
   font-family: 'Roboto', sans-serif;
   font-size: 16px;
   font-weight: 500;
   font-style: normal;
-  line-height: 20px;
-  letter-spacing: 0;
+  line-height: 24px;
+  letter-spacing: -0.32px;
 
   color: #64748B;
-
   text-align: center;
   vertical-align: middle;
+  white-space: nowrap;
 
   cursor: pointer;
-  white-space: nowrap;
+  opacity: 1;
+}
+
+.aging-options button.active {
+  color: #4361EE;
 }
 
 /* ================================================== */
-/* BOTÓN ACTIVO */
+/* LÍNEA DEL BOTÓN SELECCIONADO */
 /* ================================================== */
 
-.aging-options button.active {
-  background: transparent;
+.aging-options button {
+  position: relative;
+}
 
-  color: #1A4DD6;
+.aging-options button.active::after {
+  content: '';
+  position: absolute;
 
-  font-weight: 500;
+  width: 100%;
+  height: 2px;
+
+  left: 0;
+  bottom: 0;
+
+  background: #4361EE;
+  opacity: 1;
 }
 
 /* ================================================== */
@@ -259,7 +246,11 @@
   display: flex;
 
   width: 100%;
-  height: 280px;
+  min-width: 0;
+
+  margin-top: 16px;
+  flex: 1 1 190px;
+  min-height: 190px;
 }
 
 /* ================================================== */
@@ -267,30 +258,52 @@
 /* ================================================== */
 
 .aging-y-axis {
-  width: 55px;
-
-  display: flex;
-  flex-direction: column;
-
-  justify-content: space-between;
-
-  padding-bottom: 31px;
+  position: relative;
+  width: 75px;
+  min-width: 75px;
 
   box-sizing: border-box;
 }
 
-.aging-y-axis span {
-  font-family: 'Roboto', sans-serif;
+.aging-y-axis-title {
+  position: absolute;
+  top: -25px;
+  left: 0;
+  right: 0;
 
+  font-family: 'Roboto', sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 16px;
+
+  color: #64748B;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.aging-y-values {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 35.8px;
+  left: 0;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.aging-y-values span {
+  font-family: 'Roboto', sans-serif;
   font-size: 12px;
   font-weight: 400;
-
   line-height: 100%;
   letter-spacing: -0.66px;
 
   color: #64748B;
-
   white-space: nowrap;
+  transform: translateY(-50%);
 }
 
 /* ================================================== */
@@ -301,9 +314,7 @@
   position: relative;
 
   flex: 1;
-
   height: 100%;
-
   min-width: 0;
 
   overflow: visible;
@@ -319,11 +330,10 @@
   top: 0;
   left: 0;
   right: 0;
-  bottom: 31px;
+  bottom: 35.8px;
 
   display: flex;
   flex-direction: column;
-
   justify-content: space-between;
 }
 
@@ -343,36 +353,31 @@
 
   left: 0;
   right: 0;
-
-  bottom: 31px;
+  bottom: 35.8px;
   top: 0;
 
   display: flex;
-
   align-items: flex-end;
   justify-content: space-around;
 
-  gap: 20px;
+  gap: clamp(4px, 1.5vw, 20px);
 
   overflow: visible;
 }
 
 /* ================================================== */
-/* CADA BARRA */
+/* ELEMENTOS DE CADA BARRA */
 /* ================================================== */
 
 .aging-bar-item {
   position: relative;
 
   height: 100%;
-
   flex: 1;
-
   max-width: 90px;
 
   display: flex;
   flex-direction: column;
-
   justify-content: flex-end;
   align-items: center;
 
@@ -387,7 +392,6 @@
   background: transparent;
 
   pointer-events: none;
-  transition: background-color 0.2s ease;
 }
 
 .aging-bar-item:hover {
@@ -399,87 +403,87 @@
 }
 
 /* ================================================== */
-/* BARRAS DEL GRÁFICO */
+/* BARRAS */
 /* ================================================== */
 
 .aging-bar {
   position: relative;
   z-index: 1;
 
-  overflow: visible;
-
   width: 58px;
-  height: 61px;
+  min-width: 58px;
+  max-width: 58px;
 
+  max-height: 159px;
   min-height: 4px;
 
-  border-radius: 4px;
+  box-sizing: border-box;
 
+  border-radius: 4px;
   background: #4361EE;
 
   opacity: 1;
-
-  transition:
-    height 0.3s ease,
-    filter 0.25s ease;
-
   cursor: pointer;
 }
 
-/* ================================================== */
-/* EFECTO HOVER */
-/* ================================================== */
-
-.aging-bar:hover {
-  z-index: 21;
+.aging-bar-item:hover .aging-bar {
   filter: brightness(1.15);
+  z-index: 21;
 }
 
 /* ================================================== */
-/* EFECTO HOVER */
+/* CONTENEDOR DE INFORMACIÓN INFERIOR */
 /* ================================================== */
 
-.aging-bar:hover {
-  z-index: 21;
+.aging-labels {
+  position: absolute;
 
-  filter: brightness(1.15);
+  left: 0;
+  right: 0;
+  bottom: 6.8px;
+
+  height: 17px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+
+  gap: clamp(4px, 1.5vw, 20px);
+
+  box-sizing: border-box;
+  opacity: 1;
 }
 
 /* ================================================== */
-/* RANGO DE MORA */
+/* TEXTOS INFERIORES */
 /* ================================================== */
 
 .aging-label {
-  position: absolute;
+  flex: 1;
+  min-width: 0;
+  max-width: 90px;
+  height: 17px;
 
-  bottom: -31px;
-
-  left: 50%;
-
-  transform: translateX(-50%);
-
-  width: 74px;
-
-  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 
   font-family: 'Roboto', sans-serif;
-
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 400;
   font-style: normal;
-
-  line-height: 100%;
-  letter-spacing: -0.66px;
-
-  vertical-align: middle;
+  line-height: 16.8px;
+  letter-spacing: 0;
 
   color: #64748B;
-
+  text-align: center;
   white-space: nowrap;
+
+  opacity: 1;
 }
 
 /* ================================================== */
-/* DIAGRAMAS TEMPORALES */
+/* ESTADO SIN DATOS */
 /* ================================================== */
 
 .aging-placeholder {
@@ -488,63 +492,51 @@
 
   display: flex;
   flex-direction: column;
-
   align-items: center;
   justify-content: center;
-
-  text-align: center;
 }
 
 .aging-placeholder h3 {
-  margin: 0 0 8px;
-
   font-family: 'Roboto', sans-serif;
-
   font-size: 16px;
-  font-weight: 500;
-
-  color: #0F172A;
+  font-weight: 600;
+  color: #0A3B4E;
 }
 
 .aging-placeholder p {
-  margin: 0;
-
   font-family: 'Roboto', sans-serif;
-
-  font-size: 12px;
-  font-weight: 400;
-
+  font-size: 13px;
   color: #64748B;
 }
 
 /* ================================================== */
-/* COLORES - DIAGRAMA POR RIESGO */
+/* COLORES DE RIESGO */
 /* ================================================== */
 
-.aging-bar.risk-bajo {
-  background-color: #22C55E !important;
+.aging-bar.riesgo-bajo {
+  background: #22C55E;
 }
 
-.aging-bar.risk-medio {
-  background-color: #EAB308 !important;
+.aging-bar.riesgo-medio {
+  background: #EAB308;
 }
 
-.aging-bar.risk-alto {
-  background-color: #F97316 !important;
+.aging-bar.riesgo-alto {
+  background: #F97316;
 }
 
-.aging-bar.risk-critico {
-  background-color: #EF4444 !important;
+.aging-bar.riesgo-critico {
+  background: #EF4444;
 }
 
 /* ================================================== */
-/* TOOLTIP PERSONALIZADO */
+/* TOOLTIP */
 /* ================================================== */
 
 .aging-tooltip {
   position: absolute;
 
-  top: 40%;
+  top: 40px;
   left: calc(50% + 8px);
 
   transform: translateY(4px);
@@ -554,36 +546,29 @@
 
   padding: 10px;
 
-  box-sizing: border-box;
-
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
   justify-content: center;
-
   gap: 5px;
 
   background: #FFFFFF;
-
   border: 1px solid #CBD5E1;
   border-radius: 5px;
-  box-shadow: 0 4px 10px rgb(15 23 42 / 18%);
+
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
 
   font-family: 'Roboto', sans-serif;
   font-size: 13px;
   font-weight: 500;
   line-height: 16px;
-  color: #6B7280;
 
+  color: #6B7280;
   white-space: nowrap;
 
   opacity: 0;
   visibility: hidden;
 
-  transition:
-    opacity 0.2s ease,
-    transform 0.2s ease,
-    visibility 0.2s ease;
+  transition: opacity 0.15s ease, visibility 0.15s ease;
 
   z-index: 22;
   pointer-events: none;
@@ -598,11 +583,91 @@
   left: auto;
 }
 
-/* MOSTRAR EL RANGO SELECCIONADO Y SU INFORMACIÓN */
-
 .aging-bar-item:hover .aging-tooltip {
   opacity: 1;
   visibility: visible;
+}
 
-  transform: translateY(0);
+/* ================================================== */
+/* VISTA POR SEGMENTO */
+/* ================================================== */
+
+.aging-diagram-segmento .aging-bar-item {
+  flex: 0 0 115px;
+  width: 115px;
+  max-width: 115px;
+}
+
+.aging-diagram-segmento .aging-bar {
+  width: 115px;
+  min-width: 115px;
+  max-width: 115px;
+
+  max-height: 120px;
+
+  border-radius: 4px;
+}
+
+/* ================================================== */
+/* RESPONSIVE */
+/* ================================================== */
+
+@container (max-width: 430px) {
+  .aging-chart {
+    height: auto;
+    min-height: 340px;
+  }
+
+  .aging-header {
+    row-gap: 16px;
+  }
+
+  .aging-title-row {
+    flex-wrap: wrap;
+  }
+
+  .aging-header h2 {
+    height: auto;
+    font-size: 14px;
+  }
+
+  .asesor-filtro-button {
+    max-width: 100%;
+  }
+
+  .aging-options {
+    gap: 4px;
+  }
+
+  .aging-options button {
+    flex: 1 1 0;
+    width: 0;
+    min-width: 0;
+    padding: 8px 4px;
+    font-size: 12px;
+  }
+
+  .aging-diagram {
+    min-height: 230px;
+  }
+
+  .aging-bar {
+    width: min(58px, 70%);
+    min-width: 0;
+    max-width: 58px;
+  }
+
+  .aging-labels {
+    width: 100%;
+    padding-left: 8px;
+    padding-right: 8px;
+  }
+
+  .aging-label {
+    width: 54px;
+    height: 17px;
+    font-size: 11px;
+    line-height: 16.8px;
+    letter-spacing: 0;
+  }
 }

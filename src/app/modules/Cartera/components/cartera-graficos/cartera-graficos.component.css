@@ -1,0 +1,373 @@
+/* ================================================== */
+/* CONTENEDOR GENERAL */
+/* ================================================== */
+
+:host {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+}
+
+.cartera-graficos {
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr));
+  gap: 14px;
+  align-items: stretch;
+  margin-top: 18px;
+  box-sizing: border-box;
+}
+
+/* ================================================== */
+/* TARJETAS */
+/* ================================================== */
+
+.cartera-grafico-card {
+  width: 100%;
+  min-height: 300px;
+  min-width: 0;
+  padding: 15px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  background: #FFFFFF;
+  border: 1px solid #E2E8F0;
+  border-radius: 16px;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+.cartera-grafico-card:last-child {
+  padding-top: 20px;
+  padding-bottom: 20px;
+  gap: 16px;
+}
+
+/* ================================================== */
+/* TÍTULOS DE LOS GRÁFICOS */
+/* ================================================== */
+
+.cartera-grafico-titulo {
+  flex-shrink: 0;
+  width: 100%;
+  min-height: 19px;
+  margin: 0;
+  font-family: 'Roboto', sans-serif;
+  font-size: 16px;
+  font-weight: 600;
+  font-style: normal;
+  line-height: 100%;
+  letter-spacing: 0;
+  color: #0F172A;
+  opacity: 1;
+  overflow-wrap: anywhere;
+}
+/* ================================================== */
+/* DISTRIBUCIÓN INTERNA */
+/* ================================================== */
+
+.grafico-contenido {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* ================================================== */
+/* DONAS */
+/* ================================================== */
+
+.grafico-dona {
+  width: min(146px, 100%);
+  aspect-ratio: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-width: 0;
+  box-sizing: border-box;
+}
+
+.dona {
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+  flex-shrink: 0;
+
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  box-sizing: border-box;
+}
+
+/* DONA DE SEGMENTOS */
+
+.dona-segmentos {
+  background: conic-gradient(
+    #0075FF 0% 33.33%,
+    #22C55E 33.33% 66.66%,
+    #F97316 66.66% 100%
+  );
+}
+
+/* DONA DE RIESGO: SE CONSERVA */
+
+.dona-riesgo {
+  background: conic-gradient(
+    #18A999 0% 24.5%,
+    #EAB308 24.5% 54.3%,
+    #F97316 54.3% 85.5%,
+    #DC3545 85.5% 100%
+  );
+}
+
+.dona::before {
+  content: "";
+  position: absolute;
+  width: 60%;
+  height: 60%;
+  background: #FFFFFF;
+  border-radius: 50%;
+}
+
+.dona-centro {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.dona-centro strong {
+  color: #24364B;
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.dona-centro span {
+  color: #8492A6;
+  font-size: 9px;
+}
+
+/* ================================================== */
+/* TABLAS LATERALES */
+/* ================================================== */
+
+.grafico-detalle {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  width: 100%;
+}
+
+.detalle-fila {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 42px 58px;
+  align-items: center;
+  gap: 4px;
+  min-height: 32px;
+  border-bottom: none;
+
+  font-family: 'Roboto', sans-serif;
+  font-size: 11px;
+  font-weight: 400;
+  font-style: normal;
+  line-height: 100%;
+  letter-spacing: 0;
+  color: #374151;
+  opacity: 1;
+}
+
+.detalle-fila .punto {
+  display: none;
+}
+
+.detalle-fila strong {
+  color: #24364B;
+  font-size: 10px;
+  font-weight: 700;
+  text-align: right;
+  white-space: nowrap;
+}
+
+.detalle-fila > span:last-child {
+  color: #24364B;
+  font-weight: 600;
+  text-align: right;
+  white-space: nowrap;
+}
+
+.detalle-nombre {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.detalle-total {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 42px 58px;
+  align-items: center;
+  gap: 4px;
+  min-height: 35px;
+  margin-top: 4px;
+  border-top: 1px solid #CBD5E1;
+  color: #24364B;
+  font-size: 10px;
+}
+
+.detalle-total strong {
+  font-size: 10px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.detalle-total strong:nth-child(2),
+.detalle-total strong:nth-child(3) {
+  text-align: right;
+}
+
+/* ================================================== */
+/* COLORES DE SEGMENTOS Y RIESGO */
+/* ================================================== */
+
+.punto {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.preventiva {
+  background: #0075FF;
+}
+
+.administrativa {
+  background: #22C55E;
+}
+
+.prejuridica {
+  background: #F97316;
+}
+
+.bajo { background: #18A999; }
+.medio { background: #EAB308; }
+.alto { background: #F97316; }
+.critico { background: #DC3545; }
+
+/* ================================================== */
+/* ANTIGÜEDAD DE MORA: BARRAS HORIZONTALES */
+/* ================================================== */
+
+.antiguedad-lista {
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.antiguedad-fila {
+  min-height: 32px;
+  display: grid;
+  grid-template-columns: minmax(68px, 82px) minmax(24px, 1fr) 40px 48px;
+  align-items: center;
+  gap: 6px;
+  color: #64748B;
+  font-size: 11px;
+}
+
+.antiguedad-rango,
+.antiguedad-monto {
+  white-space: nowrap;
+}
+
+.antiguedad-barra {
+  width: 100%;
+  height: 9px;
+  overflow: hidden;
+  border-radius: 999px;
+  background-color: #F1F3F5;
+}
+
+.antiguedad-barra-valor {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background-color: #2864F0;
+}
+
+.mora-0-30 { width: 58%; }
+.mora-31-60 { width: 68%; }
+.mora-61-90 { width: 53%; }
+.mora-91-180 { width: 73%; }
+.mora-mas-180 { width: 50%; }
+
+.antiguedad-porcentaje {
+  color: #1E293B;
+  font-size: 11px;
+  font-weight: 700;
+  text-align: right;
+  white-space: nowrap;
+}
+
+.antiguedad-monto {
+  color: #64748B;
+  text-align: right;
+}
+
+/* ================================================== */
+/* RESPONSIVE */
+/* ================================================== */
+
+@media (max-width: 480px) {
+  .cartera-grafico-card {
+    padding-right: 10px;
+    padding-left: 10px;
+  }
+
+  .grafico-contenido {
+    grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
+    gap: 6px;
+  }
+
+  .detalle-fila,
+  .detalle-total {
+    grid-template-columns: minmax(0, 1fr) 38px 52px;
+    gap: 3px;
+    font-size: 10px;
+  }
+
+  .antiguedad-fila {
+    grid-template-columns: 68px minmax(20px, 1fr) 36px 44px;
+    gap: 4px;
+    font-size: 10px;
+  }
+}
+
+/* ================================================== */
+/* DONAS DINÁMICAS */
+/* ================================================== */
+
+.dona-segmentos,
+.dona-riesgo {
+  background: conic-gradient(#E2E8F0 0% 100%);
+  transition: background 0.3s ease;
+}
+
+/* BARRAS DINÁMICAS DE ANTIGÜEDAD */
+
+.antiguedad-barra-valor {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background-color: #2864F0;
+  transition: width 0.3s ease;
+}

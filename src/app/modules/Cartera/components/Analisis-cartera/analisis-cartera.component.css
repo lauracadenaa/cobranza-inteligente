@@ -1,0 +1,596 @@
+
+/* ========================================= */
+/* CONTENEDOR GENERAL */
+/* ========================================= */
+
+:host {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  font-family: Roboto, sans-serif;
+  box-sizing: border-box;
+}
+
+.analisis-cartera-container {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+}
+
+/* ========================================= */
+/* TARJETAS */
+/* ========================================= */
+
+.analisis-card {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  padding: 16px;
+  background: #FFFFFF;
+  border: 1px solid #E2E8F0;
+  border-radius: 12px;
+  box-sizing: border-box;
+}
+
+.analisis-titulo {
+  margin: 0;
+  color: #24364B;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 18px;
+}
+
+/* ========================================= */
+/* EVOLUCIÓN DE CARTERA */
+/* ========================================= */
+
+.evolucion-card {
+  width: 100%;
+  height: 245px;
+  position: relative;
+}
+
+.evolucion-resumen {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  margin-top: 12px;
+}
+
+.evolucion-resumen strong {
+  color: #173B67;
+  font-size: 21px;
+  font-weight: 700;
+}
+
+.evolucion-resumen span {
+  color: #64748B;
+  font-size: 10px;
+}
+
+.evolucion-grafico {
+  display: flex;
+  align-items: stretch;
+  flex: 1;
+  min-height: 0;
+  margin-top: 5px;
+  gap: 10px;
+}
+
+.evolucion-eje {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 3px 0 0;
+  color: #94A3B8;
+  font-size: 9px;
+}
+
+.evolucion-grafico svg {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.linea-guia {
+  stroke: #E9EEF4;
+  stroke-width: 1;
+  stroke-dasharray: 3 3;
+}
+
+.linea-evolucion {
+  fill: none;
+  stroke: #2864F0;
+  stroke-width: 2.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.punto-evolucion {
+  fill: #FFFFFF;
+  stroke: #2864F0;
+  stroke-width: 2;
+}
+
+.evolucion-meses {
+  display: flex;
+  justify-content: space-between;
+  margin-left: 42px;
+  margin-top: 5px;
+  color: #94A3B8;
+  font-size: 9px;
+}
+
+/* ========================================= */
+/* CUADRÍCULA DE ANÁLISIS */
+/* ========================================= */
+
+.analisis-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.02fr) minmax(0, 1fr);
+  align-items: stretch;
+  gap: 22px;
+  width: 100%;
+  min-width: 0;
+}
+
+.analisis-grid > .analisis-card {
+  min-height: 270px;
+}
+
+.analisis-columna-derecha {
+  display: grid;
+  grid-template-rows: 190px minmax(0, 1fr);
+  gap: 22px;
+  min-width: 0;
+}
+
+.analisis-subtitulo {
+  margin: 4px 0 0;
+  color: #64748B;
+  font-size: 11px;
+  line-height: 1.4;
+}
+
+.matriz-card {
+  min-height: 545px;
+}
+
+.matriz-concentracion {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  margin-top: 15px;
+}
+
+.matriz-cabecera,
+.matriz-columnas,
+.matriz-fila {
+  display: grid;
+  grid-template-columns: minmax(85px, 0.9fr) repeat(4, minmax(0, 1fr));
+  align-items: center;
+  gap: 2px;
+}
+
+.matriz-cabecera {
+  min-height: 26px;
+  padding: 0 5px;
+  color: #64748B;
+  background: #F8FAFC;
+  font-size: 10px;
+}
+
+.matriz-cabecera strong {
+  grid-column: 2 / 6;
+  text-align: center;
+  font-weight: 600;
+}
+
+.matriz-columnas {
+  min-height: 27px;
+  text-align: center;
+  color: #64748B;
+  font-size: 10px;
+}
+
+.matriz-fila {
+  flex: 1;
+  min-height: 56px;
+}
+
+.matriz-rango {
+  display: flex;
+  align-items: center;
+  align-self: stretch;
+  margin-right: 7px;
+  color: #64748B;
+  border-bottom: 1px solid #E2E8F0;
+  font-size: 10px;
+  white-space: nowrap;
+}
+
+.matriz-celda {
+  height: 100%;
+  min-height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  font-size: 11px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.leyenda-concentracion {
+  min-height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 7px;
+  margin-top: 14px;
+  padding: 0 10px;
+  color: #94A3B8;
+  background: #F8FAFC;
+  border-radius: 8px;
+  font-size: 9px;
+}
+
+.leyenda-concentracion span:first-child {
+  margin-right: auto;
+  font-weight: 600;
+}
+
+.leyenda-concentracion i {
+  width: 12px;
+  height: 17px;
+  display: block;
+  border-radius: 6px;
+}
+
+/* ========================================= */
+/* BARRAS HORIZONTALES - ANTIGÜEDAD */
+/* ========================================= */
+
+.ranking-lista {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  flex: 1;
+  gap: 12px;
+  min-height: 0;
+  margin-top: 12px;
+}
+
+.ranking-fila {
+  display: grid;
+  grid-template-columns: minmax(76px, 0.8fr) minmax(0, 2fr) 34px 52px;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.ranking-nombre {
+  color: #64748B;
+  font-size: 9px;
+  line-height: 1.2;
+}
+
+.ranking-barra {
+  height: 8px;
+  background: #EAF0F8;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.ranking-barra span {
+  display: block;
+  height: 100%;
+  background: #2864F0;
+  border-radius: 10px;
+  transition: width 0.3s ease;
+}
+
+.ranking-fila strong {
+  color: #24364B;
+  font-size: 9px;
+  font-weight: 600;
+  text-align: right;
+  white-space: nowrap;
+}
+
+.ranking-fila small {
+  color: #64748B;
+  font-size: 9px;
+  text-align: right;
+  white-space: nowrap;
+}
+
+/* ========================================= */
+/* CARTERA POR PRODUCTO */
+/* ========================================= */
+
+.producto-contenido {
+  display: grid;
+  grid-template-columns: minmax(130px, 0.9fr) minmax(0, 1.1fr);
+  align-items: center;
+  gap: 20px;
+  flex: 1;
+  min-height: 0;
+  margin-top: 12px;
+}
+
+.producto-dona {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
+}
+
+.dona-productos {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 150px;
+  height: 150px;
+  max-width: 100%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  position: relative;
+}
+
+.dona-centro {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 88px;
+  height: 88px;
+  border-radius: 50%;
+  background: #FFFFFF;
+}
+
+.dona-centro strong {
+  color: #24364B;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.dona-centro span {
+  margin-top: 3px;
+  color: #94A3B8;
+  font-size: 9px;
+}
+
+.producto-leyenda {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  min-width: 0;
+}
+
+.producto-fila {
+  display: grid;
+  grid-template-columns: 9px minmax(0, 1fr) auto;
+  align-items: center;
+  column-gap: 7px;
+  row-gap: 3px;
+}
+
+.producto-punto {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.producto-nombre {
+  color: #64748B;
+  font-size: 10px;
+}
+
+.producto-fila strong {
+  color: #24364B;
+  font-size: 10px;
+  font-weight: 600;
+}
+
+.producto-fila small {
+  grid-column: 2 / 4;
+  color: #94A3B8;
+  font-size: 9px;
+}
+
+/* ========================================= */
+/* TABLAS */
+/* ========================================= */
+
+.tabla-card {
+  overflow: hidden;
+}
+
+.tabla-analisis-contenedor {
+  width: 100%;
+  flex: 1;
+  min-height: 0;
+  margin-top: 15px;
+  overflow: auto;
+}
+
+.tabla-analisis {
+  width: 100%;
+  border-collapse: collapse;
+  white-space: nowrap;
+  font-family: Roboto, sans-serif;
+}
+
+.tabla-analisis thead {
+  background: #F8FAFC;
+}
+
+.tabla-analisis th {
+  padding: 11px 8px;
+  color: #64748B;
+  font-size: 10px;
+  font-weight: 600;
+  text-align: left;
+  border-bottom: 1px solid #E2E8F0;
+}
+
+.tabla-analisis td {
+  padding: 13px 8px;
+  color: #24364B;
+  font-size: 10px;
+  border-bottom: 1px solid #EDF1F5;
+}
+
+.tabla-analisis tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.saldo-destacado {
+  color: #DC3545 !important;
+  font-weight: 700;
+}
+
+/* ========================================= */
+/* ETIQUETAS DE RIESGO */
+/* ========================================= */
+
+.riesgo-etiqueta {
+  display: inline-block;
+  padding: 4px 7px;
+  border-radius: 5px;
+  font-size: 9px;
+  font-weight: 600;
+}
+
+.riesgo-bajo {
+  color: #087F5B;
+  background: #DDF7EB;
+}
+
+.riesgo-medio {
+  color: #946200;
+  background: #FFF3CD;
+}
+
+.riesgo-alto {
+  color: #C05621;
+  background: #FCE5D8;
+}
+
+.riesgo-crítico {
+  color: #C53030;
+  background: #FDE2E2;
+}
+
+/* ========================================= */
+/* RESPONSIVE */
+/* ========================================= */
+
+@media (max-width: 1100px) {
+
+  .analisis-grid {
+    gap: 16px;
+  }
+
+  .analisis-columna-derecha {
+    grid-template-rows: 190px minmax(0, 1fr);
+    gap: 16px;
+  }
+
+}
+
+@media (max-width: 900px) {
+  .analisis-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .matriz-card {
+    min-height: 480px;
+  }
+
+  .analisis-columna-derecha {
+    grid-template-rows: 190px minmax(300px, auto);
+  }
+}
+
+@media (max-width: 650px) {
+
+  .analisis-cartera-container {
+    gap: 12px;
+  }
+
+  .analisis-grid {
+    gap: 12px;
+  }
+
+  .analisis-columna-derecha {
+    grid-template-rows: auto auto;
+    gap: 12px;
+  }
+
+  .antiguedad-card {
+    min-height: 190px;
+  }
+
+  .top-saldos-card {
+    min-height: 300px !important;
+  }
+
+  .matriz-card {
+    min-height: 430px;
+    padding: 13px;
+  }
+
+  .matriz-cabecera,
+  .matriz-columnas,
+  .matriz-fila {
+    grid-template-columns: minmax(72px, 0.9fr) repeat(4, minmax(0, 1fr));
+  }
+
+  .matriz-celda {
+    min-height: 44px;
+    font-size: 9px;
+  }
+
+  .matriz-rango {
+    font-size: 8px;
+  }
+
+  .tabla-analisis {
+    min-width: 500px;
+  }
+
+  .evolucion-card {
+    height: 225px;
+  }
+
+  .analisis-card {
+    padding: 13px;
+  }
+
+  .producto-contenido {
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+
+  .dona-productos {
+    width: 125px;
+    height: 125px;
+  }
+
+  .dona-centro {
+    width: 75px;
+    height: 75px;
+  }
+
+  .ranking-fila {
+    grid-template-columns: 75px minmax(0, 1fr) 55px;
+    gap: 7px;
+  }
+
+}

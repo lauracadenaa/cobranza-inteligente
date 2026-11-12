@@ -1,0 +1,170 @@
+<section class="segmentos-container">
+
+    <app-cartera-kpis
+    vista="segmentos"
+    [datosSegmentos]="datosKpisSegmentos">
+    </app-cartera-kpis>
+
+  <!-- PRIMER CUADRO: DISTRIBUCIÓN -->
+  <section class="panel-segmentos">
+
+    <h3>Distribución por segmento de cobranza</h3>
+
+    <!-- BARRAS Y NOMBRES DE SEGMENTOS -->
+    <div class="segmentos-barras">
+
+      <div
+        class="barra-segmento"
+        *ngFor="let segmento of segmentos">
+
+        <div
+          class="linea-segmento"
+          [style.background]="segmento.color">
+        </div>
+
+        <span>{{ segmento.nombre }}</span>
+
+      </div>
+
+    </div>
+
+    <!-- TARJETAS DE SEGMENTOS -->
+<div class="segmentos-distribucion">
+
+  <article
+    class="tarjeta-segmento"
+    *ngFor="let segmento of segmentos">
+
+    <div class="tarjeta-segmento-contenido">
+
+      <h4>
+        <span
+          class="punto"
+          [style.background]="segmento.color">
+        </span>
+        {{ segmento.nombre }}
+      </h4>
+
+      <div class="dato-segmento">
+        <span>Asociados</span>
+        <strong>{{ segmento.asociados | number }}</strong>
+      </div>
+
+      <div class="dato-segmento">
+        <span>Obligaciones</span>
+        <strong>{{ segmento.obligaciones | number }}</strong>
+      </div>
+
+      <div class="dato-segmento">
+        <span>Saldo total</span>
+        <strong>{{ segmento.saldoTotal }}</strong>
+      </div>
+
+      <div class="dato-segmento vencido">
+        <span>Saldo vencido</span>
+        <strong>{{ segmento.saldoVencido }}</strong>
+      </div>
+
+      <div class="dato-segmento">
+        <span>Mora prom.</span>
+        <strong>{{ segmento.moraPromedio }} días</strong>
+      </div>
+
+      <div class="dato-segmento recuperacion">
+        <span>Tasa recup.</span>
+        <strong>{{ segmento.recuperacion }}</strong>
+      </div>
+
+    </div>
+
+  </article>
+
+</div>
+
+  </section>
+
+  <!-- SEGUNDO CUADRO: ANÁLISIS COMPARATIVO -->
+<section class="panel-comparativo">
+
+  <h3>Análisis comparativo de segmentos</h3>
+
+  <div class="tabla-contenedor">
+
+    <table>
+
+      <thead>
+        <tr>
+          <th>Segmento</th>
+          <th>Asociados</th>
+          <th>Obligaciones</th>
+          <th>Saldo vencido</th>
+          <th>Días promedio de mora</th>
+          <th>Riesgo predominante</th>
+          <th>Recuperación</th>
+        </tr>
+      </thead>
+
+      <tbody>
+
+        <tr *ngFor="let segmento of segmentos">
+
+          <!-- SEGMENTO -->
+          <td>
+            <span class="nombre-segmento">
+              <span
+                class="punto"
+                [style.background]="segmento.color">
+              </span>
+              {{ segmento.nombre }}
+            </span>
+          </td>
+
+          <!-- ASOCIADOS -->
+          <td>{{ segmento.asociados | number }}</td>
+
+          <!-- OBLIGACIONES -->
+          <td>
+            {{ segmento.obligaciones ?? '—' }}
+          </td>
+
+          <!-- SALDO VENCIDO -->
+          <td class="saldo-vencido">
+            {{ segmento.saldoVencido }}
+          </td>
+
+          <!-- DÍAS PROMEDIO DE MORA -->
+          <td>
+            {{ segmento.moraPromedio !== null
+              ? segmento.moraPromedio + ' días'
+              : '—' }}
+          </td>
+
+          <!-- RIESGO PREDOMINANTE -->
+          <td>{{ segmento.riesgo }}</td>
+
+          <!-- RECUPERACIÓN -->
+          <td class="tasa-recuperacion">
+            {{ segmento.recuperacion }}
+          </td>
+
+        </tr>
+
+      </tbody>
+
+    </table>
+
+  </div>
+
+</section>
+
+  <!-- NOTA INFORMATIVA -->
+  <div class="nota-segmentos">
+
+    <span>ⓘ</span>
+
+    La configuración de segmentos se realiza desde Estrategias.
+    Esta vista presenta únicamente sus resultados.
+
+  </div>
+
+</section>

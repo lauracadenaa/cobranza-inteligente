@@ -1,54 +1,95 @@
-// 1. Molde para las tarjetas de la parte superior (KPIs)
+// ==================================================
+// 1. MODELO PARA LAS TARJETAS KPI
+// ==================================================
+
 export interface MetricCard {
-  title: string;              // Ejemplo: "Cartera total en mora"
-  value: string;              // Ejemplo: "$326.1M"
-  changePercentage?: number;  // Ejemplo: 6.6
-  periodText?: string;        // Ejemplo: "vs mes anterior"
+  title: string;
+  value: string;
+  changePercentage?: number;
+  periodText?: string;
   status?: 'success' | 'warning' | 'danger' | 'info';
-
-  // Ruta de la imagen de cada KPI
   image?: string;
-  
-}
-
-// 2. Molde para las barras o datos del gráfico
-export interface ChartSeriesData {
-  label: string;  // Ejemplo: "0 a 30 días"
-  value: number;  // Ejemplo: 40.0M
-}
-
-// 3. Molde para la distribución de casos por estado (El gráfico circular/dona)
-export interface StatusDistribution {
-  statusName: string; // Ejemplo: "En gestión"
-  count: number;      // Ejemplo: 542
-  percentage: number; // Ejemplo: 45.66
-  color: string;      // Ejemplo: "#7C3AED" (púrpura)
-}
-
-// 4. Modelo para las filas de la tabla de casos gestionados
-export interface ManagedCase {
-
-  id: string;
-  asociado: string;
-  documento?: string;
-  obligacion: string;
-  saldoVencido?: number;
-
-  riesgo: 'Bajo' | 'Medio' | 'Alto' | 'Crítico';
-
-  diasMora: number;
-  tiempoLimite: string;
-  asesor: string;
-
-  // Nuevos campos para los filtros
-  estado?: string;
-  segmento?: string;
-  fechaCreacion?: string;
-
 }
 
 // ==================================================
-// MODELO DEL HEADER DEL DASHBOARD
+// 2. MODELO PARA LOS DATOS DE LOS GRÁFICOS
+// ==================================================
+
+export interface ChartSeriesData {
+  label: string;
+  value: number;
+}
+
+// ==================================================
+// 3. MODELO PARA LA DISTRIBUCIÓN DE CASOS POR ESTADO
+// ==================================================
+
+export interface StatusDistribution {
+  statusName: string;
+  count: number;
+  percentage: number;
+  color: string;
+}
+
+// ==================================================
+// 4. MODELO PARA LOS CASOS GESTIONADOS
+// ==================================================
+
+export interface ManagedCase {
+
+  // Identificación del caso
+  id: string;
+  backendId?: number;
+
+  // Identificación del cliente en el backend
+  clientId?: number;
+
+  // INFORMACIÓN DE LA PERSONA ASOCIADA
+  asociado: string;
+  documento?: string;
+  celular?: string;
+  correoElectronico?: string;
+  contactoPreferido?: string;
+
+  // INFORMACIÓN DE LA OBLIGACIÓN
+obligacion: string;
+obligationId?: number;
+saldoVencido?: number;
+
+  // INFORMACIÓN DEL RIESGO
+  riesgo: 'Bajo' | 'Medio' | 'Alto' | 'Crítico' | 'Sin información';
+  diasMora: number;
+  tiempoLimite: string;
+
+  // INFORMACIÓN DE ASIGNACIÓN
+  asesor: string;
+  nombreAsesor?: string;
+
+  // INFORMACIÓN DEL CASO
+  estado?: string;
+  segmento?: string;
+  fechaCreacion?: string;
+  origen?: string;
+
+  // CONTEXTO DE INTELIGENCIA ARTIFICIAL
+  scoreIA?: number;
+  mejorSiguienteAccion?: string;
+  canalSugerido?: string;
+  propensionPago?: string;
+  motivoPrioridad?: string;
+  fechaActualizacionIA?: string;
+  confianzaRecomendacion?: number;
+  motivoDesborde?: string;
+  guionSugerido?: string;
+
+  // HISTÓRICO DE EFECTIVIDAD
+  efectividadWhatsApp?: number;
+  efectividadSMS?: number;
+  efectividadLlamada?: number;
+}
+
+// ==================================================
+// 5. MODELO DEL HEADER DEL DASHBOARD
 // ==================================================
 
 export interface DashboardHeader {
@@ -60,17 +101,12 @@ export interface DashboardHeader {
   rolUsuario: string;
 }
 
-
 // ==================================================
-// MODELO DE CARTERA POR ANTIGÜEDAD DE MORA
+// 6. MODELO DE CARTERA POR ANTIGÜEDAD DE MORA
 // ==================================================
 
 export interface AgingData {
-
   rangoMora: string;
-
   valor: number;
-
   obligaciones: number;
-
 }

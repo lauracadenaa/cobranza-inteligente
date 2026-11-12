@@ -1,3 +1,4 @@
+
 <!-- ================================================== -->
 <!-- HEADER DEL DASHBOARD -->
 <!-- ================================================== -->
@@ -10,16 +11,32 @@
 
   <div class="dashboard-info">
 
-    <h1>
-      {{ header.titulo }}
-    </h1>
+    <ng-container *ngIf="casoGestion as caso; else encabezadoGeneral">
+      <h1>
+        <span style="font-size: 24px; letter-spacing: 0;">
+          {{ caso.id.replace('-OBL-', '-') }}
+        </span>
+        <span style="margin-left: 10px; color: #10B981; font-size: 11px; font-weight: 600;">
+          {{ formatearEstadoCaso(caso.estado) }}
+        </span>
+      </h1>
+      <p>
+        Asignado a: {{ caso.asesor || 'Sin asignar' }}
+        &nbsp;&nbsp; Origen: Desborde IA (Riesgo {{ caso.riesgo || 'Sin información' }})
+      </p>
+    </ng-container>
 
-    <p>
-      {{ header.descripcion }}
-    </p>
+    <ng-template #encabezadoGeneral>
+      <h1>
+        {{ tituloPersonalizado || header?.titulo }}
+      </h1>
+
+      <p>
+        {{ descripcionPersonalizada || header?.descripcion }}
+      </p>
+    </ng-template>
 
   </div>
-
 
   <!-- ================================================== -->
   <!-- INFORMACIÓN DEL LADO DERECHO -->
@@ -27,145 +44,121 @@
 
   <div class="dashboard-actions">
 
-    <!-- ================================================== -->
-<!-- ACTUALIZACIÓN -->
-<!-- ================================================== -->
 
-<div class="last-update">
+<!-- ACTUALIZACIÓN DEL DASHBOARD -->
+<div
+  class="dashboard-refresh"
+  *ngIf="mostrarBotonActualizar">
 
-  <!-- ================================================== -->
-  <!-- LOGO + INFORMACIÓN -->
-  <!-- ================================================== -->
-
-  <div class="update-info">
-
+  <div class="refresh-info">
     <img
       src="/imagenes/actualizar.png"
-      class="update-icon"
-      alt="Actualizar"
+      alt="Actualizar información"
+      class="refresh-icon"
     >
 
-    <div class="update-content">
+    <span>Actualizado hace 3 minutos</span>
+  </div>
+
+  <span class="refresh-action">
+    Actualizar
+  </span>
+
+</div>
+
+    <!-- ================================================== -->
+<!-- MOTOR IA -->
+<!-- ================================================== -->
+
+<div
+  class="ia-status"
+  [class.inactivo]="!header?.motorIAActivo">
+
+  <div class="ia-icon-container">
+
+    <img
+      src="/imagenes/IA.png"
+      class="ia-icon"
+      alt="Motor IA"
+    >
+
+  </div>
+
+  <div class="ia-content">
+
+    <div class="ia-title">
 
       <span>
-        {{ header.ultimaActualizacion }}
+        Motor IA
       </span>
 
-      <button>
-        Actualizar
+      <button
+        type="button"
+        class="ia-estado-boton"
+        (click)="abrirModalIA()">
+
+        {{ header?.motorIAActivo ? 'ACTIVO' : 'INACTIVO' }}
+
       </button>
 
     </div>
+
+    <span class="ia-version">
+      Modelo v2.4.1
+    </span>
 
   </div>
 
 </div>
 
     <!-- ================================================== -->
-    <!-- MOTOR IA -->
-    <!-- ================================================== -->
-
-    <div class="ia-status">
-
-      <!-- ================================================== -->
-      <!-- CÍRCULO CON IMAGEN -->
-      <!-- ================================================== -->
-
-      <div class="ia-icon-container">
-
-        <img
-          src="/imagenes/IA.png"
-          class="ia-icon"
-          alt="Motor IA"
-        >
-
-      </div>
-
-
-      <!-- ================================================== -->
-      <!-- INFORMACIÓN DEL MOTOR IA -->
-      <!-- ================================================== -->
-
-      <div class="ia-content">
-
-        <!-- MOTOR IA + ESTADO -->
-
-        <div class="ia-title">
-
-          <span>
-            Motor IA
-          </span>
-
-          <button
-            type="button"
-            class="ia-estado-boton"
-            (click)="abrirModalIA()"
-          >
-            {{ header.motorIAActivo ? 'ACTIVO' : 'INACTIVO' }}
-          </button>
-
-        </div>
-
-
-        <!-- VERSIÓN DEL MODELO -->
-
-        <span class="ia-version">
-          Modelo v2.4.1
-        </span>
-
-      </div>
-
-    </div>
-
-
-    <!-- ================================================== -->
     <!-- USUARIO -->
     <!-- ================================================== -->
 
-    <div class="user-info">
+    <div class="user-menu">
 
-      <!-- ================================================== -->
-      <!-- CUADRO JD -->
-      <!-- ================================================== -->
+      <div class="user-info">
 
-      <div class="user-icon">
+        <!-- CUADRO JD -->
 
-        <span>
-          JD
-        </span>
+        <div class="user-icon">
+          <span>JD</span>
+        </div>
 
-      </div>
+        <!-- INFORMACIÓN DEL USUARIO -->
 
+        <div class="user-details">
+          <strong>{{ header?.nombreUsuario }}</strong>
+          <span>{{ header?.rolUsuario }}</span>
+        </div>
 
-      <!-- ================================================== -->
-      <!-- INFORMACIÓN DEL USUARIO -->
-      <!-- ================================================== -->
+        <!-- CHEVRON DEL USUARIO -->
 
-      <div class="user-details">
-
-        <strong>
-          {{ header.nombreUsuario }}
-        </strong>
-
-        <span>
-          {{ header.rolUsuario }}
-        </span>
+        <button
+          type="button"
+          class="user-chevron"
+          [attr.aria-expanded]="menuUsuarioAbierto"
+          aria-label="Abrir menú de usuario"
+          (click)="alternarMenuUsuario($event)">
+        </button>
 
       </div>
 
-
-      <!-- ================================================== -->
-      <!-- CHEVRON DEL USUARIO -->
-      <!-- ================================================== -->
-
-      <span class="user-chevron"></span>
+      <div class="user-dropdown" *ngIf="menuUsuarioAbierto">
+        <button
+          type="button"
+          class="user-dropdown-item"
+          (click)="cerrarSesion()">
+          <i class="bi bi-box-arrow-right" aria-hidden="true"></i>
+          <span>Cerrar sesión</span>
+        </button>
+      </div>
 
     </div>
 
   </div>
 
 </header>
-
 
 <!-- ================================================== -->
 <!-- MODAL MOTOR IA -->
@@ -178,9 +171,7 @@
 
   <div class="ia-modal">
 
-    <!-- ================================================== -->
-    <!-- CONTENIDO -->
-    <!-- ================================================== -->
+    CONTENIDO
 
     <div class="ia-modal-content">
 
@@ -194,10 +185,7 @@
 
     </div>
 
-
-    <!-- ================================================== -->
     <!-- CERRAR -->
-    <!-- ================================================== -->
 
     <button
       type="button"

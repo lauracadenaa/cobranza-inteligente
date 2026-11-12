@@ -1,0 +1,172 @@
+
+<section class="analisis-cartera-container">
+
+  <!-- ===================================== -->
+  <!-- EVOLUCIÓN DE CARTERA -->
+  <!-- ===================================== -->
+
+  <article class="analisis-card evolucion-card">
+
+    <h3 class="analisis-titulo">
+      Evolución de la cartera (12 meses)
+    </h3>
+
+    <div class="evolucion-resumen">
+      <strong>$326.1M</strong>
+      <span>Saldo actual de cartera</span>
+    </div>
+
+    <div class="evolucion-grafico">
+
+      <div class="evolucion-eje">
+        <span>$350M</span>
+        <span>$300M</span>
+        <span>$250M</span>
+        <span>$200M</span>
+      </div>
+
+      <svg viewBox="0 0 630 125" preserveAspectRatio="none">
+
+        <line x1="0" y1="15" x2="630" y2="15"
+          class="linea-guia"/>
+
+        <line x1="0" y1="48" x2="630" y2="48"
+          class="linea-guia"/>
+
+        <line x1="0" y1="81" x2="630" y2="81"
+          class="linea-guia"/>
+
+        <line x1="0" y1="114" x2="630" y2="114"
+          class="linea-guia"/>
+
+        <polyline
+          [attr.points]="puntosEvolucion"
+          class="linea-evolucion"
+        />
+
+        <circle
+          *ngFor="let punto of puntosEvolucion.split(' '); let i = index"
+          [attr.cx]="punto.split(',')[0]"
+          [attr.cy]="punto.split(',')[1]"
+          r="3"
+          class="punto-evolucion"
+        />
+
+      </svg>
+
+    </div>
+
+    <div class="evolucion-meses">
+      <span *ngFor="let mes of meses">{{ mes }}</span>
+    </div>
+
+  </article>
+
+
+  <!-- ===================================== -->
+  <!-- CUADRÍCULA DE ANÁLISIS -->
+  <!-- ===================================== -->
+
+  <section class="analisis-grid">
+
+    <!-- CONCENTRACIÓN POR RIESGO Y MORA -->
+    <article class="analisis-card matriz-card">
+      <h3 class="analisis-titulo">Concentración por riesgo y mora</h3>
+      <p class="analisis-subtitulo">
+        Saldo vencido distribuido por antigüedad y nivel de riesgo.
+      </p>
+
+      <div class="matriz-concentracion">
+        <div class="matriz-cabecera">
+          <span>Antigüedad</span>
+          <strong>Nivel de riesgo</strong>
+        </div>
+
+        <div class="matriz-columnas">
+          <span></span>
+          <span *ngFor="let riesgo of riesgos">{{ riesgo }}</span>
+        </div>
+
+        <div
+          class="matriz-fila"
+          *ngFor="let fila of concentracionRiesgoMora">
+          <span class="matriz-rango">{{ fila.rango }}</span>
+          <div
+            class="matriz-celda"
+            *ngFor="let valor of fila.valores; let indice = index"
+            [style.background-color]="colorConcentracion(fila.niveles[indice])"
+            [style.color]="colorTextoConcentracion(fila.niveles[indice])">
+            {{ valor }}
+          </div>
+        </div>
+      </div>
+
+      <div class="leyenda-concentracion">
+        <span>Concentración</span>
+        <span>Menor</span>
+        <i
+          *ngFor="let color of coloresConcentracion"
+          [style.background-color]="color"></i>
+        <span>Mayor</span>
+      </div>
+    </article>
+
+    <div class="analisis-columna-derecha">
+
+      <!-- ANTIGÜEDAD DE MORA -->
+      <article class="analisis-card antiguedad-card">
+        <h3 class="analisis-titulo">Antigüedad de mora</h3>
+
+        <div class="ranking-lista">
+          <div class="ranking-fila" *ngFor="let dato of antiguedad">
+            <span class="ranking-nombre">{{ dato.rango }}</span>
+            <div class="ranking-barra">
+              <span [style.width]="dato.valor + '%'"></span>
+            </div>
+            <strong>{{ dato.porcentaje }}</strong>
+            <small>{{ dato.monto }}</small>
+          </div>
+        </div>
+      </article>
+
+      <!-- TOP SALDOS VENCIDOS -->
+      <article class="analisis-card tabla-card top-saldos-card">
+        <h3 class="analisis-titulo">Top saldos vencidos</h3>
+
+        <div class="tabla-analisis-contenedor">
+          <table class="tabla-analisis">
+            <thead>
+              <tr>
+                <th>Asociado</th>
+                <th>Obligación</th>
+                <th>Producto</th>
+                <th>Saldo vencido</th>
+                <th>Mora (D)</th>
+                <th>Riesgo</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              <tr *ngFor="let asociado of topSaldos">
+                <td>{{ asociado.asociado }}</td>
+                <td>{{ asociado.obligacion }}</td>
+                <td>{{ asociado.producto }}</td>
+                <td class="saldo-destacado">{{ asociado.saldo }}</td>
+                <td>{{ asociado.mora }}</td>
+                <td>
+                  <span
+                    class="riesgo-etiqueta"
+                    [ngClass]="'riesgo-' + asociado.riesgo.toLowerCase()">
+                    {{ asociado.riesgo }}
+                  </span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </article>
+
+    </div>
+  </section>
+
+</section>

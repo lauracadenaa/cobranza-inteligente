@@ -1,5 +1,12 @@
 
-import { Component, Input, Output, EventEmitter, OnDestroy } from '@angular/core';
+import {
+  ChangeDetectorRef,
+  Component,
+  Input,
+  Output,
+  EventEmitter,
+  OnDestroy
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ManagedCase } from '../../models/dashboard.models';
@@ -8,7 +15,6 @@ import { DashboardService } from '../../service/dashboard.service';
 import { Subject, of } from 'rxjs';
 
 import {
-  debounceTime,
   switchMap,
   catchError,
   finalize,
@@ -36,12 +42,11 @@ export class SearchCaseComponent implements OnDestroy {
   private destroy$ = new Subject<void>();
 
   constructor(
-    private dashboardService: DashboardService
+    private dashboardService: DashboardService,
+    private changeDetectorRef: ChangeDetectorRef
   ) {
 
     this.searchSubject.pipe(
-
-      debounceTime(350),
 
       switchMap(texto => {
 
@@ -54,7 +59,6 @@ export class SearchCaseComponent implements OnDestroy {
         this.searchError = false;
 
         return this.dashboardService.searchManagedCases(texto).pipe(
-
           catchError(error => {
 
             console.error('Error buscando casos:', error);
@@ -67,6 +71,7 @@ export class SearchCaseComponent implements OnDestroy {
 
           finalize(() => {
             this.isLoading = false;
+            this.changeDetectorRef.markForCheck();
           })
 
         );
@@ -78,6 +83,7 @@ export class SearchCaseComponent implements OnDestroy {
     ).subscribe(resultados => {
 
       this.filteredCases = resultados;
+      this.changeDetectorRef.markForCheck();
 
     });
 
@@ -254,6 +260,7 @@ export class SearchCaseComponent implements OnDestroy {
 
     this.isSearching = true;
     this.isLoading = true;
+    this.filteredCases = [];
 
     this.searchSubject.next(texto);
 

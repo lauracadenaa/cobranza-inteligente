@@ -1,0 +1,883 @@
+
+<section class="explorador-cartera">
+
+  <!-- OPCIONES DE CONSULTA -->
+  <div class="cartera-tipo-consulta">
+
+    <button
+      type="button"
+      class="cartera-tipo-opcion"
+      [class.activa]="tipoConsultaActiva === 'Asociados'"
+      (click)="seleccionarTipoConsulta('Asociados')">
+      Asociados
+    </button>
+
+    <button
+      type="button"
+      class="cartera-tipo-opcion"
+      [class.activa]="tipoConsultaActiva === 'Obligaciones'"
+      (click)="seleccionarTipoConsulta('Obligaciones')">
+      Obligaciones
+    </button>
+
+  </div>
+
+  <!-- ====================================== -->
+  <!-- VISTA DE ASOCIADOS -->
+  <!-- ====================================== -->
+
+  <ng-container *ngIf="tipoConsultaActiva === 'Asociados'">
+
+    <app-cartera-kpis vista="asociados"></app-cartera-kpis>
+
+    <section
+      class="explorador-sin-registros"
+      *ngIf="!hayRegistros">
+
+      <div class="sin-registros-logo"></div>
+
+      <h3 class="sin-registros-titulo">
+        No hay registros aún
+      </h3>
+
+      <p class="sin-registros-descripcion">
+        Cuando existan registros, aparecerán aquí.
+      </p>
+
+    </section>
+
+    <!-- TABLA Y RESUMEN -->
+    <section
+      class="asociados-layout"
+      *ngIf="hayRegistros"
+      [class.con-detalle]="asociadoSeleccionado">
+
+      <div class="asociados-tabla-panel">
+
+        <div class="asociados-tabla-encabezado">
+          <div class="asociados-tabla-titulo">
+            <h3>Asociados</h3>
+            <span>{{ asociadosFiltrados.length | number }} asociados</span>
+          </div>
+
+          <div class="asociados-tabla-controles">
+            <label class="asociados-buscador">
+              <span aria-hidden="true">⌕</span>
+              <input
+                type="search"
+                placeholder="Buscar por asociado u obligación..."
+                aria-label="Buscar por asociado u obligación"
+                [value]="busquedaAsociados"
+                (input)="actualizarBusquedaAsociados($event)">
+            </label>
+
+            <div class="asociados-filtro-contenedor">
+              <button
+                type="button"
+                class="asociados-filtro-boton"
+                [class.activo]="mostrarFiltrosAsociados"
+                [attr.aria-expanded]="mostrarFiltrosAsociados"
+                (click)="mostrarFiltrosAsociados = !mostrarFiltrosAsociados">
+                <span aria-hidden="true">▽</span>
+                Filtros
+              </button>
+
+              <div class="asociados-filtros" *ngIf="mostrarFiltrosAsociados">
+                <label for="filtro-segmento-asociados">
+                  Segmento
+                  <select
+                    id="filtro-segmento-asociados"
+                    [value]="filtroSegmentoAsociados"
+                    (change)="actualizarFiltroSegmentoAsociados($event)">
+                    <option value="">Todos</option>
+                    <option
+                      *ngFor="let segmento of segmentosAsociados"
+                      [value]="segmento">
+                      {{ segmento }}
+                    </option>
+                  </select>
+                </label>
+
+                <label for="filtro-riesgo-asociados">
+                  Riesgo
+                  <select
+                    id="filtro-riesgo-asociados"
+                    [value]="filtroRiesgoAsociados"
+                    (change)="actualizarFiltroRiesgoAsociados($event)">
+                    <option value="">Todos</option>
+                    <option value="Bajo">Bajo</option>
+                    <option value="Medio">Medio</option>
+                    <option value="Alto">Alto</option>
+                    <option value="Crítico">Crítico</option>
+                  </select>
+                </label>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="asociados-tabla-scroll">
+
+          <table class="asociados-tabla">
+
+            <thead>
+              <tr>
+                <th class="columna-seleccion">
+                  <input
+                    type="checkbox"
+                    aria-label="Seleccionar todos los asociados de esta página"
+                    [checked]="todosAsociadosPaginaSeleccionados"
+                    [indeterminate]="algunosAsociadosPaginaSeleccionados"
+                    (change)="cambiarSeleccionAsociadosPagina($event)">
+                </th>
+                <th>Asociado</th>
+                <th>Segmento</th>
+                <th>Obligaciones</th>
+                <th>Saldo vencido</th>
+                <th>Riesgo</th>
+                <th>Días de mora</th>
+                <th>Asesor</th>
+                <th>Última gestión</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+
+            <tbody>
+
+              <tr *ngFor="let asociado of asociadosPagina">
+
+                <td class="columna-seleccion">
+                  <input
+                    type="checkbox"
+                    [attr.aria-label]="'Seleccionar ' + asociado.asociado"
+                    [checked]="asociadoSeleccionadoEnTabla(asociado)"
+                    (change)="cambiarSeleccionAsociado(asociado, $event)">
+                </td>
+
+                <td class="asociado-nombre">
+                  <span>{{ asociado.asociado }}</span>
+                  <small>{{ asociado.casos[0]?.id || '—' }}</small>
+                </td>
+
+                <td>{{ asociado.segmento }}</td>
+
+                <td>{{ asociado.cantidadObligaciones }}</td>
+
+                <td class="saldo-vencido">
+                  {{ formatearSaldo(asociado.saldoVencido) }}
+                </td>
+
+                <td>
+                  <span
+                    class="asociado-riesgo"
+                    [ngClass]="claseRiesgo(obtenerNivelRiesgo(asociado.casos))">
+                    {{ obtenerNivelRiesgo(asociado.casos) }}
+                  </span>
+                </td>
+
+                <td>{{ asociado.mayorMora }}</td>
+
+                <td>
+                  <span class="asociado-asesor">
+                    <span class="asociado-asesor-avatar">A2</span>
+                    {{ asociado.casos[0]?.asesor || '—' }}
+                  </span>
+                </td>
+
+                <td class="asociado-ultima-gestion">
+                  <span>{{ asociado.casos[0]?.ultimaGestion || '—' }}</span>
+                </td>
+
+                <td>
+                  <button
+                    type="button"
+                    class="asociado-ver-detalle"
+                    (click)="verDetalleAsociado(asociado)">
+                    Ver detalle
+                  </button>
+                </td>
+
+              </tr>
+
+              <tr *ngIf="asociadosFiltrados.length === 0">
+                <td class="asociados-sin-coincidencias" colspan="10">
+                  No se encontraron asociados con esos criterios.
+                </td>
+              </tr>
+
+            </tbody>
+
+          </table>
+
+        </div>
+
+        <div class="asociados-tabla-pie">
+          <span>
+            Mostrando
+            {{ asociadosPagina.length ? inicioPaginaAsociados + 1 : 0 }}
+            a {{ finPaginaAsociados }}
+            de {{ asociadosFiltrados.length }} asociados
+          </span>
+
+          <nav class="asociados-paginacion" aria-label="Paginación de asociados">
+            <button
+              type="button"
+              aria-label="Página anterior"
+              [disabled]="paginaAsociados === 0"
+              (click)="cambiarPaginaAsociados(paginaAsociados - 1)">
+              ‹
+            </button>
+
+            <button
+              type="button"
+              class="pagina-activa"
+              aria-current="page">
+              {{ paginaAsociados + 1 }}
+            </button>
+
+            <button
+              type="button"
+              aria-label="Página siguiente"
+              [disabled]="paginaAsociados >= totalPaginasAsociados - 1"
+              (click)="cambiarPaginaAsociados(paginaAsociados + 1)">
+              ›
+            </button>
+          </nav>
+        </div>
+
+      </div>
+
+      <!-- RESUMEN LATERAL DEL ASOCIADO -->
+      <aside
+        class="asociado-detalle-panel asociado-resumen-panel"
+        *ngIf="asociadoSeleccionado">
+
+        <div class="asociado-detalle-header">
+
+          <div class="asociado-resumen-identidad">
+            <h3>{{ asociadoSeleccionado.asociado }}</h3>
+            <span class="asociado-resumen-documento">CC: —</span>
+          </div>
+
+          <div class="asociado-resumen-header-acciones">
+            <button type="button" class="asociado-ver-perfil">Ver perfil</button>
+            <button
+              type="button"
+              class="cerrar-detalle-asociado"
+              aria-label="Cerrar resumen"
+              (click)="cerrarDetalleAsociado()">
+              ×
+            </button>
+          </div>
+
+        </div>
+
+        <div class="asociado-detalle-contenido">
+
+          <section class="asociado-resumen-seccion">
+            <h4>Información general</h4>
+
+            <div class="asociado-resumen-fila">
+              <span>Documento</span>
+              <strong>—</strong>
+            </div>
+
+            <div class="asociado-resumen-fila">
+              <span>Celular</span>
+              <strong>—</strong>
+            </div>
+
+            <div class="asociado-resumen-fila">
+              <span>Correo</span>
+              <strong>—</strong>
+            </div>
+
+            <div class="asociado-resumen-fila">
+              <span>Agencia</span>
+              <strong>—</strong>
+            </div>
+
+            <div class="asociado-resumen-fila">
+              <span>Segmento</span>
+              <strong>{{ asociadoSeleccionado.segmento }}</strong>
+            </div>
+
+            <div class="asociado-resumen-fila">
+              <span>Nivel de riesgo</span>
+              <strong>{{ obtenerNivelRiesgo(asociadoSeleccionado.casos) }}</strong>
+            </div>
+
+            <div class="asociado-resumen-fila">
+              <span>Score PtP</span>
+              <strong>{{ obtenerScorePromesa(asociadoSeleccionado.obligaciones) }}</strong>
+            </div>
+
+            <div class="asociado-resumen-fila">
+              <span>Contactabilidad</span>
+              <strong>—</strong>
+            </div>
+
+            <div class="asociado-resumen-fila">
+              <span>Agente asignado</span>
+              <strong>{{ asociadoSeleccionado.casos[0]?.asesor || '—' }}</strong>
+            </div>
+          </section>
+
+          <section class="asociado-resumen-seccion">
+            <h4>Obligaciones</h4>
+
+            <div class="asociado-resumen-fila">
+              <span>Obligaciones activas</span>
+              <strong>{{ asociadoSeleccionado.cantidadObligaciones }}</strong>
+            </div>
+
+            <div class="asociado-resumen-fila">
+              <span>Saldo vencido total</span>
+              <strong class="asociado-saldo-alerta">
+                {{ formatearSaldo(asociadoSeleccionado.saldoVencido) }}
+              </strong>
+            </div>
+          </section>
+
+          <section class="asociado-resumen-seccion asociado-casos-seccion">
+            <h4>Casos asociados</h4>
+
+            <div
+              class="asociado-caso-resumen"
+              *ngFor="let caso of asociadoSeleccionado.casos">
+              <strong>{{ caso.id }}</strong>
+              <span>{{ caso.ultimaGestion || 'Sin gestión registrada' }}</span>
+            </div>
+          </section>
+
+          <div class="asociado-resumen-acciones">
+            <button type="button" class="asociado-accion-principal">
+              Ir al caso
+            </button>
+            <button type="button" class="asociado-accion-secundaria">
+              Ver obligaciones
+            </button>
+            <button type="button" class="asociado-accion-enlace">
+              Ver historial
+            </button>
+          </div>
+
+        </div>
+
+      </aside>
+
+    </section>
+
+  </ng-container>
+
+  <!-- ====================================== -->
+  <!-- VISTA DE OBLIGACIONES -->
+  <!-- ====================================== -->
+
+  <ng-container *ngIf="tipoConsultaActiva === 'Obligaciones'">
+
+    <app-cartera-kpis vista="obligaciones"></app-cartera-kpis>
+
+    <section class="obligaciones-contenedor">
+
+      <!-- ENCABEZADO -->
+      <div class="obligaciones-encabezado">
+
+        <h3 class="obligaciones-titulo">
+          Obligaciones Financieras
+        </h3>
+
+        <div class="obligaciones-herramientas">
+
+          <!-- BUSCADOR -->
+          <div class="obligaciones-buscador">
+
+            <span class="buscador-icono">
+              <img
+                src="/imagenes/Cartera/Buscar.png"
+                alt="">
+            </span>
+
+            <input
+              type="text"
+              placeholder="Buscar obligación o asociado"
+              [(ngModel)]="busquedaObligaciones">
+
+          </div>
+
+          <!-- FILTROS -->
+          <div class="filtros-container">
+
+            <button
+              type="button"
+              class="obligaciones-filtro"
+              [class.filtros-activos]="mostrarFiltroObligaciones"
+              [attr.aria-expanded]="mostrarFiltroObligaciones"
+              aria-haspopup="dialog"
+              (click)="mostrarFiltroObligaciones = !mostrarFiltroObligaciones">
+              <img src="imagenes/Filtro.png" alt="">
+              <span>Filtros</span>
+              <span
+                class="filter-count"
+                *ngIf="cantidadFiltrosActivosObligaciones > 0">
+                {{ cantidadFiltrosActivosObligaciones }}
+              </span>
+            </button>
+
+            <div
+              class="filtros-modal"
+              role="dialog"
+              aria-label="Filtros de obligaciones financieras"
+              *ngIf="mostrarFiltroObligaciones">
+              <div class="filtros-header">
+                <h3>Filtros</h3>
+                <button
+                  type="button"
+                  class="cerrar-filtros"
+                  (click)="mostrarFiltroObligaciones = false"
+                  aria-label="Cerrar filtros">
+                  <i class="bi bi-x"></i>
+                </button>
+              </div>
+
+              <div class="filtros-body">
+
+                <!-- RIESGO -->
+                <div class="filtro-grupo filtro-riesgo">
+
+                  <label>Riesgo</label>
+
+                  <div class="filtro-riesgos">
+
+                    <button
+                      type="button"
+                      class="btn-riesgo"
+                      [class.seleccionado]="filtrosObligaciones.riesgos.includes('Bajo')"
+                      [attr.aria-pressed]="filtrosObligaciones.riesgos.includes('Bajo')"
+                      (click)="alternarRiesgoObligacion('Bajo')">
+                      Bajo
+                    </button>
+
+                    <button
+                      type="button"
+                      class="btn-riesgo"
+                      [class.seleccionado]="filtrosObligaciones.riesgos.includes('Medio')"
+                      [attr.aria-pressed]="filtrosObligaciones.riesgos.includes('Medio')"
+                      (click)="alternarRiesgoObligacion('Medio')">
+                      Medio
+                    </button>
+
+                    <button
+                      type="button"
+                      class="btn-riesgo"
+                      [class.seleccionado]="filtrosObligaciones.riesgos.includes('Alto')"
+                      [attr.aria-pressed]="filtrosObligaciones.riesgos.includes('Alto')"
+                      (click)="alternarRiesgoObligacion('Alto')">
+                      Alto
+                    </button>
+
+                    <button
+                      type="button"
+                      class="btn-riesgo"
+                      [class.seleccionado]="filtrosObligaciones.riesgos.includes('Crítico')"
+                      [attr.aria-pressed]="filtrosObligaciones.riesgos.includes('Crítico')"
+                      (click)="alternarRiesgoObligacion('Crítico')">
+                      Crítico
+                    </button>
+
+                  </div>
+
+                </div>
+
+                <!-- PRODUCTO -->
+                <div class="filtro-grupo">
+
+                  <label for="filtro-producto-obligaciones">
+                    Producto
+                  </label>
+
+                  <div class="filtro-select">
+
+                    <select
+                      id="filtro-producto-obligaciones"
+                      [(ngModel)]="filtrosObligaciones.producto">
+
+                      <option value="">Todos los productos</option>
+                      <option value="Crédito de consumo">Crédito de consumo</option>
+                      <option value="Crédito rotativo">Crédito rotativo</option>
+                      <option value="Tarjeta de crédito">Tarjeta de crédito</option>
+                      <option value="Microcrédito">Microcrédito</option>
+                      <option value="Crédito hipotecario">Crédito hipotecario</option>
+
+                    </select>
+
+                    <img
+                      src="/imagenes/flecha.admin.png"
+                      alt="Flecha">
+
+                  </div>
+
+                </div>
+
+                <!-- ASOCIADO -->
+                <div class="filtro-grupo">
+
+                  <label for="filtro-asociado-obligaciones">
+                    Asociado
+                  </label>
+
+                  <input
+                    id="filtro-asociado-obligaciones"
+                    type="text"
+                    placeholder="Buscar asociado..."
+                    [(ngModel)]="filtrosObligaciones.asociado">
+
+                </div>
+
+                <!-- DÍAS DE MORA -->
+                <div class="filtro-grupo">
+
+                  <label>Días de mora</label>
+
+                  <div class="filtro-dos-columnas">
+
+                    <input
+                      type="number"
+                      min="0"
+                      placeholder="Desde 0"
+                      [(ngModel)]="filtrosObligaciones.diasMoraDesde">
+
+                    <input
+                      type="number"
+                      min="0"
+                      placeholder="Hasta 0"
+                      [(ngModel)]="filtrosObligaciones.diasMoraHasta">
+
+                  </div>
+
+                </div>
+
+                <!-- SALDO VENCIDO -->
+                <div class="filtro-grupo">
+
+                  <label>Saldo vencido</label>
+
+                  <div class="filtro-dos-columnas">
+
+                    <input
+                      type="number"
+                      min="0"
+                      placeholder="Desde"
+                      [(ngModel)]="filtrosObligaciones.saldoVencidoDesde">
+
+                    <input
+                      type="number"
+                      min="0"
+                      placeholder="Hasta"
+                      [(ngModel)]="filtrosObligaciones.saldoVencidoHasta">
+
+                  </div>
+
+                </div>
+
+              </div>
+
+              <div class="filtros-footer">
+                <button
+                  type="button"
+                  class="btn-limpiar-filtros"
+                  (click)="limpiarFiltrosObligaciones()">
+                  Limpiar
+                </button>
+                <button
+                  type="button"
+                  class="btn-aplicar-filtros"
+                  (click)="aplicarFiltrosObligaciones()">
+                  Aplicar filtros
+                </button>
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+      <!-- FILTROS ACTIVOS -->
+      <div
+        class="managed-active-filters"
+        *ngIf="filtrosVisiblesObligaciones.length > 0">
+
+        <div
+          class="active-filter-tag"
+          *ngFor="let filtro of filtrosVisiblesObligaciones.slice(0, 3)">
+
+          <span>{{ filtro.texto }}</span>
+
+          <button
+            type="button"
+            class="remove-active-filter"
+            (click)="quitarFiltroObligacion(filtro.clave)"
+            aria-label="Quitar filtro">
+            <i class="bi bi-x"></i>
+          </button>
+
+        </div>
+
+        <div
+          class="active-filter-tag filtros-restantes"
+          *ngIf="filtrosVisiblesObligaciones.length > 3">
+          +{{ filtrosVisiblesObligaciones.length - 3 }} filtros
+        </div>
+
+      </div>
+
+      <!-- TABLA Y DETALLE DE OBLIGACIÓN -->
+      <section
+        class="obligaciones-layout"
+        [class.con-detalle]="obligacionSeleccionadaDetalle">
+
+        <!-- TABLA -->
+        <div class="obligaciones-tabla-panel">
+
+          <div class="obligaciones-tabla-scroll">
+
+            <table class="obligaciones-tabla">
+
+              <thead>
+                <tr>
+
+                  <th
+                    class="columna-checkbox"
+                    *ngIf="!obligacionSeleccionadaDetalle">
+                    <input
+                      type="checkbox"
+                      aria-label="Seleccionar todas las obligaciones"
+                      [checked]="todasObligacionesSeleccionadas"
+                      (change)="seleccionarTodasObligaciones(
+                        $any($event.target).checked
+                      )">
+                  </th>
+
+                  <th>Obligación</th>
+                  <th>Asociado</th>
+
+                  <th *ngIf="!obligacionSeleccionadaDetalle">Producto</th>
+                  <th *ngIf="!obligacionSeleccionadaDetalle">Saldo total</th>
+
+                  <th>Saldo vencido</th>
+                  <th>Días de mora</th>
+                  <th>Riesgo</th>
+
+                  <th *ngIf="!obligacionSeleccionadaDetalle">
+                    Caso relacionado
+                  </th>
+
+                  <th>Acciones</th>
+
+                </tr>
+              </thead>
+
+              <tbody>
+
+                <tr
+                  *ngFor="let obligacion of obligacionesFiltradas"
+                  [class.fila-obligacion-activa]="
+                    obligacionSeleccionadaDetalle?.id === obligacion.id
+                  ">
+
+                  <td
+                    class="columna-checkbox"
+                    *ngIf="!obligacionSeleccionadaDetalle">
+                    <input
+                      type="checkbox"
+                      [checked]="obligacionSeleccionada(obligacion.id)"
+                      (change)="seleccionarObligacion(
+                        obligacion.id,
+                        $any($event.target).checked
+                      )">
+                  </td>
+
+                  <td>{{ obligacion.id }}</td>
+                  <td>{{ obligacion.asociado }}</td>
+
+                  <td *ngIf="!obligacionSeleccionadaDetalle">
+                    {{ obligacion.producto }}
+                  </td>
+
+                  <td *ngIf="!obligacionSeleccionadaDetalle">
+                    {{ obligacion.saldoTotal }}
+                  </td>
+
+                  <td>{{ obligacion.saldoVencido }}</td>
+                  <td>{{ obligacion.diasMora }}</td>
+
+                  <td>
+                    <span
+                      class="risk-badge"
+                      [ngClass]="claseRiesgo(obligacion.riesgo)">
+                      {{ obligacion.riesgo }}
+                    </span>
+                  </td>
+
+                  <td *ngIf="!obligacionSeleccionadaDetalle">
+                    {{ obligacion.casoRelacionado }}
+                  </td>
+
+                  <td>
+                    <button
+                      type="button"
+                      class="case-action"
+                      (click)="verDetalleDesdeObligacion(obligacion)">
+                      Ver detalle
+                    </button>
+                  </td>
+
+                </tr>
+
+                <tr *ngIf="obligacionesFiltradas.length === 0">
+
+                  <td
+                    [attr.colspan]="obligacionSeleccionadaDetalle ? 6 : 10"
+                    class="obligaciones-sin-registros">
+                    No hay obligaciones para mostrar.
+                  </td>
+
+                </tr>
+
+              </tbody>
+
+            </table>
+
+          </div>
+
+          <div class="explorador-seleccion">
+            {{ obligacionesSeleccionadas.length }}
+            obligaciones seleccionadas
+          </div>
+
+        </div>
+
+        <!-- ====================================== -->
+        <!-- PANEL LATERAL DE DETALLE DE OBLIGACIÓN -->
+        <!-- ====================================== -->
+
+        <aside
+          class="asociado-detalle-panel obligacion-detalle-panel"
+          *ngIf="obligacionSeleccionadaDetalle">
+
+          <div class="asociado-detalle-header">
+
+            <div>
+              <h3>
+                {{ obligacionSeleccionadaDetalle.id }}
+              </h3>
+              <p>
+                Asociado: {{ obligacionSeleccionadaDetalle.asociado }}
+              </p>
+            </div>
+
+            <button
+              type="button"
+              class="cerrar-detalle-asociado"
+              aria-label="Cerrar detalle"
+              (click)="cerrarDetalleObligacion()">
+              −
+            </button>
+
+          </div>
+
+          <div class="asociado-detalle-contenido">
+
+            <h4>DETALLES FINANCIEROS</h4>
+
+            <div class="detalle-dato">
+              <span>Producto</span>
+              <strong>
+                {{ obligacionSeleccionadaDetalle.producto }}
+              </strong>
+            </div>
+
+            <div class="detalle-dato">
+              <span>Estado</span>
+              <strong>{{ obligacionSeleccionadaDetalle.estado || '—' }}</strong>
+            </div>
+
+            <div class="detalle-dato">
+              <span>Saldo total</span>
+              <strong>{{ obligacionSeleccionadaDetalle.saldoTotal }}</strong>
+            </div>
+
+            <div class="detalle-dato">
+              <span>Saldo vencido</span>
+              <strong>{{ obligacionSeleccionadaDetalle.saldoVencido }}</strong>
+            </div>
+
+            <div class="detalle-dato">
+              <span>Cuota mínima</span>
+              <strong>{{ obligacionSeleccionadaDetalle.cuotaMinima || '—' }}</strong>
+            </div>
+
+            <div class="detalle-dato">
+              <span>Fecha vencimiento</span>
+              <strong>{{ obligacionSeleccionadaDetalle.fechaVencimiento || '—' }}</strong>
+            </div>
+
+            <div class="detalle-dato">
+              <span>Días de mora</span>
+              <strong>{{ obligacionSeleccionadaDetalle.diasMora }} días</strong>
+            </div>
+
+            <div class="detalle-dato">
+              <span>Score PtP</span>
+              <strong>{{ obligacionSeleccionadaDetalle.scorePtP || '—' }}</strong>
+            </div>
+
+            <div class="detalle-dato">
+              <span>Caso asociado</span>
+              <strong>{{ obligacionSeleccionadaDetalle.casoRelacionado }}</strong>
+            </div>
+
+            <div class="detalle-dato">
+              <span>Agente asignado</span>
+              <strong>{{ obtenerAsesorAsignado(obligacionSeleccionadaDetalle) }}</strong>
+            </div>
+
+            <div class="detalle-separador"></div>
+
+            <h4>COMPOSICIÓN DEL SALDO</h4>
+
+            <div class="detalle-dato">
+              <span>Capital</span>
+              <strong>{{ obligacionSeleccionadaDetalle.capital || '—' }}</strong>
+            </div>
+
+            <div class="detalle-dato">
+              <span>Intereses de mora</span>
+              <strong>{{ obligacionSeleccionadaDetalle.interesMora || '—' }}</strong>
+            </div>
+
+            <div class="detalle-acciones">
+              <button type="button" class="detalle-accion-principal">
+                Ir al caso
+              </button>
+              <button type="button" class="detalle-accion-secundaria">
+                Ver pagos
+              </button>
+              <button type="button" class="detalle-accion-enlace">
+                Ver acuerdo
+              </button>
+            </div>
+
+          </div>
+
+        </aside>
+
+      </section>
+
+    </section>
+
+  </ng-container>
+
+</section>

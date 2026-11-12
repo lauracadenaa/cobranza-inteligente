@@ -3,8 +3,16 @@
 /* CONTENEDOR PRINCIPAL */
 /* ================================================== */
 
+:host {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  container-type: inline-size;
+}
+
 .case-status-chart {
-  width: 552px;
+  width: 100%;
+  min-width: 0;
   height: 390px;
 
   display: flex;
@@ -30,31 +38,39 @@
 
 .case-status-header {
   width: 100%;
+  min-width: 0;
 
   display: flex;
   align-items: center;
-  justify-content: flex-start;
+  justify-content: space-between;
 
-  gap: 238px;
-
+  gap: 12px;
   box-sizing: border-box;
+  transform: translateY(3px);
 }
 
 .case-status-chart h2 {
+  width: 126px;
+  height: 19px;
+
   margin: 0;
+  padding: 0;
 
   font-family: 'Roboto', sans-serif;
   font-weight: 600;
   font-size: 16px;
-  line-height: 100%;
-
-  width: 126px;
-  height: 19px;
+  line-height: 19px;
 
   white-space: nowrap;
-
   color: #0F172A;
+
+  opacity: 1;
+  transform: translateY(-2px);
 }
+
+/* ================================================== */
+/* BOTÓN IR A GESTIÓN DE CASOS */
+/* ================================================== */
 
 .btn-gestion {
   width: 132px;
@@ -63,25 +79,47 @@
   padding: 0;
   margin: 0;
 
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
   flex-shrink: 0;
 
   border: none;
+  border-radius: 8px;
   background: transparent;
 
   font-family: 'Roboto', sans-serif;
   font-weight: 500;
-  font-size: estatico;
-  font-style: medium;
+  font-style: normal;
+  font-size: 14px;
   line-height: 20px;
+  letter-spacing: normal;
 
-  text-align: right;
+  text-align: center;
+  vertical-align: middle;
   white-space: nowrap;
 
   color: #2563EB;
 
   cursor: pointer;
 
-  transform: translateX(17px);
+  transition: background-color 0.25s ease,
+              box-shadow 0.25s ease;
+}
+
+.btn-gestion:hover {
+  background-color: #2563EB14;
+  box-shadow: 0 2px 8px #2563EB14;
+}
+
+.btn-gestion:active {
+  background-color: #2563EB20;
+}
+
+.btn-gestion:focus-visible {
+  outline: 2px solid #2563EB;
+  outline-offset: 3px;
 }
 
 /* ================================================== */
@@ -90,14 +128,31 @@
 
 .case-status-content {
   flex: 1;
+  min-width: 0;
 
   display: flex;
   align-items: center;
   justify-content: center;
 
-  gap: 35px;
+  gap: clamp(8px, 2vw, 35px);
 
-  transform: translateX(-10px);
+  transform: none;
+}
+
+.case-status-message {
+  flex: 1;
+  display: grid;
+  place-items: center;
+  margin: 0;
+
+  color: #64748B;
+  font-family: Roboto, sans-serif;
+  font-size: 12px;
+  text-align: center;
+}
+
+.case-status-error {
+  color: #B91C1C;
 }
 
 /* ================================================== */
@@ -105,13 +160,14 @@
 /* ================================================== */
 
 .case-status-pie {
-  width: 235px;
-  height: 235px;
+  width: min(235px, 42%);
+  height: auto;
+  aspect-ratio: 1;
 
-  min-width: 235px;
-  min-height: 235px;
+  min-width: 150px;
+  min-height: 150px;
 
-  flex: 0 0 235px;
+  flex: 0 1 235px;
 
   position: relative;
 
@@ -120,20 +176,18 @@
   justify-content: center;
 
   box-sizing: border-box;
-
   opacity: 1;
 }
 
 .donut-svg {
-  width: 235px;
-  height: 235px;
+  width: 100%;
+  height: 100%;
 
   position: absolute;
   top: 0;
   left: 0;
 
   display: block;
-
   overflow: visible;
 }
 
@@ -147,47 +201,53 @@
   top: 5px;
   left: 50%;
 
-  transform: translateX(-50%);
+  transform: translate(-50%, 4px);
 
-  display: none;
+  width: 150px;
+  min-height: 84px;
+  box-sizing: border-box;
+
+  display: flex;
   flex-direction: column;
+  justify-content: center;
 
-  align-items: center;
-  gap: 4px;
-
-  padding: 8px 12px;
+  gap: 5px;
+  padding: 10px;
 
   background: #FFFFFF;
-
-  border: 1px solid #E2E8F0;
-  border-radius: 8px;
+  border: 1px solid #CBD5E1;
+  border-radius: 5px;
 
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
 
-  z-index: 5;
+  color: #6B7280;
+  font-family: 'Roboto', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 16px;
 
   white-space: nowrap;
+  opacity: 0;
+  visibility: hidden;
+
+  transition: opacity 0.15s ease, visibility 0.15s ease;
+
+  z-index: 5;
   pointer-events: none;
 }
 
 .donut-tooltip.visible {
-  display: flex;
+  opacity: 1;
+  visibility: visible;
 }
 
 .tooltip-estado {
-  font-family: 'Roboto', sans-serif;
-  font-size: 11px;
-  font-weight: 400;
-
-  color: #64748B;
+  font-weight: 500;
 }
 
-.tooltip-porcentaje {
-  font-family: 'Roboto', sans-serif;
-  font-size: 14px;
-  font-weight: 700;
-
-  color: #0F172A;
+.donut-tooltip span {
+  font: inherit;
+  color: inherit;
 }
 
 /* ================================================== */
@@ -195,8 +255,8 @@
 /* ================================================== */
 
 .pie-center {
-  width: 165px;
-  height: 165px;
+  width: 70%;
+  height: 70%;
 
   min-width: 165px;
   min-height: 165px;
@@ -207,7 +267,6 @@
   z-index: 1;
 
   border-radius: 50%;
-
   background: #FFFFFF;
 
   display: flex;
@@ -217,24 +276,54 @@
   justify-content: center;
 }
 
-.pie-total {
-  font-family: 'Roboto', sans-serif;
-  font-size: 24px;
-  font-weight: 700;
-  line-height: 100%;
+/* ================================================== */
+/* NÚMERO DENTRO DEL CÍRCULO */
+/* ================================================== */
 
-  color: #0F172A;
+.pie-total {
+  width: 79px;
+  height: 38px;
+
+  font-family: 'Roboto', sans-serif;
+  font-weight: 400;
+  font-style: normal;
+  font-size: 32px;
+  line-height: 100%;
+  letter-spacing: 0;
+
+  color: #001822;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  opacity: 1;
 }
 
+/* ================================================== */
+/* TEXTO DEBAJO DEL NÚMERO DEL CÍRCULO */
+/* ================================================== */
+
 .pie-label {
+  width: 27px;
+  height: 14px;
+
   margin-top: 6px;
 
   font-family: 'Roboto', sans-serif;
-  font-size: 12px;
   font-weight: 400;
+  font-style: normal;
+  font-size: 12px;
   line-height: 100%;
+  letter-spacing: 0;
 
-  color: #64748B;
+  color: #AEB8CC;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  opacity: 1;
 }
 
 /* ================================================== */
@@ -248,12 +337,16 @@
   gap: 30.4px;
 
   width: 242px;
+  max-width: 52%;
+  min-width: 0;
 
-  flex-shrink: 0;
+  flex: 1 1 200px;
 }
 
 .legend-item {
-  width: 242px;
+  width: 100%;
+  min-width: 0;
+
   display: flex;
   align-items: center;
   gap: 10px;
@@ -302,54 +395,89 @@
 
 .legend-item p {
   width: 123px;
-  flex: 0 0 123px;
+  height: 13px;
 
   margin: 0;
 
   font-family: 'Roboto', sans-serif;
   font-weight: 400;
+  font-style: normal;
   font-size: 11px;
-  line-height: 13px;
+  line-height: 100%;
+  letter-spacing: 0;
 
-  color: #64748B;
+  color: #374151;
 
-  white-space: normal;
+  display: flex;
+  align-items: center;
+
+  opacity: 1;
 }
 
 /* ================================================== */
-/* CANTIDADES */
+/* CANTIDAD Y PORCENTAJE */
 /* ================================================== */
+
+.legend-value,
+.legend-percent {
+  width: 58px;
+  height: 14px;
+  flex: 0 0 58px;
+
+  font-family: 'Roboto', sans-serif;
+  font-weight: 600;
+  font-style: normal;
+  font-size: 12px;
+  line-height: 100%;
+  letter-spacing: 0;
+
+  color: #0F172A;
+
+  white-space: nowrap;
+
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+
+  opacity: 1;
+}
+
+/* CANTIDAD */
 
 .legend-value {
-  width: 32px;
-  flex: 0 0 32px;
+  margin-right: -12px;
+}
 
-  font-family: 'Roboto', sans-serif;
-  font-size: 11px;
-  font-weight: 600;
+/* PORCENTAJE */
 
-  text-align: right;
-
-  color: #0F172A;
-
-  white-space: nowrap;
+.legend-percent {
+  margin-left: 0;
 }
 
 /* ================================================== */
-/* PORCENTAJES */
+/* RESPONSIVE */
 /* ================================================== */
 
-.legend-percent {
-  width: 52px;
-  flex: 0 0 52px;
+@container (max-width: 430px) {
+  .case-status-chart {
+    height: auto;
+    min-height: 390px;
+  }
 
-  font-family: 'Roboto', sans-serif;
-  font-size: 11px;
-  font-weight: 400;
+  .case-status-content {
+    flex-direction: column;
+    padding-top: 20px;
+  }
 
-  text-align: right;
+  .case-status-pie {
+    width: min(200px, 70vw);
+    min-width: 150px;
+    flex: 0 0 auto;
+  }
 
-  color: #0F172A;
-
-  white-space: nowrap;
+  .case-status-legend {
+    width: 100%;
+    max-width: 100%;
+    gap: 14px;
+  }
 }

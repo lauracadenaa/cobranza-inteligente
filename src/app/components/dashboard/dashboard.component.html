@@ -12,7 +12,9 @@
   <main class="dashboard-content">
 
     <!-- ENCABEZADO -->
-    <app-dashboard-header></app-dashboard-header>
+    <app-dashboard-header
+      [mostrarBotonActualizar]="true">
+    </app-dashboard-header>
 
     <!-- TARJETAS KPI -->
     <app-kpi-cards></app-kpi-cards>
@@ -45,7 +47,7 @@
               placeholder="Buscar caso...">
           </div>
 
-          <!-- BOTÓN Y MODAL DE FILTROS -->
+          <!-- FILTROS -->
           <div class="filtros-container">
 
             <button
@@ -53,38 +55,24 @@
               class="managed-filter"
               [class.filtros-activos]="mostrarModalFiltros"
               (click)="abrirFiltros()">
-
               <img src="imagenes/Filtro.png" alt="">
               <span>Filtros</span>
-
-              <span
-                class="filter-count"
-                *ngIf="cantidadFiltrosActivos > 0">
+              <span class="filter-count" *ngIf="cantidadFiltrosActivos > 0">
                 {{ cantidadFiltrosActivos }}
               </span>
-
             </button>
 
-            <!-- MODAL DE FILTROS -->
-            <div
-              class="filtros-modal"
-              *ngIf="mostrarModalFiltros">
-
-              <!-- ENCABEZADO -->
+            <div class="filtros-modal" *ngIf="mostrarModalFiltros">
               <div class="filtros-header">
-
                 <h3>Filtros</h3>
-
                 <button
                   type="button"
                   class="cerrar-filtros"
                   (click)="cerrarFiltros()">
                   <i class="bi bi-x"></i>
                 </button>
-
               </div>
 
-              <!-- CUERPO DEL MODAL -->
               <div class="filtros-body">
 
                 <!-- RIESGO -->
@@ -131,7 +119,6 @@
                     </button>
 
                   </div>
-
                 </div>
 
                 <!-- SEGMENTO -->
@@ -143,6 +130,7 @@
 
                     <select
                       id="filtro-segmento"
+                      [class.con-valor]="filtros.segmento !== ''"
                       [(ngModel)]="filtros.segmento">
 
                       <option value="">Todos los segmentos</option>
@@ -167,6 +155,7 @@
 
                     <select
                       id="filtro-estado"
+                      [class.con-valor]="filtros.estado !== ''"
                       [(ngModel)]="filtros.estado">
 
                       <option value="">Todos los estados</option>
@@ -193,6 +182,7 @@
                     id="filtro-asesor"
                     type="text"
                     placeholder="Buscar asesor..."
+                    [class.con-valor]="filtros.asesor.trim() !== ''"
                     [(ngModel)]="filtros.asesor">
 
                 </div>
@@ -208,12 +198,14 @@
                       type="number"
                       min="0"
                       placeholder="Desde 0"
+                      [class.con-valor]="filtros.diasMoraDesde !== null"
                       [(ngModel)]="filtros.diasMoraDesde">
 
                     <input
                       type="number"
                       min="0"
                       placeholder="Hasta 0"
+                      [class.con-valor]="filtros.diasMoraHasta !== null"
                       [(ngModel)]="filtros.diasMoraHasta">
 
                   </div>
@@ -229,6 +221,7 @@
 
                     <input
                       type="date"
+                      [class.con-valor]="filtros.fechaExacta !== ''"
                       [(ngModel)]="filtros.fechaExacta">
 
                   </div>
@@ -240,6 +233,7 @@
 
                       <input
                         type="date"
+                        [class.con-valor]="filtros.fechaDesde !== ''"
                         [(ngModel)]="filtros.fechaDesde">
 
                       <i class="bi bi-calendar3"></i>
@@ -250,6 +244,7 @@
 
                       <input
                         type="date"
+                        [class.con-valor]="filtros.fechaHasta !== ''"
                         [(ngModel)]="filtros.fechaHasta">
 
                       <i class="bi bi-calendar3"></i>
@@ -307,36 +302,29 @@
 
               </div>
 
-              <!-- PIE DEL MODAL -->
               <div class="filtros-footer">
-
                 <button
                   type="button"
                   class="btn-limpiar-filtros"
                   (click)="limpiarFiltros()">
                   Limpiar
                 </button>
-
                 <button
                   type="button"
                   class="btn-aplicar-filtros"
                   (click)="aplicarFiltros()">
                   Aplicar filtros
                 </button>
-
               </div>
-
             </div>
-
           </div>
         </div>
       </div>
 
-      <!-- ================================================== -->
       <!-- FILTROS ACTIVOS -->
-      <!-- ================================================== -->
-
-      <div class="managed-active-filters">
+      <div
+        class="managed-active-filters"
+        *ngIf="filtrosVisibles.length > 0">
 
         <div
           class="active-filter-tag"
@@ -357,15 +345,14 @@
         <div
           class="active-filter-tag filtros-restantes"
           *ngIf="filtrosVisibles.length > 3">
+
           +{{ filtrosVisibles.length - 3 }} filtros
+
         </div>
 
       </div>
 
-      <!-- ================================================== -->
       <!-- TABLA DE CASOS -->
-      <!-- ================================================== -->
-
       <div class="managed-cases-table">
 
         <table>
@@ -385,27 +372,25 @@
 
           <tbody>
 
-            <!-- CASOS DE LA PÁGINA ACTUAL -->
             <tr *ngFor="let c of casosPaginados">
 
               <td>{{ c.id }}</td>
               <td>{{ c.asociado }}</td>
               <td>{{ c.obligacion }}</td>
 
-              <!-- RIESGO CON ETIQUETA DINÁMICA -->
-                <td class="risk-cell">
-                  <span
-                    class="risk-badge"
-                    [class.bajo]="c.riesgo?.toLowerCase().trim() === 'bajo'"
-                    [class.medio]="c.riesgo?.toLowerCase().trim() === 'medio'"
-                    [class.alto]="c.riesgo?.toLowerCase().trim() === 'alto'"
-                    [class.critico]="
-                      c.riesgo?.toLowerCase().trim() === 'crítico' ||
-                      c.riesgo?.toLowerCase().trim() === 'critico'
-                    ">
-                    {{ c.riesgo }}
-                  </span>
-                </td>
+              <td class="risk-cell">
+                <span
+                  class="risk-badge"
+                  [class.bajo]="c.riesgo?.toLowerCase().trim() === 'bajo'"
+                  [class.medio]="c.riesgo?.toLowerCase().trim() === 'medio'"
+                  [class.alto]="c.riesgo?.toLowerCase().trim() === 'alto'"
+                  [class.critico]="
+                    c.riesgo?.toLowerCase().trim() === 'crítico' ||
+                    c.riesgo?.toLowerCase().trim() === 'critico'
+                  ">
+                  {{ c.riesgo }}
+                </span>
+              </td>
 
               <td>{{ c.diasMora }}</td>
               <td>{{ c.tiempoLimite }}</td>
@@ -421,36 +406,27 @@
 
             </tr>
 
-            <!-- SIN RESULTADOS -->
             <tr *ngIf="casosFiltrados.length === 0">
-
               <td colspan="8" class="sin-resultados">
                 No se encontraron casos con los filtros seleccionados.
               </td>
-
             </tr>
 
           </tbody>
         </table>
       </div>
 
-      <!-- ================================================== -->
-      <!-- PAGINACIÓN DE CASOS -->
-      <!-- ================================================== -->
-
+      <!-- PAGINACIÓN -->
       <div class="managed-cases-pagination">
 
-        <!-- INFORMACIÓN DE REGISTROS -->
         <p class="pagination-info">
           Mostrando {{ registroInicial }}
           a {{ registroFinal }}
           de {{ casosFiltrados.length }} casos
         </p>
 
-        <!-- BOTONES DE PAGINACIÓN -->
         <div class="pagination-buttons">
 
-          <!-- FLECHA ANTERIOR -->
           <button
             type="button"
             class="pagination-button pagination-arrow"
@@ -460,7 +436,6 @@
             <i class="bi bi-chevron-left"></i>
           </button>
 
-          <!-- NÚMEROS DE PÁGINA -->
           <button
             type="button"
             class="pagination-button"
@@ -471,7 +446,6 @@
             {{ pagina }}
           </button>
 
-          <!-- FLECHA SIGUIENTE -->
           <button
             type="button"
             class="pagination-button pagination-arrow"
@@ -486,82 +460,50 @@
 
     </section>
 
-    <!-- ================================================== -->
     <!-- ACCIONES RÁPIDAS -->
-    <!-- ================================================== -->
-
     <section class="quick-actions">
 
       <h2>Acciones rápidas</h2>
 
       <div class="quick-actions-grid">
 
-        <!-- CARGAR ARCHIVO -->
         <button type="button" class="quick-card">
-
           <div class="quick-icon">
             <img src="imagenes/Cargar-archivo.png" alt="Cargar archivo">
           </div>
-
           <div class="quick-text">
             <span>Cargar archivo</span>
             <p>Nueva carga batch</p>
           </div>
-
         </button>
 
-        <!-- BUSCAR CASO -->
         <button
           type="button"
           class="quick-card"
           (click)="openSearchCase()">
-
           <div class="quick-icon">
             <img src="imagenes/Buscar-caso.png" alt="Buscar caso">
           </div>
-
           <div class="quick-text">
             <span>Buscar caso</span>
             <p>Consultar historial</p>
           </div>
-
         </button>
 
-        <!-- CREAR ACUERDO -->
         <button type="button" class="quick-card">
-
-          <div class="quick-icon">
-            <img src="imagenes/Crear-acuerdo.png" alt="Crear acuerdo">
-          </div>
-
-          <div class="quick-text">
-            <span>Crear acuerdo</span>
-            <p>Nueva promesa de pago</p>
-          </div>
-
-        </button>
-
-        <!-- GENERAR REPORTE -->
-        <button type="button" class="quick-card">
-
           <div class="quick-icon">
             <img src="imagenes/Generar-reporte.png" alt="Generar reporte">
           </div>
-
           <div class="quick-text">
             <span>Generar reporte</span>
             <p>Descargar información</p>
           </div>
-
         </button>
 
       </div>
     </section>
 
-    <!-- ================================================== -->
     <!-- MODAL BUSCAR CASO -->
-    <!-- ================================================== -->
-
     <app-search-case
       [isOpen]="isSearchCaseOpen"
       [cases]="cases"

@@ -1,0 +1,62 @@
+
+<div class="dashboard-layout">
+
+  <app-sidebar></app-sidebar>
+
+  <main class="dashboard-content">
+
+    <!-- ====================================== -->
+    <!-- ENCABEZADO -->
+    <!-- ====================================== -->
+
+    <app-dashboard-header
+      [tituloPersonalizado]="
+        pestanaActiva === 'Análisis de cartera'
+          ? 'Análisis de cartera'
+          : 'Cartera'
+      "
+      [descripcionPersonalizada]="
+        pestanaActiva === 'Integración de cartera'
+          ? 'Carga y procesa la información de cartera'
+          : pestanaActiva === 'Análisis de cartera'
+            ? 'Explora tendencias, concentraciones y variaciones relevantes de la cartera en mora'
+            : 'Consulta y compara los segmentos de cartera'
+      ">
+    </app-dashboard-header>
+
+    <!-- ====================================== -->
+    <!-- PESTAÑAS -->
+    <!-- ====================================== -->
+
+    <app-cartera-tabs
+      (pestanaSeleccionada)="seleccionarPestana($event)">
+    </app-cartera-tabs>
+
+    <!-- ====================================== -->
+    <!-- SEGMENTOS -->
+    <!-- ====================================== -->
+
+    <ng-container *ngIf="pestanaActiva === 'Segmentos'">
+
+      <app-segmento-cartera></app-segmento-cartera>
+
+    </ng-container>
+
+    <!-- ====================================== -->
+    <!-- ANÁLISIS DE CARTERA -->
+    <!-- ====================================== -->
+
+    <ng-container *ngIf="pestanaActiva === 'Análisis de cartera'">
+      <app-analisis-cartera></app-analisis-cartera>
+    </ng-container>
+    <!-- ====================================== -->
+    <!-- INTEGRACIÓN DE CARTERA -->
+    <!-- ====================================== -->
+
+    <app-integracion-cartera
+      *ngIf="pestanaActiva === 'Integración de cartera'">
+    </app-integracion-cartera>
+
+  </main>
+
+</div>

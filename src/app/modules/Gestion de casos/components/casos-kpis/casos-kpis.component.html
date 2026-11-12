@@ -1,0 +1,24 @@
+
+<section class="kpi-container">
+
+  <div class="kpi-card" *ngFor="let kpi of kpis">
+
+    <div class="kpi-icon">
+      <img [src]="kpi.imagen" [alt]="kpi.alt">
+    </div>
+
+    <div class="kpi-title">
+      {{ kpi.titulo }}
+    </div>
+
+    <div class="kpi-value">
+      {{ cargando && !caso ? '...' : kpi.valor }}
+    </div>
+
+  </div>
+
+</section>
+
+<p class="kpi-message" *ngIf="errorCarga" role="alert">
+  {{ errorCarga }}
+</p>

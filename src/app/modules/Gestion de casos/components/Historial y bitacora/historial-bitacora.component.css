@@ -1,0 +1,491 @@
+
+/* =========================================
+   DISTRIBUCIÓN PRINCIPAL
+========================================= */
+
+.historial-layout {
+  width: 100%;
+  display: grid;
+  grid-template-columns: minmax(0, 744px) minmax(0, 360px);
+  gap: 16px;
+  align-items: start;
+  box-sizing: border-box;
+  font-family: 'Roboto', sans-serif;
+  color: #0A3B4E;
+}
+
+
+/* =========================================
+   CONTENEDOR IZQUIERDO
+   HISTORIAL Y BITÁCORA
+========================================= */
+
+.historial-card {
+  width: 100%;
+  min-height: 886px;
+  padding: 24px;
+  background: #FFFFFF;
+  border: 1px solid #CBD5E1;
+  border-radius: 16px;
+  box-sizing: border-box;
+}
+
+.historial-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+
+.historial-header h3,
+.sidebar-card-header h3 {
+  margin: 0;
+  color: #0A3B4E;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.historial-header p {
+  margin: 7px 0 0;
+  color: #64748B;
+  font-size: 13px;
+  line-height: 19px;
+}
+
+.total-eventos {
+  padding: 7px 12px;
+  background: #EFF6FF;
+  border-radius: 20px;
+  color: #2563EB;
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.historial-divider,
+.sidebar-divider {
+  width: 100%;
+  height: 1px;
+  margin: 20px 0;
+  background: #E2E8F0;
+}
+
+
+/* =========================================
+   LÍNEA DE TIEMPO
+========================================= */
+
+.timeline-container {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.timeline-item {
+  display: grid;
+  grid-template-columns: 20px minmax(0, 1fr);
+  gap: 12px;
+  min-height: 145px;
+}
+
+.timeline-indicator {
+  position: relative;
+  display: flex;
+  justify-content: center;
+}
+
+.timeline-dot {
+  position: relative;
+  z-index: 2;
+  width: 11px;
+  height: 11px;
+  margin-top: 22px;
+  background: #CBD5E1;
+  border: 2px solid #FFFFFF;
+  border-radius: 50%;
+  box-shadow: 0 0 0 1px #CBD5E1;
+}
+
+.timeline-dot-active {
+  background: #0075FF;
+  box-shadow: 0 0 0 3px #DBEAFE;
+}
+
+.timeline-line {
+  position: absolute;
+  top: 36px;
+  bottom: -2px;
+  width: 2px;
+  background: #E2E8F0;
+}
+
+
+/* =========================================
+   TARJETA DE CADA EVENTO
+========================================= */
+
+.evento-card {
+  width: 100%;
+  min-width: 0;
+  min-height: 120px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  text-align: left;
+  background: #FFFFFF;
+  border: 1px solid #E2E8F0;
+  border-radius: 12px;
+  cursor: pointer;
+  box-sizing: border-box;
+  transition: border-color 0.2s, background 0.2s;
+}
+
+.evento-card:hover {
+  background: #F8FAFC;
+  border-color: #93C5FD;
+}
+
+.evento-card.evento-seleccionado {
+  background: #F0F7FF;
+  border: 1px solid #2563EB;
+}
+
+.evento-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.evento-title-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.evento-type {
+  width: fit-content;
+  padding: 4px 8px;
+  background: #F1F5F9;
+  color: #475569;
+  border-radius: 5px;
+  font-size: 10px;
+  font-weight: 600;
+}
+
+.evento-title-group h4 {
+  margin: 0;
+  color: #0A3B4E;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.evento-date {
+  color: #64748B;
+  font-size: 11px;
+  white-space: nowrap;
+}
+
+.evento-description {
+  margin: 0;
+  color: #475569;
+  font-size: 12px;
+  line-height: 18px;
+}
+
+.evento-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.evento-responsable {
+  color: #475569;
+  font-size: 11px;
+}
+
+.footer-label {
+  color: #64748B;
+}
+
+.evento-result {
+  padding: 5px 9px;
+  background: #F1F5F9;
+  color: #475569;
+  border-radius: 20px;
+  font-size: 10px;
+  font-weight: 600;
+}
+
+.evento-result.resultado-efectivo {
+  background: #DCFCE7;
+  color: #15803D;
+}
+
+
+/* =========================================
+   ESTADO SIN REGISTROS
+========================================= */
+
+.historial-empty {
+  min-height: 300px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  text-align: center;
+}
+
+.historial-empty p {
+  margin: 0;
+  color: #0A3B4E;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.historial-empty span {
+  color: #64748B;
+  font-size: 12px;
+}
+
+
+/* =========================================
+   COLUMNA DERECHA
+========================================= */
+
+.historial-sidebar {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+
+/* =========================================
+   DETALLE DEL EVENTO
+========================================= */
+
+.detalle-evento-card {
+  width: 100%;
+  min-height: 367px;
+  padding: 20px;
+  background: #FFFFFF;
+  border: 1px solid #CBD5E1;
+  border-radius: 16px;
+  box-sizing: border-box;
+}
+
+.sidebar-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.sidebar-card-header h3 {
+  font-size: 15px;
+}
+
+.detalle-evento-card .sidebar-divider {
+  margin: 16px 0;
+}
+
+.detalle-evento-content {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.detalle-evento-title {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.detalle-evento-type {
+  width: fit-content;
+  padding: 4px 8px;
+  background: #EFF6FF;
+  color: #2563EB;
+  border-radius: 5px;
+  font-size: 10px;
+  font-weight: 600;
+}
+
+.detalle-evento-title h4 {
+  margin: 0;
+  color: #0A3B4E;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.detalle-data-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.detalle-data-item span,
+.detalle-description span,
+.detalle-observacion span {
+  color: #64748B;
+  font-size: 11px;
+}
+
+.detalle-data-item strong {
+  color: #001822;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.detalle-description,
+.detalle-observacion {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.detalle-description p,
+.detalle-observacion p {
+  margin: 0;
+  color: #475569;
+  font-size: 11px;
+  line-height: 17px;
+}
+
+.detalle-empty {
+  min-height: 230px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+
+.detalle-empty p {
+  color: #64748B;
+  font-size: 12px;
+}
+
+
+/* =========================================
+   RESUMEN DE LA BITÁCORA
+========================================= */
+
+.resumen-bitacora-card {
+  width: 100%;
+  min-height: 124px;
+  padding: 16px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  background: #FFFFFF;
+  border: 1px solid #CBD5E1;
+  border-radius: 16px;
+  box-sizing: border-box;
+}
+
+.resumen-bitacora-card .sidebar-card-header h3 {
+  font-size: 14px;
+}
+
+.resumen-bitacora-content {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.resumen-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.resumen-item span,
+.ultima-actividad span {
+  color: #64748B;
+  font-size: 10px;
+}
+
+.resumen-item strong {
+  color: #0A3B4E;
+  font-size: 17px;
+  font-weight: 700;
+}
+
+.ultima-actividad {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+}
+
+.ultima-actividad strong {
+  color: #475569;
+  font-size: 10px;
+  font-weight: 600;
+}
+
+
+/* =========================================
+   RESPONSIVE
+========================================= */
+
+@media (max-width: 1150px) {
+
+  .historial-layout {
+    grid-template-columns: minmax(0, 1fr) 320px;
+  }
+
+}
+
+@media (max-width: 900px) {
+
+  .historial-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .historial-card {
+    min-height: auto;
+  }
+
+  .historial-sidebar {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    align-items: start;
+  }
+
+}
+
+@media (max-width: 600px) {
+
+  .historial-card {
+    padding: 16px;
+  }
+
+  .historial-header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .historial-sidebar {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .evento-card-header {
+    flex-direction: column;
+  }
+
+  .evento-footer {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .resumen-bitacora-content {
+    grid-template-columns: 1fr 1fr;
+  }
+
+}

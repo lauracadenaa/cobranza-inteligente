@@ -1,0 +1,1425 @@
+
+<div class="case-detail-container" *ngIf="caso as casoActual">
+
+  <!-- =====================================
+       1. NAVEGACIÓN DEL CASO
+  ====================================== -->
+
+  <nav class="case-navigation">
+
+    <button
+      type="button"
+      [class.active]="seccionActiva === 'resumen'"
+      (click)="cambiarSeccion('resumen')">
+      Resumen
+    </button>
+
+    <button
+      type="button"
+      [class.active]="seccionActiva === 'historial'"
+      (click)="cambiarSeccion('historial')">
+      Historial y bitácora
+    </button>
+
+    <button
+      type="button"
+      [class.active]="seccionActiva === 'notas'"
+      (click)="cambiarSeccion('notas')">
+      Notas
+    </button>
+
+    <div class="case-header-actions">
+
+      <button
+        type="button"
+        class="btn-back"
+        (click)="regresarACola()">
+        ‹ Volver a la cola
+      </button>
+
+      <button
+        type="button"
+        class="btn-actions"
+        (click)="abrirAcciones()">
+        ↑ Acciones
+      </button>
+
+    </div>
+
+  </nav>
+
+  <!-- =====================================
+       2. KPIs
+  ====================================== -->
+
+  <div
+    class="kpis-wrapper"
+    *ngIf="seccionActiva === 'resumen'">
+
+    <app-casos-kpis [caso]="casoActual"></app-casos-kpis>
+
+  </div>
+
+  <!-- =====================================
+       3. CONTENEDORES DEL RESUMEN
+  ====================================== -->
+
+  <section
+    class="case-information-grid"
+    *ngIf="seccionActiva === 'resumen'">
+
+    <!-- =================================
+         3.1 PERSONA ASOCIADA
+    ================================== -->
+
+    <article class="case-information-card persona-card">
+
+      <div class="information-card-header">
+        <h3>Persona asociada</h3>
+      </div>
+
+      <div class="persona-profile">
+
+        <div class="persona-avatar">
+          {{
+            (clienteDetalle?.fullName || casoActual.asociado)
+              ?.charAt(0)?.toUpperCase() || 'A'
+          }}
+        </div>
+
+        <div class="persona-information">
+
+          <h4>
+            {{
+              cargandoCliente
+                ? 'Consultando cliente...'
+                : (clienteDetalle?.fullName || casoActual.asociado || 'Sin información')
+            }}
+          </h4>
+
+          <span>Asociado</span>
+
+        </div>
+
+      </div>
+
+      <div class="information-divider"></div>
+
+      <div *ngIf="cargandoCliente" class="information-data">
+
+        <div class="data-item">
+          <span>Información del cliente</span>
+          <strong>Consultando información del backend...</strong>
+        </div>
+
+      </div>
+
+      <div
+        *ngIf="errorCliente && !cargandoCliente"
+        class="information-data">
+
+        <div class="data-item">
+          <span>Información del cliente</span>
+          <strong>{{ errorCliente }}</strong>
+        </div>
+
+      </div>
+
+      <div
+        class="information-data"
+        *ngIf="!cargandoCliente && clienteDetalle">
+
+        <div class="data-item">
+          <span>{{ clienteDetalle.documentType || 'Documento' }}</span>
+
+          <strong>
+            {{ clienteDetalle.documentNumber || 'No disponible' }}
+          </strong>
+        </div>
+
+        <div class="data-item">
+          <span>Número de celular</span>
+
+          <strong>
+            {{
+              clienteDetalle.mobile ||
+              clienteDetalle.phone ||
+              'No disponible'
+            }}
+          </strong>
+        </div>
+
+        <div class="data-item">
+          <span>Correo electrónico</span>
+
+          <strong>
+            {{ clienteDetalle.email || 'No disponible' }}
+          </strong>
+        </div>
+
+        <div class="data-item">
+          <span>Contacto preferido</span>
+          <strong>No definido</strong>
+        </div>
+
+      </div>
+
+      <div
+        class="information-data"
+        *ngIf="!cargandoCliente && !clienteDetalle && !errorCliente">
+
+        <div class="data-item">
+          <span>Documento</span>
+          <strong>{{ casoActual.documento || 'No disponible' }}</strong>
+        </div>
+
+        <div class="data-item">
+          <span>Número de celular</span>
+          <strong>{{ casoActual.celular || 'No disponible' }}</strong>
+        </div>
+
+        <div class="data-item">
+          <span>Correo electrónico</span>
+          <strong>{{ casoActual.correoElectronico || 'No disponible' }}</strong>
+        </div>
+
+        <div class="data-item">
+          <span>Contacto preferido</span>
+          <strong>No definido</strong>
+        </div>
+
+      </div>
+
+    </article>
+
+    <!-- =================================
+         3.2 CONTEXTO DE IA
+    ================================== -->
+
+    <article class="case-information-card contexto-card">
+
+      <div class="information-card-header contexto-header">
+
+        <h3>Contexto de IA</h3>
+
+        <div class="score-container">
+
+          <span>Score</span>
+
+          <strong>
+            <ng-container *ngIf="cargandoScoring">
+              ...
+            </ng-container>
+
+            <ng-container *ngIf="!cargandoScoring && scoreIA !== null">
+              {{ scoreIA }}/1000
+            </ng-container>
+
+            <ng-container *ngIf="!cargandoScoring && scoreIA === null">
+              N/D
+            </ng-container>
+          </strong>
+
+        </div>
+
+      </div>
+
+      <div
+        class="contexto-main-information"
+        *ngIf="cargandoScoring">
+
+        <div class="contexto-data-item">
+          <span>Scoring IA</span>
+          <strong>Consultando información del backend...</strong>
+        </div>
+
+      </div>
+
+      <div
+        class="contexto-main-information"
+        *ngIf="!cargandoScoring && errorScoring">
+
+        <div class="contexto-data-item">
+          <span>Información del scoring</span>
+          <strong>{{ errorScoring }}</strong>
+        </div>
+
+      </div>
+
+      <div
+        class="contexto-main-information"
+        *ngIf="!cargandoScoring && scoringResumen">
+
+        <div class="contexto-data-item">
+          <span>Mejor siguiente acción</span>
+
+          <strong>
+            {{
+              siguienteAccionIA
+                ? formatearAccion(siguienteAccionIA)
+                : 'No disponible'
+            }}
+          </strong>
+        </div>
+
+        <div class="contexto-data-item">
+          <span>Canal sugerido</span>
+
+          <strong>
+            {{
+              canalRecomendadoIA
+                ? formatearCanal(canalRecomendadoIA)
+                : 'No disponible'
+            }}
+          </strong>
+        </div>
+
+        <div class="contexto-data-item">
+          <span>Probabilidad de recaudo</span>
+
+          <strong>
+            {{
+              probabilidadRecaudoIA !== null
+                ? (probabilidadRecaudoIA | number:'1.0-2') + '%'
+                : 'No disponible'
+            }}
+          </strong>
+        </div>
+
+        <div class="contexto-data-item">
+          <span>Nivel de riesgo</span>
+
+          <strong>
+            {{ nivelRiesgoIA || 'No disponible' }}
+          </strong>
+        </div>
+
+        <div class="contexto-data-item">
+          <span>Segmento recomendado</span>
+
+          <strong>
+            {{ segmentoRecomendadoIA || 'No disponible' }}
+          </strong>
+        </div>
+
+      </div>
+
+      <div class="information-divider"></div>
+
+      <div class="efectividad-container">
+
+        <h4>Histórico de efectividad</h4>
+
+        <div class="efectividad-items">
+
+          <div class="efectividad-item whatsapp">
+            <span>WhatsApp</span>
+            <strong>No disponible</strong>
+          </div>
+
+          <div class="efectividad-item sms">
+            <span>SMS</span>
+            <strong>No disponible</strong>
+          </div>
+
+          <div class="efectividad-item llamada">
+            <span>Llamada</span>
+            <strong>No disponible</strong>
+          </div>
+
+        </div>
+
+      </div>
+
+      <button
+        type="button"
+        class="btn-explicacion-score"
+        (click)="verExplicacionScore()">
+
+        Ver explicación del score
+        <span>›</span>
+
+      </button>
+
+    </article>
+
+    <!-- =====================================
+         3.3 ACCIONES RÁPIDAS
+    ====================================== -->
+
+    <article class="case-information-card acciones-card">
+
+      <div class="information-card-header">
+        <h3>Acciones rápidas</h3>
+      </div>
+
+      <div class="quick-actions-grid">
+
+        <button
+          type="button"
+          class="quick-action-button"
+          (click)="generarLink()">
+
+          <img
+            src="/imagenes/Gestioncasos/Generar-link.png"
+            alt="Generar link">
+
+          <span>Generar link</span>
+        </button>
+
+        <button
+          type="button"
+          class="quick-action-button"
+          (click)="contactarWhatsApp()">
+
+          <img
+            src="/imagenes/Gestioncasos/WhatsApp.png"
+            alt="WhatsApp">
+
+          <span>WhatsApp</span>
+        </button>
+
+        <button
+          type="button"
+          class="quick-action-button"
+          (click)="llamarAsociado()">
+
+          <img
+            src="/imagenes/Gestioncasos/Llamar.png"
+            alt="Llamar">
+
+          <span>Llamar</span>
+        </button>
+
+        <button
+          type="button"
+          class="quick-action-button"
+          (click)="enviarEmail()">
+
+          <img
+            src="/imagenes/Gestioncasos/Enviar-email.png"
+            alt="Enviar Email">
+
+          <span>Enviar Email</span>
+        </button>
+
+        <button
+          type="button"
+          class="quick-action-button"
+          (click)="crearPromesa()">
+
+          <img
+            src="/imagenes/Gestioncasos/Crear-promesa.png"
+            alt="Crear promesa">
+
+          <span>Crear promesa</span>
+        </button>
+
+        <button
+          type="button"
+          class="quick-action-button"
+          (click)="enviarSMS()">
+
+          <img
+            src="/imagenes/Gestioncasos/Enviar-SMS.png"
+            alt="Enviar SMS">
+
+          <span>Enviar SMS</span>
+        </button>
+
+      </div>
+
+      <button
+        type="button"
+        class="quick-action-escalate"
+        (click)="escalarCaso()">
+
+        <span>Escalar caso</span>
+
+      </button>
+
+    </article>
+
+    <!-- =====================================
+         3.4 CONTEXTO Y RECOMENDACIÓN DE IA
+    ====================================== -->
+
+    <article class="case-information-card recomendacion-card">
+
+      <div class="recomendacion-header">
+
+        <div class="recomendacion-title">
+          <h3>Contexto y recomendación de IA</h3>
+          <span class="ia-indicator">IA</span>
+        </div>
+
+        <span class="recomendacion-actualizado">
+
+          Actualizado:
+
+          <strong>
+            {{
+              scoringResumen
+                ? formatearFechaScoring(scoringResumen.calculatedAt)
+                : 'No disponible'
+            }}
+          </strong>
+
+        </span>
+
+      </div>
+
+      <div *ngIf="cargandoScoring" class="recomendacion-loading">
+        Consultando recomendaciones del motor IA...
+      </div>
+
+      <div
+        *ngIf="errorScoring && !cargandoScoring"
+        class="recomendacion-loading">
+
+        {{ errorScoring }}
+
+      </div>
+
+      <ng-container *ngIf="scoringResumen && !cargandoScoring">
+
+        <div class="recomendacion-indicators">
+
+          <div class="propension-indicator">
+
+            <span>Probabilidad de recaudo:</span>
+
+            <strong>
+              {{
+                probabilidadRecaudoIA !== null
+                  ? (probabilidadRecaudoIA | number:'1.0-2') + '%'
+                  : 'No disponible'
+              }}
+            </strong>
+
+          </div>
+
+          <div class="confianza-indicator">
+
+            <span>Confianza de la recomendación:</span>
+
+            <strong>No disponible</strong>
+
+          </div>
+
+        </div>
+
+        <div class="recomendacion-cards-grid">
+
+          <div class="recomendacion-info-box">
+
+            <h4>Detalle del cálculo</h4>
+
+            <p class="motivo-desborde-text">
+              Nivel de riesgo:
+              {{ nivelRiesgoIA || 'No disponible' }}
+            </p>
+
+            <p class="motivo-desborde-detail">
+              Segmento recomendado:
+              {{ segmentoRecomendadoIA || 'No disponible' }}
+            </p>
+
+            <p class="motivo-desborde-detail">
+              Origen del cálculo:
+              {{ origenCalculoIA || 'No disponible' }}
+            </p>
+
+          </div>
+
+          <div class="recomendacion-info-box">
+
+            <h4>Mejor siguiente acción</h4>
+
+            <p class="motivo-desborde-text">
+              {{
+                siguienteAccionIA
+                  ? formatearAccion(siguienteAccionIA)
+                  : 'No disponible'
+              }}
+            </p>
+
+            <p class="motivo-desborde-detail">
+              Canal sugerido:
+              {{
+                canalRecomendadoIA
+                  ? formatearCanal(canalRecomendadoIA)
+                  : 'No disponible'
+              }}
+            </p>
+
+            <p class="motivo-desborde-detail">
+              Versión del modelo:
+              {{ versionModeloIA || 'No disponible' }}
+            </p>
+
+          </div>
+
+          <div class="recomendacion-info-box guion-sugerido-box">
+
+            <h4>Información del motor IA</h4>
+
+            <p class="motivo-desborde-text">
+              Motor:
+              {{ motorUtilizadoIA || 'No disponible' }}
+            </p>
+
+            <p class="motivo-desborde-detail">
+              Motivo de fallback:
+              {{ motivoFallbackIA || 'No reportado' }}
+            </p>
+
+            <p class="motivo-desborde-detail">
+              Probabilidad de recaudo:
+              {{
+                probabilidadRecaudoIA !== null
+                  ? (probabilidadRecaudoIA | number:'1.0-2') + '%'
+                  : 'No disponible'
+              }}
+            </p>
+
+          </div>
+
+        </div>
+
+      </ng-container>
+
+      <div
+        *ngIf="!scoringResumen && !cargandoScoring && !errorScoring"
+        class="recomendacion-loading">
+
+        No hay información de scoring disponible para este cliente.
+
+      </div>
+
+    </article>
+
+    
+<!-- =================================
+     3.5 HISTORIAL DE CONTACTOS
+================================== -->
+
+<article class="case-information-card historial-contactos-card">
+
+  <div class="information-card-header historial-contactos-header">
+
+    <h3>Historial de contactos</h3>
+
+    <button
+      type="button"
+      class="btn-ver-todos"
+      (click)="seccionActiva = 'historial'">
+      Ver todos
+    </button>
+
+  </div>
+
+  <div class="historial-contactos-content">
+
+    <!-- CARGANDO -->
+
+    <div
+      *ngIf="cargandoHistorialContactos"
+      class="historial-estado">
+
+      Consultando historial de contactos...
+
+    </div>
+
+    <!-- ERROR -->
+
+    <div
+      *ngIf="errorHistorialContactos && !cargandoHistorialContactos"
+      class="historial-estado historial-error">
+
+      {{ errorHistorialContactos }}
+
+      <button
+        type="button"
+        (click)="cargarHistorialContactos()">
+        Reintentar
+      </button>
+
+    </div>
+
+    <!-- SIN REGISTROS -->
+
+    <div
+      *ngIf="
+        !cargandoHistorialContactos &&
+        !errorHistorialContactos &&
+        historialContactos.length === 0
+      "
+      class="historial-estado">
+
+      <p>No hay contactos registrados para este cliente.</p>
+
+      <span>
+        Cuando se realicen llamadas o se envíen mensajes,
+        aparecerán aquí.
+      </span>
+
+    </div>
+
+    <!-- REGISTROS DEL BACKEND -->
+
+    <div
+      *ngFor="let contacto of historialContactos"
+      class="contacto-item">
+
+      <div class="contacto-icon-box">
+
+        <img
+          [src]="contacto.icono"
+          [alt]="contacto.canal">
+
+      </div>
+
+      <div class="contacto-information">
+
+        <div class="contacto-item-header">
+
+          <strong>
+            {{ contacto.fecha }}
+          </strong>
+
+          <span
+            class="contacto-estado"
+            [ngClass]="contacto.claseEstado">
+
+            {{ contacto.estado }}
+
+          </span>
+
+        </div>
+
+        <p>{{ contacto.canal }}</p>
+
+        <p
+          class="contacto-descripcion"
+          *ngIf="contacto.descripcion">
+
+          {{ contacto.descripcion }}
+
+        </p>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</article>
+
+    <!-- =================================
+         3.6 TIPIFICACIÓN RÁPIDA
+    ================================== -->
+
+    <article class="case-information-card tipificacion-card">
+
+      <div class="information-card-header">
+
+        <h3>Tipificación rápida</h3>
+
+        <span class="tipificacion-indicator">
+          Gestión del caso
+        </span>
+
+      </div>
+
+      <div class="tipificacion-content">
+
+        <p class="tipificacion-description">
+          Selecciona el resultado de tu gestión y la próxima acción
+        </p>
+
+        <div class="tipificacion-fields-row">
+
+          <div class="tipificacion-field">
+
+            <label for="resultado-contacto">
+              Resultado de contacto <span>*</span>
+            </label>
+
+            <select id="resultado-contacto">
+              <option value="">Seleccionar resultado</option>
+              <option value="contacto-efectivo">Contacto efectivo</option>
+              <option value="sin-respuesta">Sin respuesta</option>
+              <option value="no-contactado">No contactado</option>
+              <option value="numero-equivocado">Número equivocado</option>
+              <option value="tercero-contactado">Contacto con tercero</option>
+              <option value="promesa-pago">Promesa de pago</option>
+              <option value="rechaza-pago">Rechaza realizar el pago</option>
+            </select>
+
+          </div>
+
+          <div class="tipificacion-field">
+
+            <label for="proxima-accion">
+              Próxima acción <span>*</span>
+            </label>
+
+            <select id="proxima-accion">
+              <option value="">Seleccionar próxima acción</option>
+              <option value="nueva-llamada">Programar nueva llamada</option>
+              <option value="enviar-whatsapp">Enviar WhatsApp</option>
+              <option value="enviar-sms">Enviar SMS</option>
+              <option value="enviar-email">Enviar email</option>
+              <option value="crear-promesa">Crear promesa de pago</option>
+              <option value="seguimiento">Realizar seguimiento</option>
+              <option value="escalar-caso">Escalar caso</option>
+              <option value="sin-accion">Sin acción adicional</option>
+            </select>
+
+          </div>
+
+        </div>
+
+        <div class="tipificacion-field tipificacion-note-field">
+
+          <label for="comentario-gestion">
+            Comentario / nota
+          </label>
+
+          <textarea
+            id="comentario-gestion"
+            placeholder="Escribe una nota sobre la gestión realizada...">
+          </textarea>
+
+        </div>
+
+        <div class="tipificacion-actions">
+
+          <button
+            type="button"
+            class="btn-tipificacion-guardar">
+            Guardar gestión
+          </button>
+
+        </div>
+
+      </div>
+
+    </article>
+
+  </section>
+
+  <!-- =====================================
+       4. HISTORIAL Y BITÁCORA
+  ====================================== -->
+
+  <app-historial-bitacora
+    *ngIf="seccionActiva === 'historial'">
+  </app-historial-bitacora>
+
+ <!-- =====================================
+     5. NOTAS
+====================================== -->
+
+<app-notas-resumen
+  *ngIf="seccionActiva === 'notas'"
+  [notas]="notasCaso">
+</app-notas-resumen>
+
+  <!-- =====================================
+       6. MODAL EXPLICACIÓN DEL SCORE
+  ====================================== -->
+
+  <div
+    class="score-modal-overlay"
+    *ngIf="mostrarExplicacionScore"
+    (click)="cerrarExplicacionScore()">
+
+    <section
+      class="score-modal"
+      (click)="$event.stopPropagation()">
+
+      <div class="score-modal-header">
+
+        <div>
+          <h3>Explicación del score</h3>
+
+          <p>
+            Detalle del análisis realizado por el motor IA.
+          </p>
+        </div>
+
+        <button
+          type="button"
+          class="score-modal-close"
+          aria-label="Cerrar"
+          (click)="cerrarExplicacionScore()">
+          ×
+        </button>
+
+      </div>
+
+      <div class="score-modal-content">
+
+        <div *ngIf="cargandoScoring">
+          Consultando explicación del score...
+        </div>
+
+        <div *ngIf="errorScoring && !cargandoScoring">
+          {{ errorScoring }}
+        </div>
+
+        <ng-container *ngIf="scoringResumen && !cargandoScoring">
+
+          <div class="score-modal-value">
+
+            <span>Score asignado</span>
+
+            <strong>
+              {{ scoreIA ?? 'N/D' }}/1000
+            </strong>
+
+          </div>
+
+          <div class="information-divider"></div>
+
+          <div class="score-explanation-item">
+            <span>Nivel de riesgo</span>
+            <strong>{{ nivelRiesgoIA || 'No disponible' }}</strong>
+          </div>
+
+          <div class="score-explanation-item">
+            <span>Probabilidad de recaudo</span>
+
+            <strong>
+              {{
+                probabilidadRecaudoIA !== null
+                  ? (probabilidadRecaudoIA | number:'1.0-2') + '%'
+                  : 'No disponible'
+              }}
+            </strong>
+          </div>
+
+          <div class="score-explanation-item">
+            <span>Segmento recomendado</span>
+            <strong>{{ segmentoRecomendadoIA || 'No disponible' }}</strong>
+          </div>
+
+          <div class="score-explanation-item">
+            <span>Canal sugerido</span>
+
+            <strong>
+              {{
+                canalRecomendadoIA
+                  ? formatearCanal(canalRecomendadoIA)
+                  : 'No disponible'
+              }}
+            </strong>
+          </div>
+
+          <div class="score-explanation-item">
+            <span>Origen del cálculo</span>
+            <strong>{{ origenCalculoIA || 'No disponible' }}</strong>
+          </div>
+
+          <div class="score-explanation-item">
+            <span>Motor utilizado</span>
+            <strong>{{ motorUtilizadoIA || 'No disponible' }}</strong>
+          </div>
+
+          <div class="score-explanation-item">
+            <span>Versión del modelo</span>
+            <strong>{{ versionModeloIA || 'No disponible' }}</strong>
+          </div>
+
+          <div class="score-explanation-item">
+            <span>Motivo de fallback</span>
+            <strong>{{ motivoFallbackIA || 'No reportado' }}</strong>
+          </div>
+
+          <div class="information-divider"></div>
+
+          <h4>Factores que influyen en el score</h4>
+
+          <div
+            class="score-explanation-item"
+            *ngFor="let impacto of impactosScoreIA">
+
+            <span>
+              {{ obtenerNombreVariable(impacto.feature) }}
+            </span>
+
+            <strong>
+              {{ impacto.value }}
+            </strong>
+
+          </div>
+
+          <div *ngIf="impactosScoreIA.length === 0">
+            No hay factores detallados disponibles.
+          </div>
+
+        </ng-container>
+
+      </div>
+
+      <div class="score-modal-footer">
+
+        <button
+          type="button"
+          (click)="cerrarExplicacionScore()">
+          Entendido
+        </button>
+
+      </div>
+
+    </section>
+  </div>
+
+  <!-- =====================================
+       7. MODAL GENERAR LINK DE PAGO
+  ====================================== -->
+
+  <div
+    class="payment-modal-overlay"
+    *ngIf="mostrarModalLinkPago"
+    (click)="cerrarModalLinkPago()">
+
+    <section
+      class="payment-modal"
+      (click)="$event.stopPropagation()">
+
+      <!-- ENCABEZADO -->
+
+      <div class="payment-modal-header">
+
+        <div class="payment-modal-title">
+
+          <div class="payment-modal-icon" *ngIf="!linkPagoGenerado">
+            <img
+              src="/imagenes/Gestioncasos/Generar- link.png"
+              alt="Generar enlace de pago">
+          </div>
+
+          <div>
+            <h3>
+              {{ linkPagoGenerado ? 'Link enviado' : 'Generar Link de pago' }}
+            </h3>
+
+            <p>
+              {{
+                linkPagoGenerado
+                  ? 'El enlace de pago ha sido generado y enviado exitosamente.'
+                  : 'Configura y envía un enlace de pago asociado a este caso.'
+              }}
+            </p>
+          </div>
+
+        </div>
+
+        <button
+          type="button"
+          class="payment-modal-close"
+          aria-label="Cerrar modal"
+          [disabled]="generandoLinkPago"
+          (click)="cerrarModalLinkPago()">
+          ×
+        </button>
+
+      </div>
+
+      <!-- CONTENIDO -->
+
+      <div class="payment-modal-body">
+
+        <!-- PANEL IZQUIERDO: INFORMACIÓN DEL CLIENTE -->
+
+        <aside
+          class="payment-client-panel"
+          *ngIf="!linkPagoGenerado">
+
+          <h4>Información del caso</h4>
+
+          <div class="payment-client-data">
+
+            <span>Cliente</span>
+
+            <strong>
+              {{
+                clienteDetalle?.fullName ||
+                casoActual.asociado ||
+                'No disponible'
+              }}
+            </strong>
+
+          </div>
+
+          <div class="payment-client-data">
+
+            <span>Obligación</span>
+
+            <strong>
+              {{ casoActual.obligacion || 'No disponible' }}
+            </strong>
+
+          </div>
+
+          <div class="payment-client-data">
+
+            <span>Saldo vencido</span>
+
+            <strong class="payment-balance">
+              {{ formatearMoneda(casoActual.saldoVencido) }}
+            </strong>
+
+          </div>
+
+          <div class="payment-client-note">
+            El enlace quedará asociado a la obligación seleccionada.
+          </div>
+
+        </aside>
+
+        <!-- PANEL IZQUIERDO: CONFIRMACIÓN -->
+
+        <aside
+          class="payment-success-panel"
+          *ngIf="linkPagoGenerado">
+
+          <img
+            src="/imagenes/Gestioncasos/Link-enviado.png"
+            alt="Link enviado"
+            class="payment-success-image">
+
+          <h3>Link enviado</h3>
+
+          <p>
+            El enlace de pago ha sido generado y enviado exitosamente.
+          </p>
+
+        </aside>
+
+        <!-- LADO DERECHO -->
+
+        <div class="payment-configuration">
+
+          <!-- =================================
+               FORMULARIO DE CONFIGURACIÓN
+          ================================== -->
+
+          <ng-container *ngIf="!linkPagoGenerado">
+
+            <h4>Configuración del pago</h4>
+
+            <div class="payment-field">
+
+              <label for="concepto-pago">
+                Concepto del pago <span>*</span>
+              </label>
+
+              <select
+                id="concepto-pago"
+                name="conceptoPago"
+                [(ngModel)]="conceptoPago">
+
+                <option
+                  *ngFor="let concepto of conceptosPago"
+                  [value]="concepto.value">
+                  {{ concepto.label }}
+                </option>
+
+              </select>
+
+            </div>
+
+            <div class="payment-field">
+
+              <label for="valor-pago">
+                Valor a pagar <span>*</span>
+              </label>
+
+              <input
+                id="valor-pago"
+                name="valorPago"
+                type="number"
+                min="1"
+                step="1"
+                [(ngModel)]="valorPago"
+                placeholder="Ingresa el valor a pagar">
+
+              <small>Moneda: COP</small>
+
+            </div>
+
+            <div class="payment-field">
+
+              <label for="vigencia-pago">
+                Vigencia <span>*</span>
+              </label>
+
+              <select
+                id="vigencia-pago"
+                name="vigenciaPago"
+                [(ngModel)]="vigenciaPago">
+
+                <option
+                  *ngFor="let vigencia of vigenciasPago"
+                  [ngValue]="vigencia.value">
+                  {{ vigencia.label }}
+                </option>
+
+              </select>
+
+            </div>
+
+            <div class="payment-field">
+
+              <label for="canal-pago">
+                Canal de envío <span>*</span>
+              </label>
+
+              <select
+                id="canal-pago"
+                name="canalPago"
+                [(ngModel)]="canalPago"
+                (ngModelChange)="cambiarCanalPago($event)">
+
+                <option
+                  *ngFor="let canal of canalesPago"
+                  [value]="canal.value">
+                  {{ canal.label }}
+                </option>
+
+              </select>
+
+            </div>
+
+            <div class="payment-field">
+
+              <label for="destinatario-pago">
+                Destinatario <span>*</span>
+              </label>
+
+              <input
+                id="destinatario-pago"
+                name="destinatarioPago"
+                type="text"
+                [(ngModel)]="destinatarioPago"
+                placeholder="Número de celular o correo electrónico">
+
+            </div>
+
+            <div class="payment-summary">
+
+              <h4>Resumen de envío</h4>
+
+              <div class="payment-summary-row">
+
+                <span>Valor</span>
+
+                <strong>
+                  {{ formatearMoneda(valorPago) }}
+                </strong>
+
+              </div>
+
+              <div class="payment-summary-row">
+
+                <span>Vigencia</span>
+
+                <strong>
+                  {{ vigenciaPago }} horas
+                </strong>
+
+              </div>
+
+              <div class="payment-summary-row">
+
+                <span>Canal</span>
+
+                <strong>
+                  {{ formatearCanal(canalPago) }}
+                </strong>
+
+              </div>
+
+              <div class="payment-summary-row">
+
+                <span>Destinatario</span>
+
+                <strong>
+                  {{ destinatarioPago || 'No definido' }}
+                </strong>
+
+              </div>
+
+            </div>
+
+          </ng-container>
+
+          <!-- =================================
+               VISTA DE ÉXITO
+          ================================== -->
+
+          <div
+            class="payment-success"
+            *ngIf="linkPagoGenerado">
+
+            <div class="payment-success-details">
+
+              <div class="payment-detail-row">
+
+                <span>Valor</span>
+
+                <strong>
+                  {{ formatearMoneda(linkPagoGenerado.amount) }}
+                </strong>
+
+              </div>
+
+              <div class="payment-detail-row">
+
+                <span>Vigencia</span>
+
+                <strong>
+                  {{ formatearVigenciaPago(linkPagoGenerado.expiresAt) }}
+                </strong>
+
+              </div>
+
+              <div class="payment-detail-row">
+
+                <span>Canal</span>
+
+                <strong>
+                  {{ formatearCanalPago(linkPagoGenerado.channel) }}
+                </strong>
+
+              </div>
+
+              <div class="payment-detail-row">
+
+                <span>Destinatario</span>
+
+                <strong>
+                  {{ destinatarioPago || 'No disponible' }}
+                </strong>
+
+              </div>
+
+            </div>
+
+            <!-- ENLACE GENERADO -->
+
+            <div class="payment-success-link">
+
+              <label for="url-pago-generada">
+                Enlace de pago
+              </label>
+
+              <div class="payment-link-value">
+
+                <input
+                  id="url-pago-generada"
+                  type="text"
+                  readonly
+                  [value]="linkPagoGenerado.generatedUrl">
+
+                <button
+                  type="button"
+                  class="btn-success-copy"
+                  (click)="copiarLinkPago()">
+
+                  Copiar link
+
+                </button>
+
+              </div>
+
+              <small *ngIf="mensajeCopiado">
+                {{ mensajeCopiado }}
+              </small>
+
+            </div>
+
+            <!-- ACCIONES DEL ÉXITO -->
+
+            <div class="payment-success-actions">
+
+              <button
+                type="button"
+                class="btn-success-detail">
+
+                Ver detalle
+
+              </button>
+
+              <button
+                type="button"
+                class="btn-success-back"
+                (click)="cerrarModalLinkPago()">
+
+                Volver al caso
+
+              </button>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+      <!-- ERROR -->
+
+      <div
+        class="payment-error"
+        *ngIf="errorLinkPago">
+
+        <span>!</span>
+
+        {{ errorLinkPago }}
+
+      </div>
+
+      <!-- PIE DEL MODAL: SOLO FORMULARIO -->
+
+      <div
+        class="payment-modal-footer"
+        *ngIf="!linkPagoGenerado">
+
+        <button
+          type="button"
+          class="btn-payment-cancel"
+          [disabled]="generandoLinkPago"
+          (click)="cerrarModalLinkPago()">
+
+          Cerrar
+
+        </button>
+
+        <button
+          type="button"
+          class="btn-payment-generate"
+          [disabled]="generandoLinkPago"
+          (click)="generarEnlacePago()">
+
+          <span *ngIf="!generandoLinkPago">
+            Generar link de pago
+          </span>
+
+          <span *ngIf="generandoLinkPago">
+            Generando enlace...
+          </span>
+
+        </button>
+
+      </div>
+
+    </section>
+
+  </div>
+
+</div>

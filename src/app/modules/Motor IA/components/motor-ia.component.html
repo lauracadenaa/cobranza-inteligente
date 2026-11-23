@@ -1,0 +1,262 @@
+<div class="dashboard-layout">
+
+  <app-sidebar></app-sidebar>
+
+  <main class="dashboard-content">
+
+    <!-- ENCABEZADO (el mismo de las demás pantallas) -->
+    <app-dashboard-header
+      [tituloPersonalizado]="'Motor IA y Scoring'"
+      [descripcionPersonalizada]="'Configuración y Políticas del Modelo IA'">
+    </app-dashboard-header>
+
+    <div class="motor-body">
+
+      <!-- =====================================
+           1. MODELO ACTIVO
+      ====================================== -->
+      <section class="motor-card modelo-card">
+
+        <div class="modelo-icono">
+          <i class="bi bi-gear" aria-hidden="true"></i>
+        </div>
+
+        <div class="modelo-info">
+          <div class="modelo-nombre">
+            <h2>{{ nombreModelo }}</h2>
+            <span class="etiqueta-activo">Activo</span>
+          </div>
+          <p>
+            <strong>{{ modelo?.modelVersion || '—' }}</strong>
+            <span class="separador">/</span>
+            Fecha ejecución:
+            {{ versiones[0]?.fecha ? (versiones[0].fecha | date:'yyyy-MM-dd HH:mm') : 'Sin información' }}
+          </p>
+        </div>
+
+        <button
+          type="button"
+          class="btn-guardar"
+          [disabled]="!puedeGuardar"
+          [title]="!hayCambios ? 'No hay cambios para guardar' : (!pesosCalibrados ? 'Los pesos deben sumar 100 %' : '')"
+          (click)="pedirConfirmacion()">
+          <i class="bi bi-floppy" aria-hidden="true"></i>
+          Guardar cambios
+        </button>
+
+      </section>
+
+      <!-- Mensajes de carga o error -->
+      <div class="motor-card estado-carga" *ngIf="cargando">
+        Cargando configuración del modelo...
+      </div>
+
+      <div class="motor-card estado-carga estado-error" *ngIf="!cargando && errorCarga">
+        <span>{{ errorCarga }}</span>
+        <button type="button" (click)="cargarConfiguracion()">Reintentar</button>
+      </div>
+
+      <ng-container *ngIf="!cargando && modelo">
+
+        <!-- =====================================
+             2. PESOS DE VARIABLES
+        ====================================== -->
+        <section class="motor-card">
+
+          <div class="card-encabezado">
+            <div>
+              <h3>Pesos de Variables de Scoring</h3>
+              <p>Saldo vencido distribuido por antigüedad y nivel de riesgo.</p>
+            </div>
+
+            <span class="etiqueta-calibrado" [class.descalibrado]="!pesosCalibrados">
+              <i class="bi" [class.bi-check-lg]="pesosCalibrados"
+                 [class.bi-exclamation-triangle]="!pesosCalibrados" aria-hidden="true"></i>
+              {{ totalPesos }}% {{ pesosCalibrados ? 'Calibrado' : '· debe sumar 100%' }}
+            </span>
+          </div>
+
+          <div class="variables-lista">
+            <div class="variable-fila" *ngFor="let variable of variables">
+
+              <span class="variable-nombre">{{ variable.nombre }}</span>
+
+              <input
+                type="range"
+                min="0"
+                max="100"
+                class="variable-slider"
+                [style.--avance]="variable.peso + '%'"
+                [ngModel]="variable.peso"
+                (ngModelChange)="ajustarPeso(variable, $event)"
+                [attr.aria-label]="'Peso de ' + variable.nombre">
+
+              <input
+                type="number"
+                min="0"
+                max="100"
+                class="variable-valor"
+                [ngModel]="variable.peso"
+                (ngModelChange)="ajustarPeso(variable, $event)"
+                [attr.aria-label]="'Porcentaje de ' + variable.nombre">
+
+              <span class="variable-porcentaje">%</span>
+
+              <button
+                type="button"
+                class="btn-icono-eliminar"
+                title="Dejar en 0 %"
+                (click)="quitarVariable(variable)">
+                <i class="bi bi-trash3" aria-hidden="true"></i>
+              </button>
+
+            </div>
+          </div>
+
+          <button type="button" class="btn-agregar" (click)="agregarVariable()">
+            <i class="bi bi-plus-lg" aria-hidden="true"></i>
+            Agregar variable
+          </button>
+
+        </section>
+
+        <!-- =====================================
+             3. UMBRALES DE RIESGO
+        ====================================== -->
+        <section class="motor-card">
+
+          <div class="card-encabezado">
+            <div>
+              <h3>Umbrales de Riesgo</h3>
+              <p>Rango de score IA por nivel</p>
+            </div>
+          </div>
+
+          <div class="umbrales-tabla">
+
+            <div class="umbral-fila umbral-titulos">
+              <span></span>
+              <span>Score mínimo</span>
+              <span>Score máximo</span>
+            </div>
+
+            <div class="umbral-fila" *ngFor="let umbral of umbrales">
+
+              <span class="umbral-nombre">
+                <i [style.background]="umbral.color"></i>
+                {{ umbral.nombre }}
+              </span>
+
+              <div class="contador" *ngFor="let campo of ['minimo', 'maximo']">
+                <button type="button" aria-label="Restar"
+                        (click)="cambiarUmbral(umbral, $any(campo), -1)">
+                  <i class="bi bi-dash-lg" aria-hidden="true"></i>
+                </button>
+                <input
+                  type="number"
+                  min="0"
+                  max="1000"
+                  [class.invalido]="umbral.minimo > umbral.maximo"
+                  [ngModel]="$any(umbral)[campo]"
+                  (ngModelChange)="fijarUmbral(umbral, $any(campo), $event)">
+                <button type="button" aria-label="Sumar"
+                        (click)="cambiarUmbral(umbral, $any(campo), 1)">
+                  <i class="bi bi-plus-lg" aria-hidden="true"></i>
+                </button>
+              </div>
+
+            </div>
+
+            <p class="sin-datos" *ngIf="umbrales.length === 0">
+              No hay umbrales configurados.
+            </p>
+
+          </div>
+
+        </section>
+
+        <!-- =====================================
+             4. HISTÓRICO DE VERSIONES
+        ====================================== -->
+        <section class="motor-card historial-card">
+
+          <h3 class="historial-titulo">Histórico de versiones</h3>
+
+          <div class="tabla-contenedor">
+            <table>
+              <thead>
+                <tr>
+                  <th>Versión</th>
+                  <th>Fecha de publicación</th>
+                  <th>Creador</th>
+                  <th>Estado</th>
+                  <th class="col-acciones">Acciones</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let v of versiones">
+                  <td>{{ v.version }}</td>
+                  <td>{{ v.fecha ? (v.fecha | date:'dd/MM/yyyy') : '—' }}</td>
+                  <td>
+                    <span class="creador">
+                      <span class="creador-avatar">{{ v.creador.slice(0, 2).toUpperCase() }}</span>
+                      {{ v.creador }}
+                    </span>
+                  </td>
+                  <td>
+                    <span class="estado" [class.estado-activo]="v.activo">
+                      {{ v.activo ? 'Activo' : 'Inactivo' }}
+                    </span>
+                  </td>
+                  <td class="col-acciones">
+                    <span *ngIf="v.activo" class="sin-accion">—</span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <p class="historial-pie">
+            Mostrando {{ versiones.length }} {{ versiones.length === 1 ? 'versión' : 'versiones' }}
+          </p>
+
+        </section>
+
+      </ng-container>
+
+    </div>
+
+  </main>
+
+</div>
+
+<!-- =====================================
+     CONFIRMAR GUARDADO
+====================================== -->
+<div class="modal-fondo" *ngIf="mostrarConfirmacion" (click)="cancelarGuardado()">
+  <div class="modal" role="dialog" aria-modal="true" (click)="$event.stopPropagation()">
+
+    <h3>¿Guardar cambios del modelo?</h3>
+    <p>
+      Los nuevos pesos y umbrales se aplicarán al modelo
+      <strong>{{ modelo?.modelVersion }}</strong> y cambiarán cómo se calcula el
+      score de riesgo de los asociados.
+    </p>
+
+    <div class="modal-acciones">
+      <button type="button" class="btn-secundario" [disabled]="guardando" (click)="cancelarGuardado()">
+        Cancelar
+      </button>
+      <button type="button" class="btn-primario" [disabled]="guardando" (click)="confirmarGuardado()">
+        {{ guardando ? 'Guardando...' : 'Sí, guardar' }}
+      </button>
+    </div>
+
+  </div>
+</div>
+
+<!-- AVISO FLOTANTE -->
+<div class="aviso" *ngIf="aviso" [class.aviso-error]="aviso.tipo === 'error'"
+     [class.aviso-exito]="aviso.tipo === 'exito'" role="status">
+  {{ aviso.texto }}
+</div>

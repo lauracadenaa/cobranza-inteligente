@@ -7,6 +7,19 @@ body {
   margin: 0;
 }
 
+/* Letra de todo el proyecto (como en Figma).
+   Sin esto, los textos sin letra propia salían en Times (con serifa). */
+body {
+  font-family: 'Roboto', Arial, sans-serif;
+}
+
+button,
+input,
+select,
+textarea {
+  font-family: inherit;
+}
+
 app-root {
   display: block;
   min-height: 100vh;

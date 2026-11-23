@@ -1,0 +1,133 @@
+:host { display: block; }
+
+button { font-family: inherit; }
+
+.card {
+  background: #FFF;
+  border: 1px solid #E3EAF0;
+  border-radius: 16px;
+  padding: 22px 24px;
+}
+
+.titulo { margin-bottom: 22px; }
+
+h2 {
+  display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+  margin: 0 0 4px;
+  font-size: 15px;
+  color: #193B4A;
+}
+
+.titulo p { margin: 0; font-size: 12px; color: #71818C; }
+
+.chip-lectura {
+  font-size: 10px; font-weight: 600;
+  color: #1763F5; background: #EAF1FF;
+  padding: 3px 8px; border-radius: 6px;
+}
+
+h3 { margin: 0 0 12px; font-size: 13px; color: #193B4A; }
+
+/* PASOS */
+.pasos {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.paso {
+  display: flex; gap: 10px;
+  padding: 14px;
+  border: 1px solid #E3EAF0;
+  border-radius: 10px;
+  background: #FAFBFC;
+}
+
+.numero {
+  width: 24px; height: 24px; flex-shrink: 0;
+  display: grid; place-items: center;
+  border-radius: 50%;
+  background: #EAF1FF; color: #1763F5;
+  font-size: 11px; font-weight: 700;
+}
+
+.paso strong { display: block; font-size: 12px; color: #193B4A; }
+.paso small { display: block; font-size: 10px; color: #8A99A4; margin: 2px 0 6px; }
+.paso p { margin: 0; font-size: 11px; line-height: 1.45; color: #71818C; }
+
+.descargar {
+  display: inline-flex; align-items: center; gap: 6px;
+  margin-top: 10px; padding: 0;
+  border: none; background: none;
+  color: #1763F5; font-size: 11px; font-weight: 600;
+  cursor: pointer;
+}
+.descargar:hover { text-decoration: underline; }
+
+/* TABLA */
+.tabla-scroll { overflow-x: auto; }
+
+table { width: 100%; min-width: 700px; border-collapse: collapse; font-size: 12px; }
+
+th {
+  text-align: left;
+  font-size: 10px; font-weight: 600;
+  letter-spacing: .04em; text-transform: uppercase;
+  color: #71818C; background: #F6F8FA;
+  padding: 10px 12px;
+}
+
+td {
+  padding: 9px 12px;
+  border-bottom: 1px solid #EEF2F5;
+  color: #4A5C68;
+}
+
+.posicion { color: #193B4A; }
+.campo { font-weight: 700; color: #193B4A; }
+
+.chip {
+  display: inline-flex; align-items: center; gap: 4px;
+  font-size: 10px; font-weight: 600;
+  padding: 2px 7px; border-radius: 6px;
+}
+.chip.si { color: #0E8A5F; background: #E3F7EE; }
+.chip.no { color: #5D6B75; background: #EEF2F5; }
+
+/* AVISO */
+.importante {
+  display: flex; gap: 12px; align-items: flex-start;
+  margin-top: 20px;
+  padding: 14px 16px;
+  border-radius: 10px;
+  background: #EEF4FF;
+  color: #1763F5;
+}
+.importante strong { display: block; font-size: 12px; color: #193B4A; }
+.importante p { margin: 2px 0 0; font-size: 11px; color: #71818C; }
+
+@media (max-width: 900px) {
+  .pasos { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (max-width: 520px) {
+  .pasos { grid-template-columns: 1fr; }
+}
+
+
+/* Encabezado con el botón "Descargar plantilla" a la derecha (Figma) */
+.titulo {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  padding-bottom: 14px;
+  border-bottom: 1px solid #EEF2F5;
+}
+
+.titulo .descargar {
+  margin-top: 4px;
+  font-size: 12px;
+}

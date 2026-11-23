@@ -548,19 +548,6 @@
   white-space: nowrap;
 }
 
-.ia-indicator {
-  width: 25px;
-  height: 20px;
-  flex-shrink: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 5px;
-  background: #E0F2FE;
-  color: #0369A1;
-  font-size: 10px;
-  font-weight: 700;
-}
 
 .recomendacion-actualizado {
   color: #64748B;
@@ -827,14 +814,6 @@
   gap: 18px;
 }
 
-.tipificacion-indicator {
-  padding: 5px 9px;
-  border-radius: 6px;
-  background: #F1F5F9;
-  color: #64748B;
-  font-size: 10px;
-  font-weight: 600;
-}
 
 /* CONTENIDO GENERAL */
 
@@ -1177,47 +1156,10 @@
   transform: translateY(-1px);
 }
 
-/* BOTÓN ESCALAR CASO */
 
-.quick-action-escalate {
-  width: 100%;
-  max-width: 320px;
-  height: 34px;
-  min-height: 34px;
-  align-self: center;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  padding: 0 12px;
-  border: 1px solid #D97706;
-  border-radius: 12px;
-  background: #FFFFFF;
-  box-sizing: border-box;
-  cursor: pointer;
-  transition:
-    background-color 0.2s ease,
-    border-color 0.2s ease;
-}
 
-.quick-action-escalate img {
-  width: 15px;
-  height: 15px;
-  object-fit: contain;
-}
 
-.quick-action-escalate span {
-  font-family: 'Roboto', sans-serif;
-  font-size: 12px;
-  font-weight: 600;
-  line-height: 16px;
-  color: #B45309;
-}
 
-.quick-action-escalate:hover {
-  background: #FFF7ED;
-  border-color: #B45309;
-}
 
 
 /* =========================================
@@ -1385,11 +1327,6 @@
    GUION SUGERIDO
 ========================================= */
 
-.guion-sugerido-box {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-}
 
 .guion-text {
   margin: 0;
@@ -2075,5 +2012,773 @@
 
   .btn-success-copy {
     min-height: 40px;
+  }
+}
+/* =========================================
+   AJUSTES PARA PARECERSE A FIGMA
+   (van al final para tener prioridad)
+========================================= */
+
+/* Botones de arriba: "Acciones" en azul, como en Figma */
+.case-header-actions .btn-back,
+.case-header-actions .btn-actions {
+  gap: 6px;
+  min-height: 32px;
+  font-size: 12px;
+}
+
+.case-header-actions .btn-actions {
+  border-color: #1763F5;
+  background: #1763F5;
+}
+
+.case-header-actions .btn-actions:hover {
+  background: #0F52D6;
+}
+
+/* Las tarjetas crecen con su contenido (antes el texto se salía) */
+.persona-card,
+.contexto-card,
+.acciones-card,
+.historial-contactos-card {
+  height: auto;
+  min-height: 245px;
+}
+
+/* Cajas de recomendación: sin barritas de desplazamiento,
+   el texto se muestra completo */
+.recomendacion-info-box {
+  height: auto;
+  min-height: 128px;
+}
+
+.recomendacion-info-box p {
+  flex-shrink: 0;
+  overflow: visible;
+}
+
+/* Chips de efectividad: se ajustan al texto */
+.efectividad-item {
+  width: auto;
+  padding: 0 8px;
+}
+
+/* "Ver todos" del historial de contactos */
+.btn-ver-todos {
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: #2563EB;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.btn-ver-todos:hover {
+  text-decoration: underline;
+}
+
+/* Mensajes del historial (cargando, vacío, error) */
+.historial-estado {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 28px 12px;
+  text-align: center;
+  color: #64748B;
+  font-size: 12px;
+}
+
+.historial-estado p {
+  margin: 0;
+  color: #0A3B4E;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.historial-estado span {
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.historial-estado.historial-error {
+  color: #B42318;
+}
+
+.historial-estado button {
+  margin-top: 6px;
+  padding: 6px 12px;
+  border: 1px solid #CBD5E1;
+  border-radius: 8px;
+  background: #FFFFFF;
+  color: #2563EB;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+/* =========================================
+   DISTRIBUCIÓN COMO EN FIGMA
+   Izquierda: (Persona + Contexto IA), Recomendación, Tipificación
+   Derecha: Acciones rápidas + Historial de contactos
+========================================= */
+
+.case-information-grid {
+  grid-template-columns: minmax(0, 1fr) minmax(260px, 300px);
+  align-items: start;
+}
+
+.resumen-columna-principal,
+.resumen-columna-lateral {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-width: 0;
+}
+
+.resumen-fila-superior {
+  display: grid;
+  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+  gap: 16px;
+  align-items: stretch;
+}
+
+.resumen-fila-superior .case-information-card {
+  height: auto;
+  min-height: 0;
+}
+
+.case-information-grid .recomendacion-card,
+.case-information-grid .tipificacion-card,
+.case-information-grid .historial-contactos-card,
+.case-information-grid .acciones-card {
+  grid-column: auto;
+  width: 100%;
+  height: auto;
+  min-height: 0;
+}
+
+/* Acciones rápidas: botones que llenan el ancho de la columna */
+.resumen-columna-lateral .quick-actions-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-rows: auto;
+  gap: 8px;
+}
+
+.resumen-columna-lateral .quick-action-button {
+  width: 100%;
+  height: 60px;
+}
+
+@media (max-width: 1100px) {
+  .case-information-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 700px) {
+  .resumen-fila-superior {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ================================================== */
+/* BOTÓN Y MENÚ "ACCIONES" (como en Figma)             */
+/* ================================================== */
+
+.case-header-actions .btn-actions {
+  gap: 8px;
+  border-color: #1763F5;
+  background: #1763F5;
+}
+
+.case-header-actions .btn-actions:hover {
+  background: #1452CC;
+}
+
+.acciones-caso {
+  position: relative;
+}
+
+.menu-acciones-caso {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  z-index: 60;
+  display: flex;
+  flex-direction: column;
+  width: 280px;
+  padding: 8px;
+  border: 1px solid #E2E8F0;
+  border-radius: 12px;
+  background: #FFFFFF;
+  box-shadow: 0 12px 28px rgba(15, 23, 42, 0.14);
+  box-sizing: border-box;
+}
+
+.menu-acciones-caso hr {
+  margin: 6px 4px;
+  border: none;
+  border-top: 1px solid #E2E8F0;
+}
+
+.menu-item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  padding: 10px 12px;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: #0F172A;
+  font-family: 'Roboto', sans-serif;
+  font-size: 14px;
+  text-align: left;
+  cursor: pointer;
+}
+
+.menu-item:hover,
+.menu-item.activo {
+  background: #F1F5F9;
+}
+
+.menu-item > i {
+  font-size: 16px;
+}
+
+.menu-item .flecha {
+  margin-left: auto;
+  font-size: 13px;
+}
+
+.menu-item.peligro,
+.menu-item.peligro i {
+  color: #DC2626;
+}
+
+/* Submenú de estados: se abre a la derecha del menú, como en Figma */
+.menu-item-con-submenu {
+  position: relative;
+}
+
+.menu-acciones-caso.con-submenu {
+  right: 270px;
+}
+
+.submenu-estados {
+  position: absolute;
+  top: -8px;
+  left: calc(100% + 18px);
+  display: flex;
+  flex-direction: column;
+  width: 260px;
+  padding: 8px;
+  border: 1px solid #E2E8F0;
+  border-radius: 12px;
+  background: #FFFFFF;
+  box-shadow: 0 12px 28px rgba(15, 23, 42, 0.14);
+  box-sizing: border-box;
+}
+
+.submenu-estados .menu-item {
+  gap: 8px;
+}
+
+.submenu-estados .menu-item.actual {
+  background: #F1F5F9;
+}
+
+.aviso-acciones {
+  position: fixed;
+  right: 24px;
+  bottom: 24px;
+  z-index: 1100;
+  max-width: 360px;
+  padding: 12px 16px;
+  border-radius: 10px;
+  background: #0A3B4E;
+  color: #FFFFFF;
+  font-size: 13px;
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.2);
+}
+
+@media (max-width: 700px) {
+  .menu-acciones-caso.con-submenu {
+    right: 0;
+  }
+
+  .submenu-estados {
+    position: static;
+    width: 100%;
+    margin-top: 4px;
+    border: none;
+    box-shadow: none;
+    padding: 0 0 0 20px;
+  }
+}
+
+/* ================================================== */
+/* VENTANAS DE ACCIONES (promesa, escalar, asignar, cerrar) */
+/* ================================================== */
+
+.accion-fondo {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  background: rgba(15, 23, 42, 0.45);
+}
+
+.accion-modal {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  width: 100%;
+  max-width: 440px;
+  padding: 22px;
+  border-radius: 14px;
+  background: #FFFFFF;
+  box-shadow: 0 20px 48px rgba(15, 23, 42, 0.18);
+  box-sizing: border-box;
+  font-family: 'Roboto', sans-serif;
+}
+
+.accion-encabezado {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.accion-encabezado h3 {
+  margin: 0;
+  color: #0A3B4E;
+  font-size: 17px;
+  font-weight: 600;
+}
+
+.accion-encabezado button {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: #64748B;
+  cursor: pointer;
+}
+
+.accion-encabezado button:hover { background: #F1F5F9; }
+
+.accion-caso {
+  margin: -6px 0 0;
+  color: #64748B;
+  font-size: 12px;
+}
+
+.accion-campo {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  color: #0A3B4E;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.accion-campo input,
+.accion-campo select,
+.accion-campo textarea {
+  padding: 9px 12px;
+  border: 1px solid #DCE3EA;
+  border-radius: 8px;
+  outline: none;
+  background: #FFFFFF;
+  color: #0F172A;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 400;
+}
+
+.accion-campo input:focus,
+.accion-campo select:focus,
+.accion-campo textarea:focus { border-color: #1763F5; }
+
+.accion-ayuda {
+  margin: 0;
+  color: #64748B;
+  font-size: 12px;
+}
+
+.accion-ayuda.aviso { color: #B45309; }
+
+.accion-error {
+  margin: 0;
+  color: #B42318;
+  font-size: 12px;
+}
+
+.accion-botones {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 4px;
+}
+
+.accion-secundario,
+.accion-primario {
+  height: 38px;
+  padding: 0 16px;
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.accion-secundario {
+  border: 1px solid #CBD5E1;
+  background: #FFFFFF;
+  color: #475569;
+}
+
+.accion-primario {
+  border: none;
+  background: #1763F5;
+  color: #FFFFFF;
+}
+
+.accion-primario.peligro { background: #DC2626; }
+
+.accion-primario:disabled,
+.accion-secundario:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Link de pago: botón para enviarlo al asociado */
+.payment-success-actions {
+  flex-wrap: wrap;
+}
+
+.btn-success-send {
+  flex: 1 1 100%;
+  min-height: 43px;
+  padding: 10px 14px;
+  border: none;
+  border-radius: 8px;
+  background: #1763F5;
+  color: #FFFFFF;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.btn-success-send:hover {
+  background: #1452CC;
+}
+
+.payment-estado {
+  margin: 0;
+  color: #475569;
+  font-size: 12px;
+}
+
+/* La imagen del link es pequeña: se muestra a su tamaño para que no se pixele */
+.payment-success-image {
+  width: 72px !important;
+  height: auto !important;
+  max-width: 72px;
+}
+
+
+/* =========================================================
+   AJUSTES PARA QUE EL DETALLE DEL CASO QUEDE COMO EN FIGMA
+========================================================= */
+
+/* ---------- Tarjeta del asociado ---------- */
+
+.persona-encabezado {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 6px;
+}
+
+.persona-icono {
+  color: #10B981;
+  font-size: 20px;
+  line-height: 1;
+}
+
+.persona-encabezado h4 {
+  margin: 0;
+  color: #0F2733;
+  font-size: 17px;
+  font-weight: 700;
+}
+
+.persona-chip {
+  padding: 3px 8px;
+  border-radius: 4px;
+  background: #F1F5F9;
+  color: #475569;
+  font-size: 11px;
+  font-weight: 500;
+}
+
+.persona-aviso,
+.contexto-aviso {
+  margin: 6px 0;
+  color: #64748B;
+  font-size: 12px;
+}
+
+.persona-datos {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+  margin: 18px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.persona-datos li {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: #1E293B;
+  font-size: 13px;
+  word-break: break-word;
+}
+
+.persona-datos li i {
+  flex-shrink: 0;
+  color: #475569;
+  font-size: 17px;
+}
+
+.persona-datos li i.persona-preferido-icono {
+  color: #10B981;
+}
+
+.persona-preferido {
+  color: #10B981;
+  font-weight: 600;
+}
+
+/* ---------- Contexto IA del caso ---------- */
+
+.score-chip {
+  padding: 4px 8px;
+  border-radius: 6px;
+  background: #EAF1FF;
+  color: #1763F5;
+  font-size: 11px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.contexto-filas {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  row-gap: 9px;
+  column-gap: 12px;
+  margin: 4px 0 0;
+}
+
+.contexto-filas dt {
+  color: #64748B;
+  font-size: 11px;
+}
+
+.contexto-filas dd {
+  margin: 0;
+  color: #0F2733;
+  font-size: 11px;
+  font-weight: 600;
+  text-align: right;
+}
+
+.propension-alta { color: #16A34A !important; }
+.propension-media { color: #D97706 !important; }
+.propension-baja { color: #DC2626 !important; }
+.propension-nd { color: #64748B !important; }
+
+.efectividad-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.efectividad-chip {
+  padding: 3px 8px;
+  border: 1px solid;
+  border-radius: 6px;
+  font-size: 10px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.efectividad-chip.whatsapp {
+  border-color: #10B981;
+  background: #F0FDF4;
+  color: #059669;
+}
+
+.efectividad-chip.sms {
+  border-color: #3B82F6;
+  background: #EFF6FF;
+  color: #2563EB;
+}
+
+.efectividad-chip.llamada {
+  border-color: #C084FC;
+  background: #FAF5FF;
+  color: #9333EA;
+}
+
+/* ---------- Contexto y recomendación de IA ---------- */
+
+.recomendacion-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.recomendacion-icono {
+  color: #0A718D;
+  font-size: 18px;
+}
+
+.punto-propension {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.confianza-barra {
+  display: inline-block;
+  width: 160px;
+  max-width: 30vw;
+  height: 8px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: #E2E8F0;
+}
+
+.confianza-barra i {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  background: #10B981;
+}
+
+.recomendacion-info-box h4 {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.titulo-icono {
+  color: #0A718D;
+  font-size: 14px;
+}
+
+.titulo-icono.rojo {
+  color: #DC2626;
+}
+
+.motivo-desborde-text.texto-rojo {
+  color: #DC2626;
+  font-weight: 700;
+}
+
+/* ---------- Tipificación: botón azul con ícono ---------- */
+
+.btn-tipificacion-guardar {
+  gap: 8px;
+  border-color: #1F64E6;
+  background: #1F64E6;
+}
+
+.btn-tipificacion-guardar:hover:not(:disabled) {
+  border-color: #0F52D6;
+  background: #0F52D6;
+}
+
+/* ---------- Acciones rápidas: 4 botones en 2 columnas ---------- */
+
+.quick-actions-grid.quick-actions-4 {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-rows: none;
+  gap: 8px;
+}
+
+.quick-actions-4 .quick-action-button {
+  width: 100%;
+  height: 54px;
+  border: none;
+  background: #F1F5F9;
+}
+
+.quick-actions-4 .quick-action-button:hover {
+  background: #E2E8F0;
+}
+
+.quick-icono {
+  color: #334155;
+  font-size: 16px;
+  line-height: 1;
+}
+
+.quick-icono.whatsapp {
+  color: #10B981;
+}
+
+.quick-icono.llamar {
+  color: #1763F5;
+}
+
+/* Acciones rápidas en 2 columnas (Figma): gana a la regla de la columna lateral */
+.resumen-columna-lateral .quick-actions-grid.quick-actions-4 {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+/* Menos espacio entre el nombre del asociado y sus datos */
+.persona-datos {
+  margin-top: 12px;
+}
+
+/* Las tarjetas de arriba quedan pegaditas a las pestañas, como en Figma */
+.kpis-wrapper {
+  margin-top: -22px;
+}
+
+/* Botones de acciones rápidas con fondo gris y sin borde (Figma) */
+.resumen-columna-lateral .quick-actions-4 .quick-action-button {
+  border: none;
+  background: #F1F5F9;
+}
+
+.resumen-columna-lateral .quick-actions-4 .quick-action-button:hover {
+  background: #E2E8F0;
+}
+
+
+/* La recomendación queda con 2 recuadros (Figma) */
+.recomendacion-cards-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+@media (max-width: 700px) {
+  .recomendacion-cards-grid {
+    grid-template-columns: 1fr;
   }
 }

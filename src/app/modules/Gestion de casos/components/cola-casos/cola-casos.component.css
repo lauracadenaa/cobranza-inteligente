@@ -341,7 +341,8 @@
   min-width: 0;
   min-height: 0;
   flex: 0 0 auto;
-  overflow: hidden;
+  /* visible: para que el menú ⋮ no se corte en las últimas filas */
+  overflow: visible;
   background: #FFFFFF;
   box-sizing: border-box;
 }
@@ -473,11 +474,26 @@
 
 /* CHECKBOX */
 
-.col-seleccion input {
-  width: 13px;
-  height: 13px;
-  accent-color: #1A4DD6;
+/* La columna de casillas queda oculta: en Figma se
+   selecciona haciendo clic en la fila completa. */
+.cases-table .col-seleccion {
+  display: none;
+}
+
+.fila-caso {
   cursor: pointer;
+}
+
+.cases-table tbody tr.fila-seleccionada,
+.cases-table tbody tr.fila-seleccionada:hover {
+  background: #EAF1FF;
+}
+
+.contador-casos {
+  margin-left: 6px;
+  color: #94A3B8;
+  font-size: 12px;
+  font-weight: 400;
 }
 
 /* ========================================= */
@@ -841,6 +857,14 @@
   border-radius: 16px;
   background: #FFFFFF;
   box-sizing: border-box;
+  font-family: Roboto, sans-serif;
+}
+
+.quick-summary h3,
+.quick-summary h4,
+.quick-summary strong,
+.quick-summary p {
+  font-family: Roboto, sans-serif;
 }
 
 .quick-summary-header {
@@ -877,10 +901,16 @@
   align-items: center;
   justify-content: space-between;
   gap: 8px;
+  min-width: 0;
 }
 
+/* El número del caso es largo: se recorta con "…" para que
+   la etiqueta del estado siempre se vea completa. */
 .summary-case-heading > strong {
-  flex: 0 0 auto;
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
   color: #3B82F6;
   font-family: Roboto, sans-serif;
   font-size: 12px;
@@ -1832,4 +1862,954 @@
   background: #FFFFFF;
   border-radius: 16px;
   box-shadow: 0 20px 50px rgba(0, 0, 0, 0.20);
+}
+/* ========================================= */
+/* LETRA DE LAS VENTANAS DE ASIGNACIÓN */
+/* ========================================= */
+
+.assignment-modal,
+.assignment-modal *,
+.review-modal,
+.review-modal * {
+  font-family: Roboto, sans-serif;
+}
+
+/* ========================================= */
+/* VENTANA "REVISAR ASIGNACIÓN" (como en Figma) */
+/* ========================================= */
+
+.review-modal {
+  width: 100%;
+  max-width: 440px;
+  max-height: 90vh;
+  overflow-y: auto;
+  padding: 20px;
+  border-radius: 14px;
+  background: #FFFFFF;
+  box-sizing: border-box;
+  box-shadow: 0 15px 40px rgba(15, 23, 42, 0.16);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.review-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.review-header h2 {
+  margin: 0;
+  color: #0A3B4E;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.review-header p {
+  margin: 2px 0 0;
+  color: #64748B;
+  font-size: 12px;
+}
+
+.review-icon {
+  width: 34px;
+  height: 34px;
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  border-radius: 10px;
+  background: #E9F8F4;
+  color: #10B981;
+  font-size: 16px;
+}
+
+.review-close {
+  margin-left: auto;
+  border: none;
+  background: none;
+  color: #0A3B4E;
+  cursor: pointer;
+}
+
+.review-compare {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.review-box {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 12px;
+  border: 1px solid #E2E8F0;
+  border-radius: 10px;
+  background: #F8FAFC;
+}
+
+.review-box.nueva {
+  border-color: #BFD3FF;
+  background: #EEF4FF;
+}
+
+.review-box-title {
+  margin-bottom: 6px;
+  color: #64748B;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.review-box.nueva .review-box-title {
+  color: #1D4ED8;
+}
+
+.review-box small {
+  margin-top: 4px;
+  color: #94A3B8;
+  font-size: 10px;
+}
+
+.review-box strong {
+  color: #0A3B4E;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.review-criterio {
+  align-self: flex-end;
+  margin-top: 6px;
+  color: #10B981;
+  font-size: 10px;
+  font-weight: 600;
+}
+
+.review-motivo {
+  padding: 12px;
+  border: 1px solid #E2E8F0;
+  border-radius: 10px;
+}
+
+.review-motivo-fila {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.review-motivo small {
+  color: #94A3B8;
+  font-size: 10px;
+}
+
+.review-motivo strong {
+  color: #0A3B4E;
+  font-size: 12px;
+}
+
+.review-motivo p {
+  margin: 2px 0 0;
+  color: #334155;
+  font-size: 12px;
+}
+
+.review-aviso {
+  margin: 0;
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: #EEF4FF;
+  color: #1E3A8A;
+  font-size: 11px;
+  line-height: 1.45;
+}
+
+.review-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+/* Aviso abajo a la derecha */
+.aviso-asignacion {
+  position: fixed;
+  right: 24px;
+  bottom: 24px;
+  z-index: 2100;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  border-radius: 10px;
+  background: #0A3B4E;
+  color: #FFFFFF;
+  font-family: Roboto, sans-serif;
+  font-size: 12px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.18);
+}
+
+/* ========================================= */
+/* MENÚ DE LOS TRES PUNTOS (⋮) */
+/* ========================================= */
+
+.cases-table td.col-acciones {
+  position: relative;
+  overflow: visible;
+}
+
+.menu-acciones {
+  position: absolute;
+  top: calc(100% - 6px);
+  right: 8px;
+  z-index: 50;
+  min-width: 190px;
+  padding: 6px;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid #E2E8F0;
+  border-radius: 10px;
+  background: #FFFFFF;
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.12);
+}
+
+.menu-acciones button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: #0A3B4E;
+  font-family: Roboto, sans-serif;
+  font-size: 12px;
+  text-align: left;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.menu-acciones button:hover {
+  background: #F1F5F9;
+}
+
+.menu-acciones i {
+  color: #475569;
+  font-size: 13px;
+}
+
+/* ================================================== */
+/* VENTANA DE FILTROS: igual que Inicio > Casos en gestión */
+/* ================================================== */
+.filtros-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.filtros-modal {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+
+  width: 440px;
+  height: 462px;
+  min-width: 440px;
+  min-height: 462px;
+
+  padding: 0;
+  margin: 0;
+
+  box-sizing: border-box;
+
+  display: flex;
+  flex-direction: column;
+
+  background-color: #FFFFFF;
+
+  border: 1px solid #E2E8F0;
+  border-radius: 12px;
+
+  opacity: 1;
+
+  z-index: 100;
+
+  box-shadow: 0px 4px 12px rgba(15, 23, 42, 0.12);
+}
+
+/* ================================================== */
+/* ENCABEZADO DEL MODAL */
+/* ================================================== */
+
+.filtros-header {
+  width: 100%;
+  height: 51px;
+  min-height: 51px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  padding: 16px 24px;
+  box-sizing: border-box;
+
+  border-bottom: 1px solid #E2E8F0;
+  flex-shrink: 0;
+}
+
+.filtros-header h3 {
+  width: 46px;
+  height: 19px;
+  margin: 0;
+
+  font-family: 'Roboto', sans-serif;
+  font-weight: 600;
+  font-style: normal;
+  font-size: 16px;
+  line-height: 100%;
+  letter-spacing: 0;
+
+  color: #1E293B;
+
+  opacity: 1;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  box-sizing: border-box;
+}
+
+.cerrar-filtros {
+  width: 24px;
+  height: 24px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 0;
+  background: transparent;
+  border: none;
+
+  color: #64748B;
+  font-size: 20px;
+  cursor: pointer;
+}
+
+.cerrar-filtros:hover {
+  color: #0F172A;
+}
+
+/* ================================================== */
+/* CUERPO DEL MODAL */
+/* ================================================== */
+
+.filtros-body {
+  flex: 1;
+  min-height: 0;
+
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+
+  padding: 24px;
+  box-sizing: border-box;
+
+  overflow-y: auto;
+  overflow-x: hidden;
+
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.filtros-body::-webkit-scrollbar {
+  display: none;
+}
+
+/* ================================================== */
+/* GRUPOS DE FILTROS */
+/* ================================================== */
+
+.filtro-grupo {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* ================================================== */
+/* SUBTÍTULOS DE TODOS LOS FILTROS */
+/* ================================================== */
+
+.filtro-grupo > label,
+.filtro-fechas > label,
+.filtro-riesgo > label {
+  width: 41px;
+  height: 15px;
+  margin: 0;
+
+  font-family: 'Roboto', sans-serif;
+  font-weight: 600;
+  font-style: semibold;
+  font-size: 13px;
+  line-height: 100%;
+  letter-spacing: 0;
+
+  color: #001822;
+
+  opacity: 1;
+  white-space: nowrap;
+  box-sizing: border-box;
+}
+
+/* ================================================== */
+/* CAMPOS DE TEXTO */
+/* ================================================== */
+
+.filtro-grupo > input {
+  width: 100%;
+  height: 40px;
+  min-height: 40px;
+
+  padding: 8px 16px;
+  box-sizing: border-box;
+
+  background-color: #F5F5F5;
+  border: 1px solid #E2E8F0;
+  border-radius: 8px;
+
+  outline: none;
+
+  font-family: 'Roboto', sans-serif;
+  font-size: 12px;
+  font-weight: 400;
+  color: #94A3B8;
+}
+
+.filtro-grupo input::placeholder {
+  color: #94A3B8;
+  opacity: 1;
+}
+
+.filtro-grupo input:focus {
+  border-color: #E2E8F0;
+}
+
+.filtros-modal input,
+.filtros-modal select {
+  font-family: 'Roboto', sans-serif;
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 100%;
+  letter-spacing: 0;
+}
+
+.filtros-modal .con-valor {
+  color: #1E293B;
+}
+
+#filtro-asesor {
+  background-color: #FFFFFF;
+  border-color: #D9E3EA;
+}
+
+#filtro-asesor:focus {
+  border-color: #D9E3EA;
+}
+
+/* ================================================== */
+/* CONTENEDOR DE RIESGO */
+/* ================================================== */
+
+.filtro-riesgo {
+  width: 100%;
+  min-height: 50px;
+
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+
+  box-sizing: border-box;
+}
+
+/* ================================================== */
+/* BOTONES DE RIESGO */
+/* ================================================== */
+
+.filtro-riesgos {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn-riesgo {
+  width: 50px;
+  height: 27px;
+  min-width: 62px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 6px 12px;
+  box-sizing: border-box;
+
+  background: #F1F5F9;
+  border: 1px solid #F1F5F9;
+  border-radius: 100px;
+
+  font-family: 'Roboto', sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 100%;
+  color: #475569;
+
+  cursor: pointer;
+  transition: background-color 0.2s ease,
+              border-color 0.2s ease,
+              color 0.2s ease;
+}
+
+.btn-riesgo.seleccionado {
+  background-color: #EAF2FF;
+  border-color: #2764E7;
+  color: #2764E7;
+}
+
+/* ================================================== */
+/* CAMPOS DE DÍAS DE MORA */
+/* ================================================== */
+
+.filtro-dos-columnas {
+  display: grid;
+  grid-template-columns: repeat(2, 188px);
+  gap: 10px;
+}
+
+.filtro-dos-columnas input {
+  width: 188px;
+  height: 38px;
+  min-width: 0;
+
+  display: flex;
+  align-items: center;
+
+  padding: 8px 12px;
+  box-sizing: border-box;
+
+  background-color: #FFFFFF;
+  border: 1px solid #D9E3EA;
+  border-radius: 8px;
+
+  outline: none;
+
+  font-family: 'Roboto', sans-serif;
+  font-size: 12px;
+  font-weight: 400;
+  color: #94A3B8;
+}
+
+/* ================================================== */
+/* ORIGEN */
+/* ================================================== */
+
+.filtro-origen {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.filtro-origenes {
+  width: 100%;
+
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+/* ================================================== */
+/* BOTONES DE ORIGEN */
+/* ================================================== */
+
+.btn-origen {
+  min-width: 37px;
+  width: auto;
+  height: 27px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 6px 12px;
+  box-sizing: border-box;
+
+  background: #F1F5F9;
+  border: 1px solid #F1F5F9;
+  border-radius: 100px;
+
+  font-family: 'Roboto', sans-serif;
+  font-weight: 500;
+  font-style: normal;
+  font-size: 13px;
+  line-height: 100%;
+  letter-spacing: 0;
+
+  color: #475569;
+  white-space: nowrap;
+
+  cursor: pointer;
+  transition: background-color 0.2s ease,
+              border-color 0.2s ease,
+              color 0.2s ease;
+}
+
+/* ORIGEN SELECCIONADO */
+
+.btn-origen.seleccionado {
+  background-color: #EAF2FF;
+  border-color: #2764E7;
+  color: #2764E7;
+}
+
+/* ================================================== */
+/* CAMPOS DE SELECCIÓN: SEGMENTO, ESTADO Y ASESOR */
+/* ================================================== */
+
+.filtro-select {
+  position: relative;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  width: 392px;
+  max-width: 100%;
+  height: 40px;
+
+  padding: 8px 16px;
+  box-sizing: border-box;
+
+  background-color: #FFFFFF;
+  border: 1px solid #D9E3EA;
+  border-radius: 8px;
+
+  opacity: 1;
+}
+
+.filtro-select input,
+.filtro-select select {
+  display: block;
+  flex: 1;
+
+  min-width: 0;
+  width: 100%;
+  height: 100%;
+
+  padding: 0;
+  box-sizing: border-box;
+
+  border: none;
+  outline: none;
+  background: transparent;
+
+  font-family: 'Roboto', sans-serif;
+  font-size: 12px;
+  font-weight: 400;
+  color: #94A3B8;
+}
+
+.filtro-select select {
+  appearance: none;
+  cursor: pointer;
+}
+
+.filtro-select input::placeholder,
+.filtro-select select:invalid {
+  color: #94A3B8;
+  opacity: 1;
+}
+
+.filtro-select img {
+  position: absolute;
+  width: 12px;
+  height: 12px;
+
+  top: 50%;
+  right: 16px;
+  transform: translateY(-50%);
+
+  object-fit: contain;
+  pointer-events: none;
+  z-index: 5;
+}
+
+/* ================================================== */
+/* FILTROS DE FECHA */
+/* ================================================== */
+
+.filtro-fechas {
+  width: 100%;
+
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+
+  box-sizing: border-box;
+}
+
+/* ================================================== */
+/* FECHA DE CREACIÓN */
+/* ================================================== */
+
+.campo-fecha-creacion {
+  position: relative;
+  width: 100%;
+  height: 40px;
+  flex-shrink: 0;
+}
+
+.campo-fecha-creacion input {
+  display: block;
+  width: 100%;
+  height: 40px;
+
+  padding: 8px 40px 8px 16px;
+  box-sizing: border-box;
+
+  background-color: #FFFFFF;
+  border: 1px solid #D9E3EA;
+  border-radius: 8px;
+
+  outline: none;
+
+  font-family: 'Roboto', sans-serif;
+  font-size: 12px;
+  font-weight: 400;
+  color: #94A3B8;
+}
+
+.campo-fecha-creacion input::placeholder {
+  color: #94A3B8;
+  opacity: 1;
+}
+
+.campo-fecha-creacion img {
+  position: absolute;
+  width: 12px;
+  height: 12px;
+
+  top: 50%;
+  right: 16px;
+  transform: translateY(-50%);
+
+  object-fit: contain;
+  pointer-events: none;
+  z-index: 5;
+}
+
+/* ================================================== */
+/* CONTENEDOR DE FECHA DESDE Y FECHA HASTA */
+/* ================================================== */
+
+.filtro-fechas-contenedor {
+  display: grid;
+  grid-template-columns: repeat(2, 188px);
+  gap: 10px;
+  width: 100%;
+}
+
+.filtro-fechas-contenedor .campo-fecha {
+  position: relative;
+  width: 188px;
+  min-width: 0;
+  height: 38px;
+}
+
+.filtro-fechas-contenedor .campo-fecha input {
+  display: block;
+  width: 188px;
+  height: 38px;
+
+  padding: 8px 35px 8px 12px;
+  box-sizing: border-box;
+
+  background-color: #FFFFFF;
+  border: 1px solid #D9E3EA;
+  border-radius: 8px;
+
+  outline: none;
+
+  font-family: 'Roboto', sans-serif;
+  font-size: 12px;
+  font-weight: 400;
+  color: #94A3B8;
+
+  cursor: pointer;
+}
+
+.filtro-fechas-contenedor .campo-fecha i {
+  position: absolute;
+
+  top: 50%;
+  right: 12px;
+  transform: translateY(-50%);
+
+  font-size: 14px;
+  color: #94A3B8;
+  pointer-events: none;
+}
+
+/* ================================================== */
+/* PIE DEL MODAL */
+/* ================================================== */
+
+.filtros-footer {
+  width: 100%;
+  height: 80px;
+  min-height: 80px;
+
+  box-sizing: border-box;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  padding: 16px;
+
+  background-color: transparent;
+  border-top: 1px solid #E2E8F0;
+
+  flex-shrink: 0;
+}
+
+/* ================================================== */
+/* FILTROS RESTANTES */
+/* ================================================== */
+
+.filtros-restantes {
+  min-width: 74px;
+  height: 31px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 0 10px;
+  box-sizing: border-box;
+
+  background-color: #F1F5F9;
+  border: 1px solid #CBD5E1;
+  border-radius: 6px;
+
+  font-family: 'Roboto', sans-serif;
+  font-weight: 500;
+  font-size: 13px;
+  line-height: 100%;
+  letter-spacing: 0;
+
+  color: #0A3B4E;
+  white-space: nowrap;
+}
+
+/* ================================================== */
+/* BOTONES DEL PIE DEL MODAL */
+/* ================================================== */
+
+.btn-limpiar-filtros,
+.btn-aplicar-filtros {
+  height: 36px;
+  padding: 0 16px;
+
+  border-radius: 7px;
+
+  font-family: 'Roboto', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+
+  cursor: pointer;
+}
+
+.btn-limpiar-filtros {
+  background-color: #FFFFFF;
+  border: 1px solid #CBD5E1;
+  color: #475569;
+}
+
+.btn-limpiar-filtros:hover {
+  background-color: #F8FAFC;
+}
+
+.btn-aplicar-filtros {
+  background-color: #2563EB;
+  border: 1px solid #2563EB;
+  color: #FFFFFF;
+}
+
+.btn-aplicar-filtros:hover {
+  background-color: #1D4ED8;
+}
+
+/* ================================================== */
+
+/* ================================================== */
+/* MENÚ DE ACCIONES COMO EN FIGMA                      */
+/* El botón ⋮ se vuelve una X y el menú sale a la izquierda */
+/* ================================================== */
+
+.col-acciones {
+  position: relative;
+}
+
+.btn-acciones.abierto {
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  background: #DCE8FB;
+  color: #0A3B4E;
+}
+
+.btn-acciones.abierto i {
+  font-size: 14px;
+}
+
+.menu-acciones {
+  top: 6px;
+  right: calc(100% - 4px);
+  min-width: 220px;
+  padding: 8px;
+  border-radius: 12px;
+}
+
+.menu-acciones button {
+  gap: 12px;
+  padding: 10px 12px;
+  font-size: 13px;
+}
+
+.menu-acciones i {
+  font-size: 15px;
+  color: #0A3B4E;
+}
+
+/* Filas del resumen rápido (Gestión y Contexto IA) */
+.summary-gestion-fila {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: 6px;
+  font-size: 12px;
+}
+
+.summary-gestion-fila span {
+  color: #64748B;
+}
+
+.summary-gestion-fila strong {
+  color: #0F172A;
+  font-weight: 600;
+  text-align: right;
+}
+
+.summary-gestion-fila .propension {
+  color: #10B981;
 }

@@ -1,0 +1,66 @@
+
+<!-- ESTRUCTURA PRINCIPAL -->
+
+<div class="dashboard-layout">
+
+  <!-- SIDEBAR -->
+  <app-sidebar></app-sidebar>
+
+  <!-- CONTENIDO -->
+  <main class="dashboard-content">
+
+    <div class="reportes-layout">
+
+      <!-- ENCABEZADO GENERAL -->
+      <div class="reportes-header-container">
+
+        <app-dashboard-header
+          [tituloPersonalizado]="seccionActiva === 'reportes' ? 'Generación de reportes' : 'Trazabilidad de la plataforma'"
+          [descripcionPersonalizada]="seccionActiva === 'reportes'
+            ? 'Elige un reporte, configura sus parámetros y descárgalo para consultar la información'
+            : 'Supervisa las acciones registradas e identifica qué ocurrió, cuándo y quién las ejecutó'">
+        </app-dashboard-header>
+
+      </div>
+
+      <!-- PESTAÑAS -->
+      <nav class="reportes-tabs">
+
+        <button
+          type="button"
+          [class.activo]="seccionActiva === 'reportes'"
+          (click)="cambiarSeccion('reportes')">
+
+          Reportes
+
+        </button>
+
+        <button
+          type="button"
+          [class.activo]="seccionActiva === 'auditoria'"
+          (click)="cambiarSeccion('auditoria')">
+
+          Bitácora de auditoría
+
+        </button>
+
+      </nav>
+
+      <!-- CONTENIDO INDEPENDIENTE -->
+      <div class="reportes-contenido">
+
+        <app-reportes
+          *ngIf="seccionActiva === 'reportes'">
+        </app-reportes>
+
+        <app-auditoria
+          *ngIf="seccionActiva === 'auditoria'">
+        </app-auditoria>
+
+      </div>
+
+    </div>
+
+  </main>
+
+</div>

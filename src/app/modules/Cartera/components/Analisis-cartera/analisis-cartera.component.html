@@ -1,55 +1,55 @@
 
 <section class="analisis-cartera-container">
 
+  <p class="analisis-aviso" *ngIf="cargando" role="status">Consultando la cartera...</p>
+  <p class="analisis-aviso error" *ngIf="errorCarga" role="alert">
+    No fue posible consultar la cartera. Revisa tu sesión e inténtalo de nuevo.
+  </p>
+
   <!-- ===================================== -->
   <!-- EVOLUCIÓN DE CARTERA -->
   <!-- ===================================== -->
 
   <article class="analisis-card evolucion-card">
 
-    <h3 class="analisis-titulo">
-      Evolución de la cartera (12 meses)
-    </h3>
+    <!-- TÍTULO Y LEYENDA -->
+    <div class="evolucion-encabezado">
 
-    <div class="evolucion-resumen">
-      <strong>$326.1M</strong>
-      <span>Saldo actual de cartera</span>
+      <div>
+        <h3 class="analisis-titulo">
+          Evolución de la cartera ({{ tituloPeriodo }})
+        </h3>
+        <span class="evolucion-subtitulo">Valores en millones de pesos</span>
+      </div>
+
+      <div class="evolucion-leyenda">
+        <span *ngFor="let serie of seriesEvolucion">
+          <i [style.background]="serie.color"></i>
+          {{ serie.nombre }}
+        </span>
+      </div>
+
     </div>
 
     <div class="evolucion-grafico">
 
       <div class="evolucion-eje">
-        <span>$350M</span>
-        <span>$300M</span>
-        <span>$250M</span>
-        <span>$200M</span>
+        <span *ngFor="let etiqueta of etiquetasEje">{{ etiqueta }}</span>
       </div>
 
-      <svg viewBox="0 0 630 125" preserveAspectRatio="none">
+      <svg viewBox="0 0 630 160" preserveAspectRatio="none">
 
-        <line x1="0" y1="15" x2="630" y2="15"
-          class="linea-guia"/>
-
-        <line x1="0" y1="48" x2="630" y2="48"
-          class="linea-guia"/>
-
-        <line x1="0" y1="81" x2="630" y2="81"
-          class="linea-guia"/>
-
-        <line x1="0" y1="114" x2="630" y2="114"
+        <line
+          *ngFor="let y of lineasGuia"
+          x1="0" x2="630"
+          [attr.y1]="y" [attr.y2]="y"
           class="linea-guia"/>
 
         <polyline
-          [attr.points]="puntosEvolucion"
+          *ngFor="let serie of seriesEvolucion"
+          [attr.points]="puntosSerie(serie.valores)"
+          [attr.stroke]="serie.color"
           class="linea-evolucion"
-        />
-
-        <circle
-          *ngFor="let punto of puntosEvolucion.split(' '); let i = index"
-          [attr.cx]="punto.split(',')[0]"
-          [attr.cy]="punto.split(',')[1]"
-          r="3"
-          class="punto-evolucion"
         />
 
       </svg>
@@ -139,7 +139,7 @@
               <tr>
                 <th>Asociado</th>
                 <th>Obligación</th>
-                <th>Producto</th>
+                <th>Segmento</th>
                 <th>Saldo vencido</th>
                 <th>Mora (D)</th>
                 <th>Riesgo</th>
@@ -147,6 +147,9 @@
             </thead>
 
             <tbody>
+              <tr *ngIf="!cargando && topSaldos.length === 0">
+                <td colspan="6" class="tabla-vacia">No hay obligaciones en mora.</td>
+              </tr>
               <tr *ngFor="let asociado of topSaldos">
                 <td>{{ asociado.asociado }}</td>
                 <td>{{ asociado.obligacion }}</td>

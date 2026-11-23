@@ -12,21 +12,21 @@
   <div class="sidebar-logo">
 
     <!-- BOTÓN PARA CONTRAER Y EXPANDIR -->
-<button
-  type="button"
-  class="sidebar-toggle"
-  (click)="alternarSidebar()"
-  [attr.aria-label]="sidebarContraido ? 'Expandir menú' : 'Contraer menú'"
-  [title]="sidebarContraido ? 'Expandir menú' : 'Contraer menú'"
->
-  <img
-    [src]="sidebarContraido
-      ? 'imagenes/Sildedar/Expandir.png'
-      : 'imagenes/Sildedar/Contraer.png'"
-    alt="Contraer o expandir menú"
-    class="toggle-icon"
-  />
-</button>
+    <button
+      type="button"
+      class="sidebar-toggle"
+      (click)="alternarSidebar()"
+      [attr.aria-label]="sidebarContraido ? 'Expandir menú' : 'Contraer menú'"
+      [title]="sidebarContraido ? 'Expandir menú' : 'Contraer menú'"
+    >
+      <img
+        [src]="sidebarContraido
+          ? 'imagenes/Sildedar/Expandir.png'
+          : 'imagenes/Sildedar/Contraer.png'"
+        alt="Contraer o expandir menú"
+        class="toggle-icon"
+      />
+    </button>
 
     <div class="logo">
 
@@ -59,9 +59,14 @@
       title="Inicio"
       (click)="seleccionarOpcion('Inicio'); $event.preventDefault()"
     >
-      <img src="imagenes/Sildedar/Inicio.png" alt="Inicio" class="menu-icon" />
+      <img
+        src="imagenes/Sildedar/Inicio.png"
+        alt="Inicio"
+        class="menu-icon"
+      />
       <span *ngIf="!sidebarContraido">Inicio</span>
     </a>
+
 
     <!-- CARTERA -->
     <a
@@ -71,9 +76,14 @@
       title="Cartera"
       (click)="seleccionarOpcion('Cartera'); $event.preventDefault()"
     >
-      <img src="imagenes/Sildedar/Cartera.png" alt="Cartera" class="menu-icon" />
+      <img
+        src="imagenes/Sildedar/Cartera.png"
+        alt="Cartera"
+        class="menu-icon"
+      />
       <span *ngIf="!sidebarContraido">Cartera</span>
     </a>
+
 
     <!-- GESTIÓN DE CASOS -->
     <a
@@ -83,21 +93,35 @@
       title="Gestión de casos"
       (click)="seleccionarOpcion('Gestión de casos'); $event.preventDefault()"
     >
-      <img src="imagenes/Sildedar/Gestion caso.png" alt="Gestión de casos" class="menu-icon" />
+      <img
+        src="imagenes/Sildedar/Gestion caso.png"
+        alt="Gestión de casos"
+        class="menu-icon"
+      />
       <span *ngIf="!sidebarContraido">Gestión de casos</span>
     </a>
 
-    <!-- MOTOR IA -->
-    <a
-      href="#"
-      class="menu-item"
-      [class.active]="opcionSeleccionada === 'Motor IA y Scoring'"
-      title="Motor IA y Scoring"
-      (click)="seleccionarOpcion('Motor IA y Scoring'); $event.preventDefault()"
-    >
-      <img src="imagenes/Sildedar/Motor IA.png" alt="Motor IA" class="menu-icon" />
-      <span *ngIf="!sidebarContraido">Motor IA y Scoring</span>
-    </a>
+
+   
+<!-- MOTOR IA -->
+<a
+  routerLink="/motor-ia"
+  class="menu-item"
+  [class.active]="opcionSeleccionada === 'Motor IA y Scoring'"
+  title="Motor IA y Scoring"
+  (click)="seleccionarOpcion('Motor IA y Scoring')"
+>
+  <img
+    src="imagenes/Sildedar/Motor IA.png"
+    alt="Motor IA"
+    class="menu-icon"
+  />
+
+  <span *ngIf="!sidebarContraido">
+    Motor IA y Scoring
+  </span>
+</a>
+
 
     <!-- ESTRATEGIAS -->
     <a
@@ -107,119 +131,70 @@
       title="Estrategias"
       (click)="seleccionarOpcion('Estrategias'); $event.preventDefault()"
     >
-      <img src="imagenes/Sildedar/Estrategias.png" alt="Estrategias" class="menu-icon" />
+      <img
+        src="imagenes/Sildedar/Estrategias.png"
+        alt="Estrategias"
+        class="menu-icon"
+      />
       <span *ngIf="!sidebarContraido">Estrategias</span>
     </a>
 
-    <!-- PAGOS Y RECAUDOS -->
+
+    <!-- LINKS Y PAGOS -->
     <a
-      href="#"
+      routerLink="/links-pagos"
       class="menu-item"
       [class.active]="opcionSeleccionada === 'Pagos y recaudos'"
-      title="Pagos y recaudos"
-      (click)="seleccionarOpcion('Pagos y recaudos'); $event.preventDefault()"
+      title="Links y pagos"
+      (click)="seleccionarOpcion('Pagos y recaudos')"
     >
-      <img src="imagenes/Sildedar/Pagos-recaudo.png" alt="Pagos y recaudos" class="menu-icon" />
-      <span *ngIf="!sidebarContraido">Pagos y recaudos</span>
+      <img
+        src="imagenes/Sildedar/Pagos-recaudo.png"
+        alt="Links y pagos"
+        class="menu-icon"
+      />
+
+      <span *ngIf="!sidebarContraido">
+        Links y pagos
+      </span>
     </a>
 
     <!-- REPORTES Y AUDITORÍA -->
     <a
-      href="#"
+      href="/reportes-auditoria"
       class="menu-item"
       [class.active]="opcionSeleccionada === 'Reportes y auditoría'"
       title="Reportes y auditoría"
       (click)="seleccionarOpcion('Reportes y auditoría'); $event.preventDefault()"
     >
-      <img src="imagenes/Sildedar/Reportes-auditoria.png" alt="Reportes y auditoría" class="menu-icon" />
-      <span *ngIf="!sidebarContraido">Reportes y auditoría</span>
+      <img
+        src="imagenes/Sildedar/Reportes-auditoria.png"
+        alt="Reportes y auditoría"
+        class="menu-icon"
+      />
+
+      <span *ngIf="!sidebarContraido">
+        Reportes y auditoría
+      </span>
     </a>
+
 
     <!-- ADMINISTRACIÓN -->
     <a
-      href="#"
+      href="/administracion"
       class="menu-item"
       [class.active]="opcionSeleccionada === 'Administración'"
       title="Administración"
       (click)="seleccionarOpcion('Administración'); $event.preventDefault()"
     >
-      <img src="imagenes/Sildedar/Administracion.png" alt="Administración" class="menu-icon" />
+      <img
+        src="imagenes/Sildedar/Administracion.png"
+        alt="Administración"
+        class="menu-icon"
+      />
       <span *ngIf="!sidebarContraido">Administración</span>
     </a>
 
   </nav>
 
 
-  <!-- ================================================== -->
-  <!-- CERRAR SESIÓN -->
-  <!-- ================================================== -->
-
-  <button
-    type="button"
-    class="logout-button"
-    (click)="cerrarSesion()"
-    title="Cerrar sesión"
-  >
-    <span class="logout-icon">
-      <i class="bi bi-box-arrow-right"></i>
-    </span>
-
-    <span *ngIf="!sidebarContraido">Cerrar sesión</span>
-  </button>
-
-</aside>
-
-
-<!-- ================================================== -->
-<!-- MODAL CONFIRMAR CIERRE DE SESIÓN -->
-<!-- ================================================== -->
-
-<div
-  class="logout-modal-overlay"
-  *ngIf="mostrarModalCerrarSesion"
->
-
-  <div class="logout-modal">
-
-    <button
-      type="button"
-      class="logout-modal-close"
-      (click)="cancelarCerrarSesion()"
-      aria-label="Cerrar ventana"
-    >
-      <i class="bi bi-x-lg"></i>
-    </button>
-
-    <div class="logout-modal-icon">
-      <img src="imagenes/Cerrar-sesion.png" alt="Cerrar Sesión">
-    </div>
-
-    <h2>¿Cerrar sesión?</h2>
-
-    <p>
-      Tendrás que iniciar sesión nuevamente para acceder nuevamente.
-    </p>
-
-    <div class="logout-modal-buttons">
-
-      <button
-        type="button"
-        class="btn-seguir"
-        (click)="cancelarCerrarSesion()"
-      >
-        Seguir navegando
-      </button>
-
-      <button
-        type="button"
-        class="btn-cerrar"
-        (click)="confirmarCerrarSesion()"
-      >
-        Cerrar sesión
-      </button>
-
-    </div>
-
-  </div>
-
-</div>

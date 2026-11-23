@@ -1,5 +1,5 @@
 
-import { Component, inject, OnDestroy } from '@angular/core';
+import { Component, HostListener, inject, OnDestroy } from '@angular/core';
 import { Router, NavigationEnd } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { filter, Subject, takeUntil } from 'rxjs';
@@ -22,10 +22,28 @@ export class SidebarComponent implements OnDestroy {
   // ESTADO DEL SIDEBAR
   // ==============================================
 
-  sidebarContraido = false;
+  // En pantallas angostas el menú empieza contraído para dejar espacio al contenido
+  private static readonly ANCHO_PANTALLA_ANGOSTA = 900;
+  private pantallaAngosta = this.esPantallaAngosta();
+  sidebarContraido = this.pantallaAngosta;
 
   alternarSidebar(): void {
     this.sidebarContraido = !this.sidebarContraido;
+  }
+
+  @HostListener('window:resize')
+  alCambiarTamano(): void {
+    const angosta = this.esPantallaAngosta();
+    // Solo cambia cuando se cruza el límite, para respetar lo que el usuario eligió
+    if (angosta !== this.pantallaAngosta) {
+      this.pantallaAngosta = angosta;
+      this.sidebarContraido = angosta;
+    }
+  }
+
+  private esPantallaAngosta(): boolean {
+    return typeof window !== 'undefined' &&
+      window.innerWidth < SidebarComponent.ANCHO_PANTALLA_ANGOSTA;
   }
 
   // ==============================================
@@ -74,6 +92,26 @@ export class SidebarComponent implements OnDestroy {
 
       this.opcionSeleccionada = 'Gestión de casos';
 
+    } else if (ruta.startsWith('/motor-ia')) {
+
+      this.opcionSeleccionada = 'Motor IA y Scoring';
+
+    } else if (ruta.startsWith('/estrategias')) {
+
+      this.opcionSeleccionada = 'Estrategias';
+
+    } else if (ruta.startsWith('/links-pagos')) {
+
+      this.opcionSeleccionada = 'Pagos y recaudos';
+
+    } else if (ruta.startsWith('/reportes-auditoria')) {
+
+      this.opcionSeleccionada = 'Reportes y auditoría';
+
+    } else if (ruta.startsWith('/administracion')) {
+
+      this.opcionSeleccionada = 'Administración';
+
     } else if (ruta.startsWith('/dashboard')) {
 
       this.opcionSeleccionada = 'Inicio';
@@ -104,35 +142,30 @@ export class SidebarComponent implements OnDestroy {
         void this.router.navigateByUrl('/gestion-casos');
         break;
 
+      case 'Motor IA y Scoring':
+        void this.router.navigateByUrl('/motor-ia');
+        break;
+
+      case 'Estrategias':
+        void this.router.navigateByUrl('/estrategias');
+        break;
+
+      case 'Pagos y recaudos':
+        void this.router.navigateByUrl('/links-pagos');
+        break;
+
+      case 'Reportes y auditoría':
+        void this.router.navigateByUrl('/reportes-auditoria');
+        break;
+
+      case 'Administración':
+        void this.router.navigateByUrl('/administracion');
+        break;
+
       default:
         break;
 
     }
 
   }
-
-  // ==============================================
-  // MODAL CERRAR SESIÓN
-  // ==============================================
-
-  mostrarModalCerrarSesion = false;
-
-  cerrarSesion(): void {
-    this.mostrarModalCerrarSesion = true;
-  }
-
-  cancelarCerrarSesion(): void {
-    this.mostrarModalCerrarSesion = false;
-  }
-
-  confirmarCerrarSesion(): void {
-
-    this.caseService.invalidarCache();
-    sessionStorage.removeItem('token');
-    sessionStorage.removeItem('refreshToken');
-
-    void this.router.navigateByUrl('/login');
-
-  }
-
 }

@@ -31,8 +31,12 @@
     <!-- PORCENTAJE Y PERÍODO -->
     <div class="kpi-change">
 
-      <span class="kpi-percentage">
-        {{ kpi.changePercentage }}%
+      <!-- Solo se muestra si el backend trae una comparación -->
+      <span
+        class="kpi-percentage"
+        *ngIf="kpi.changePercentage !== undefined && kpi.changePercentage !== null"
+      >
+        {{ kpi.changePercentage > 0 ? '+' : '' }}{{ kpi.changePercentage }}%
       </span>
 
       <span class="kpi-period">

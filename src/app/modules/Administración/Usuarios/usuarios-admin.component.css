@@ -1,0 +1,293 @@
+:host { display: block; }
+
+button, input, select { font-family: inherit; }
+
+.card {
+  background: #FFF;
+  border: 1px solid #E3EAF0;
+  border-radius: 16px;
+  padding: 22px 24px;
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 18px;
+}
+
+h2 { margin: 0 0 4px; font-size: 15px; color: #193B4A; }
+.card-header p { margin: 0; font-size: 12px; color: #71818C; }
+
+.btn-primario, .btn-secundario, .btn-peligro {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 34px;
+  padding: 0 14px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+}
+.btn-primario { background: #1763F5; color: #FFF; }
+.btn-primario:hover { background: #0F52D6; }
+.btn-secundario { background: #F3F6FA; color: #193B4A; border: 1px solid #E3EAF0; }
+.btn-peligro { background: #E5484D; color: #FFF; }
+
+/* TABLA */
+.tabla-scroll { overflow-x: auto; }
+
+table { width: 100%; min-width: 720px; border-collapse: collapse; font-size: 12px; }
+
+th {
+  text-align: left;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  color: #71818C;
+  background: #F6F8FA;
+  padding: 10px 12px;
+}
+
+td {
+  padding: 12px;
+  border-bottom: 1px solid #EEF2F5;
+  color: #193B4A;
+  vertical-align: middle;
+}
+
+tr.inactivo td { opacity: .55; }
+
+.persona { display: flex; align-items: center; gap: 10px; }
+.persona strong { display: block; font-size: 12px; }
+.persona small { display: block; color: #8A99A4; font-size: 11px; }
+
+.avatar {
+  width: 28px; height: 28px; flex-shrink: 0;
+  display: grid; place-items: center;
+  border-radius: 8px;
+  background: #EEF2F5;
+  color: #193B4A;
+  font-weight: 700;
+  font-size: 11px;
+}
+
+.usuario { font-weight: 600; }
+.rol { color: #4A5C68; }
+
+.estado { display: flex; align-items: center; gap: 10px; }
+.estado-texto { font-size: 12px; font-weight: 500; color: #183B4A; }
+.codigo { font-size: 11px; font-weight: 600; color: #4A5C68; min-width: 46px; }
+
+.switch {
+  position: relative;
+  width: 40px; height: 22px;
+  border: none; border-radius: 999px;
+  background: #CBD5DD;
+  cursor: pointer;
+  transition: background .2s;
+}
+.switch span {
+  position: absolute; top: 3px; left: 3px;
+  width: 16px; height: 16px;
+  border-radius: 50%;
+  background: #FFF;
+  transition: transform .2s;
+}
+.switch.on { background: #22A06B; }
+.switch.on span { transform: translateX(18px); }
+
+.col-acciones { text-align: right; }
+.acciones { display: inline-flex; gap: 4px; }
+.acciones button {
+  width: 28px; height: 28px;
+  border: none; border-radius: 6px;
+  background: transparent;
+  color: #8A99A4;
+  cursor: pointer;
+}
+.acciones button:hover { background: #F3F6FA; color: #193B4A; }
+.acciones button.peligro:hover { color: #E5484D; }
+
+.vacio { text-align: center; color: #8A99A4; padding: 28px; }
+
+/* VENTANAS */
+.fondo {
+  position: fixed; inset: 0; z-index: 1000;
+  display: grid; place-items: center;
+  background: rgba(15, 30, 40, .45);
+  padding: 16px;
+}
+
+.modal {
+  width: 100%; max-width: 400px;
+  background: #FFF;
+  border-radius: 14px;
+  padding: 22px;
+  display: flex; flex-direction: column; gap: 12px;
+}
+.modal h3 { margin: 0; font-size: 15px; color: #193B4A; }
+.modal p { margin: 0; font-size: 13px; color: #4A5C68; }
+
+.modal label {
+  display: flex; flex-direction: column; gap: 5px;
+  font-size: 12px; font-weight: 600; color: #4A5C68;
+}
+.modal input, .modal select {
+  height: 36px;
+  padding: 0 10px;
+  border: 1px solid #D5DEE5;
+  border-radius: 8px;
+  font-size: 13px;
+  color: #193B4A;
+}
+.modal input:focus, .modal select:focus { outline: 2px solid #BFD3FF; border-color: #1763F5; }
+
+.modal .error { color: #E5484D; font-size: 12px; }
+.modal-botones { display: flex; justify-content: flex-end; gap: 8px; margin-top: 4px; }
+
+.aviso {
+  position: fixed; right: 24px; bottom: 24px; z-index: 1001;
+  background: #193B4A; color: #FFF;
+  padding: 10px 16px;
+  border-radius: 10px;
+  font-size: 12px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, .18);
+}
+
+
+/* =========================================
+   CONEXIÓN CON EL BACKEND
+========================================= */
+
+.error-carga {
+  margin: 0 0 10px;
+  color: #E5484D;
+  font-size: 13px;
+}
+
+.modal input:disabled {
+  background: #F1F5F9;
+  color: #64748B;
+}
+
+.modal .nota,
+.nota {
+  font-size: 11px;
+  font-weight: 400;
+  color: #8A99A4;
+}
+
+/* Recuadro con la contraseña temporal */
+.clave {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 10px 12px;
+  border: 1px dashed #BFD3FF;
+  border-radius: 8px;
+  background: #F5F8FF;
+}
+
+.clave code {
+  font-family: 'Roboto Mono', monospace;
+  font-size: 15px;
+  color: #193B4A;
+  word-break: break-all;
+  user-select: all;
+}
+
+button:disabled {
+  opacity: .55;
+  cursor: not-allowed;
+}
+
+
+/* =========================================
+   MENÚ DE ACCIONES (⋮), como en Figma
+========================================= */
+
+.menu-acciones {
+  position: relative;
+  display: inline-block;
+}
+
+.btn-menu {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: #1763F5;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.btn-menu:hover,
+.btn-menu[aria-expanded="true"] {
+  background: #EAF1FF;
+}
+
+.menu-desplegable {
+  position: absolute;
+  top: calc(100% + 4px);
+  right: 0;
+  z-index: 50;
+  display: flex;
+  flex-direction: column;
+  min-width: 190px;
+  padding: 6px;
+  background: #FFFFFF;
+  border: 1px solid #E2E8F0;
+  border-radius: 10px;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.12);
+  text-align: left;
+}
+
+.menu-desplegable button {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 9px 10px;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: #193B4A;
+  font-family: inherit;
+  font-size: 12px;
+  text-align: left;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.menu-desplegable button:hover {
+  background: #F3F6FA;
+}
+
+.menu-desplegable button i {
+  font-size: 14px;
+}
+
+.menu-desplegable button.peligro {
+  color: #E5484D;
+}
+
+.menu-desplegable button.peligro:hover {
+  background: #FEF2F2;
+}
+
+/* En pantallas anchas la tabla cabe completa: se deja visible para que el menú no se corte */
+@media (min-width: 900px) {
+  .tabla-scroll {
+    overflow: visible;
+  }
+}

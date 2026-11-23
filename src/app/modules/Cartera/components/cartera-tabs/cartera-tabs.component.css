@@ -28,11 +28,17 @@
 /* PESTAÑAS */
 /* ================================================== */
 
+.tabs-extra {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
 .cartera-tabs .tab {
-  flex: 0 0 172px;
-  width: 172px;
-  height: 38px;
-  padding: 0 16px;
+  flex: 0 0 auto;
+  height: 34px;
+  padding: 0 14px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -41,7 +47,7 @@
   background: transparent;
   color: #475569;
   font-family: 'Roboto', sans-serif;
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 500;
   cursor: pointer;
   white-space: nowrap;
@@ -57,7 +63,7 @@
 /* ================================================== */
 
 .cartera-tabs .tab.active {
-  background-color: #DBEAFE;
+  background-color: #EAF1FF;
   color: #1D4ED8;
 }
 

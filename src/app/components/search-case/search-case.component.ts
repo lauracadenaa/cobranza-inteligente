@@ -105,7 +105,8 @@ export class SearchCaseComponent implements OnDestroy {
 
   @Output() closed = new EventEmitter<void>();
 
-  @Output() goToCases = new EventEmitter<void>();
+  // Envía el caso elegido (o nada, si solo se quiere ir a Gestión de casos)
+  @Output() goToCases = new EventEmitter<ManagedCase | null>();
 
   // ==================================================
   // CONTROL DE BÚSQUEDA
@@ -351,9 +352,9 @@ export class SearchCaseComponent implements OnDestroy {
   // IR A GESTIÓN DE CASOS
   // ==================================================
 
-  goToCaseManagement(): void {
+  goToCaseManagement(caso: ManagedCase | null = null): void {
 
-    this.goToCases.emit();
+    this.goToCases.emit(caso);
 
   }
 

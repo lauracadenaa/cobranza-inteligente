@@ -1,0 +1,140 @@
+/* ESTADOS DEL TIEMPO */
+.estados {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.estado {
+  padding: 10px 12px;
+  border-radius: 8px;
+}
+
+.estado-titulo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.estado-titulo i {
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  font-size: 12px;
+}
+
+.estado-titulo strong {
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.estado p {
+  margin: 8px 0 0;
+  font-size: 10px;
+  line-height: 1.45;
+}
+
+.tono-verde { background: #ECFDF5; color: #065F46; }
+.tono-verde i { background: #D1FAE5; color: #059669; }
+.tono-amarillo { background: #FEFCE8; color: #92400E; }
+.tono-amarillo i { background: #FDE68A; color: #92400E; }
+.tono-rojo { background: #FEE2E2; color: #991B1B; }
+.tono-rojo i { background: #FECACA; color: #DC2626; }
+
+/* TABLA */
+.tabla-borde {
+  margin-top: 14px;
+  border: 1px solid #E3EAF0;
+  border-radius: 8px;
+}
+
+td {
+  padding: 8px 12px;
+}
+
+tr:last-child td {
+  border-bottom: none;
+}
+
+.prioridad {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: #0A3B4E;
+  font-weight: 600;
+}
+
+.prioridad i {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+}
+
+.tiempo {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #334155;
+}
+
+.campo.numero {
+  width: 40px;
+  padding: 0 4px;
+  background: #F1F5F9;
+  text-align: center;
+  -moz-appearance: textfield;
+}
+
+.campo.numero.ancho {
+  width: 60px;
+}
+
+.campo.numero::-webkit-inner-spin-button,
+.campo.numero::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+select.campo {
+  width: 86px;
+}
+
+/* REGLAS Y BOTONES */
+.reglas {
+  margin-top: 14px;
+  padding: 8px 8px;
+  border-radius: 6px;
+  background: #F8FAFC;
+}
+
+.reglas p {
+  margin: 3px 0;
+  color: #475569;
+  font-size: 10px;
+}
+
+.reglas.con-error {
+  background: #FEF2F2;
+}
+
+.reglas.con-error p {
+  color: #B42318;
+}
+
+.acciones {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px solid #EEF2F5;
+}
+
+@media (max-width: 700px) {
+  .estados {
+    grid-template-columns: 1fr;
+  }
+}

@@ -1,0 +1,202 @@
+@if (errorCarga) {
+  <div class="card error-general">
+    <p class="error-carga">{{ errorCarga }}</p>
+    <button type="button" class="btn-secundario" (click)="cargar()">Reintentar</button>
+  </div>
+}
+
+<!-- INDICADORES -->
+<div class="kpis">
+  @for (kpi of kpis; track kpi.titulo) {
+    <article class="card kpi">
+      <div class="kpi-arriba">
+        <span>{{ kpi.titulo }}</span>
+        <i class="bi {{ kpi.icono }} tono-{{ kpi.tono }}" aria-hidden="true"></i>
+      </div>
+      <strong>{{ kpi.valor }}</strong>
+      <small class="kpi-detalle">{{ kpi.detalle }}</small>
+    </article>
+  }
+</div>
+
+<div class="fila-reglas">
+
+  <!-- REGLAS DE DISTRIBUCIÓN -->
+  <section class="card reglas">
+
+    <div class="card-titulo">
+      <h2>Reglas de distribución</h2>
+      <p>Define cómo se distribuyen los casos entre los agentes disponibles.</p>
+    </div>
+
+    <div class="campos">
+
+      <label class="grupo">
+        <span class="etiqueta">Método de asignación</span>
+        <select class="campo" [(ngModel)]="metodo">
+          @for (m of metodos; track m.valor) {
+            <option [value]="m.valor">{{ m.texto }}</option>
+          }
+        </select>
+        <small class="ayuda">{{ ayudaMetodo }}</small>
+      </label>
+
+      <label class="grupo">
+        <span class="etiqueta">Capacidad general</span>
+        <div class="campo-sufijo campo solo-lectura">
+          <strong>
+            @if (cargando) { Cargando... }
+            @else if (capacidadGeneral !== null) { {{ capacidadGeneral }} }
+            @else { Sin tope }
+          </strong>
+          <span>casos por agente</span>
+        </div>
+        <small class="ayuda azul">
+          Se aplica a todos los agentes, excepto a quienes tengan una capacidad personalizada.
+          La define el servidor; la de cada agente se cambia en "Capacidad por agente".
+        </small>
+      </label>
+
+      <label class="grupo">
+        <span class="etiqueta">Umbral de saturación</span>
+        <div class="con-porcentaje">
+          <input type="number" min="1" max="100" class="campo" [class.invalido]="!umbralValido"
+                 [(ngModel)]="umbralSaturacion" aria-label="Umbral de saturación">
+          <span>%</span>
+        </div>
+        <small class="ayuda azul">
+          Al alcanzar este porcentaje, el agente se marcará como próximo a capacidad
+        </small>
+      </label>
+
+    </div>
+
+    <div class="formula">
+      <i class="bi bi-info-circle" aria-hidden="true"></i>
+      <div>
+        <strong>Ocupación relativa = casos activos / capacidad máxima × 100</strong>
+        <p>
+          Un agente inactivo o con ocupación ≥ {{ umbralSaturacion }} % no recibe nuevos casos.
+          Si no hay disponibilidad o especialidad compatible, el caso permanece en cola temporal.
+        </p>
+      </div>
+    </div>
+
+    <div class="redistribuir">
+      <div>
+        <strong>Redistribuir casos sin gestión cuando un agente quede inactivo</strong>
+        <p>Los casos con gestiones registradas conservarán su responsable.</p>
+      </div>
+      <button type="button" class="switch" role="switch"
+              [class.on]="redistribuir" [attr.aria-checked]="redistribuir"
+              aria-label="Redistribuir casos sin gestión"
+              (click)="redistribuir = !redistribuir">
+        <span></span>
+      </button>
+    </div>
+
+    <p class="vista-previa">
+      <i class="bi bi-eye" aria-hidden="true"></i>
+      El método de asignación, el umbral y la redistribución automática son una vista previa:
+      el backend todavía no guarda estas reglas.
+    </p>
+
+    <div class="acciones">
+      <button type="button" class="btn-primario"
+              [disabled]="cargando || redistribuyendo" (click)="pedirRedistribucion()">
+        <i class="bi bi-arrow-repeat" aria-hidden="true"></i>
+        Redistribuir casos ahora
+      </button>
+    </div>
+
+  </section>
+
+  <!-- ESTADOS DE OCUPACIÓN -->
+  <aside class="card estados">
+    <h2>Estados de ocupación</h2>
+
+    @for (e of estadosOcupacion; track e.nombre) {
+      <div class="estado">
+        <span class="barra" [style.background]="e.color" [style.width.%]="e.ancho"></span>
+        <strong [style.color]="e.color">{{ e.nombre }}</strong>
+        <small>{{ e.rango }}</small>
+      </div>
+    }
+
+    <p class="nota">
+      El umbral de saturación detiene nuevas asignaciones; no cambia los casos que ya tienen responsable.
+    </p>
+  </aside>
+
+</div>
+
+<!-- COLA TEMPORAL -->
+<section class="card cola">
+
+  <div class="card-titulo">
+    <h2>Cola temporal de asignación</h2>
+    <p>Contiene casos que todavía no tienen un agente elegible o con capacidad disponible.</p>
+  </div>
+
+  <div class="tabla-scroll">
+    <table>
+      <thead>
+        <tr>
+          <th>Caso</th>
+          <th>En cola desde</th>
+          <th>Tiempo sin asignar</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        @if (cargando) {
+          <tr><td colspan="4" class="vacio"><span>Cargando cola...</span></td></tr>
+        } @else {
+          @for (c of cola; track c.caseId) {
+            <tr>
+              <td class="caso">{{ c.caseNumber ?? ('Caso ' + c.caseId) }}</td>
+              <td>{{ fechaCorta(c.enqueuedAt) }}</td>
+              <td>{{ tiempoEnCola(c.enqueuedAt) }}</td>
+              <td><button type="button" class="btn-enlace" (click)="verCaso(c)">Ver caso</button></td>
+            </tr>
+          } @empty {
+            <tr>
+              <td colspan="4" class="vacio">
+                <strong>No hay casos pendientes de asignación</strong>
+                <span>Todos los casos tienen un responsable disponible.</span>
+              </td>
+            </tr>
+          }
+        }
+      </tbody>
+    </table>
+  </div>
+
+  @if (totalCola > cola.length) {
+    <p class="pie-cola">Mostrando los {{ cola.length }} casos más antiguos de {{ totalCola }} en espera.</p>
+  }
+
+</section>
+
+<!-- CONFIRMAR REDISTRIBUCIÓN -->
+@if (confirmarRedistribucion) {
+  <div class="fondo" (click)="cancelarRedistribucion()">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <h3>¿Redistribuir casos ahora?</h3>
+      <p class="texto-modal">
+        El sistema va a mover casos entre los agentes según su capacidad: devuelve a la cola los que sobran,
+        equilibra la carga y asigna los casos en espera a quienes tengan cupo. Los casos cerrados no se tocan.
+      </p>
+      <div class="modal-botones">
+        <button type="button" class="btn-secundario" [disabled]="redistribuyendo" (click)="cancelarRedistribucion()">Cancelar</button>
+        <button type="button" class="btn-primario" [disabled]="redistribuyendo" (click)="redistribuirAhora()">
+          {{ redistribuyendo ? 'Redistribuyendo...' : 'Sí, redistribuir' }}
+        </button>
+      </div>
+    </div>
+  </div>
+}
+
+@if (mensaje) {
+  <div class="aviso" role="status">{{ mensaje }}</div>
+}

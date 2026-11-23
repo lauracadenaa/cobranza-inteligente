@@ -1,7 +1,8 @@
 
-import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+
 
 interface NotaCaso {
   id: number;
@@ -25,9 +26,21 @@ interface NotaCaso {
   templateUrl: './notas-resumen.component.html',
   styleUrl: './notas-resumen.component.css'
 })
-export class NotasResumenComponent implements OnChanges {
+export class NotasResumenComponent implements OnChanges, OnInit {
+
+  ngOnInit(): void {
+    this.actualizarAutores();
+  }
 
   @Input() notas: NotaCaso[] = [];
+
+  // Mientras el caso guarda la nota en el backend
+  @Input() guardando = false;
+  @Input() error = '';
+
+  // El caso abierto es quien guarda en el backend
+  @Output() guardar = new EventEmitter<{ categoria: string; texto: string }>();
+  @Output() aclarar = new EventEmitter<{ nota: NotaCaso; texto: string }>();
 
   // =========================================
   // CATEGORÍAS
@@ -35,9 +48,10 @@ export class NotasResumenComponent implements OnChanges {
 
   categorias: string[] = [
     'Seguimiento',
-    'Contacto con el cliente',
+    'Gestión',
+    'Obligación',
     'Compromiso de pago',
-    'Novedad',
+    'Supervisor',
     'Otra'
   ];
 
@@ -53,7 +67,15 @@ export class NotasResumenComponent implements OnChanges {
 
   autorFiltro = 'Todos';
 
-  fechaFiltro = '';
+  // Periodo (como en Figma: "Últimos 30 días")
+  periodoFiltro = '30';
+
+  readonly opcionesPeriodo = [
+    { valor: '7', texto: 'Últimos 7 días' },
+    { valor: '30', texto: 'Últimos 30 días' },
+    { valor: '90', texto: 'Últimos 90 días' },
+    { valor: 'todas', texto: 'Todas las fechas' }
+  ];
 
   autores: string[] = [];
 
@@ -109,10 +131,8 @@ export class NotasResumenComponent implements OnChanges {
         this.autorFiltro === 'Todos' ||
         nota.nombre === this.autorFiltro;
 
-      // FILTRO POR FECHA
-      const coincideFecha =
-        !this.fechaFiltro ||
-        this.convertirFecha(nota.fecha) === this.fechaFiltro;
+      // FILTRO POR PERIODO
+      const coincideFecha = this.dentroDelPeriodo(nota.fecha);
 
       return (
         coincideBusqueda &&
@@ -123,6 +143,44 @@ export class NotasResumenComponent implements OnChanges {
 
     });
 
+  }
+
+  private dentroDelPeriodo(fecha: string): boolean {
+    if (this.periodoFiltro === 'todas') return true;
+    const dia = this.convertirFecha(fecha);
+    if (!dia) return true;
+    const limite = new Date();
+    limite.setHours(0, 0, 0, 0);
+    limite.setDate(limite.getDate() - Number(this.periodoFiltro));
+    return new Date(dia + 'T00:00:00') >= limite;
+  }
+
+  // =========================================
+  // AYUDAS PARA DIBUJAR (como en Figma)
+  // =========================================
+
+  iniciales(nombre: string): string {
+    return (nombre || '?')
+      .split(/\s+/)
+      .filter(Boolean)
+      .slice(0, 2)
+      .map(p => p.charAt(0).toUpperCase())
+      .join('');
+  }
+
+  // Avatar morado para el sistema / IA, azul para personas
+  esSistema(nota: NotaCaso): boolean {
+    return /sistema|motor/i.test(`${nota.rol} ${nota.nombre}`);
+  }
+
+  // Color de la etiqueta de categoría
+  claseCategoria(categoria: string): string {
+    const valor = (categoria || '').toLowerCase();
+    if (valor.includes('seguimiento')) return 'cat-azul';
+    if (valor.includes('supervis')) return 'cat-naranja';
+    if (valor.includes('obligaci') || valor.includes('compromiso')) return 'cat-morado';
+    if (valor.includes('novedad')) return 'cat-naranja';
+    return 'cat-suave';
   }
 
   // =========================================
@@ -169,46 +227,10 @@ export class NotasResumenComponent implements OnChanges {
       return;
     }
 
-    const ahora = new Date();
+    // Se envía al backend (lo hace el caso abierto) y se limpia el formulario
+    this.guardar.emit({ categoria: this.categoriaSeleccionada, texto: contenido });
 
-    const fecha = ahora.toLocaleDateString('es-CO');
-
-    const hora = ahora.toLocaleTimeString('es-CO', {
-      hour: '2-digit',
-      minute: '2-digit',
-      hour12: true
-    });
-
-    const nuevaNotaCaso: NotaCaso = {
-
-      id: Date.now(),
-
-      nombre: 'Nueva nota',
-
-      fecha: fecha,
-
-      hora: hora,
-
-      rol: 'Agente',
-
-      gestion: this.categoriaSeleccionada,
-
-      notaInterna: contenido
-
-    };
-
-    // Agregar al listado
-    this.notas = [
-      ...this.notas,
-      nuevaNotaCaso
-    ];
-
-    // Actualizar autores
-    this.actualizarAutores();
-
-    // Limpiar formulario
     this.categoriaSeleccionada = '';
-
     this.nuevaNota = '';
 
   }
@@ -274,8 +296,7 @@ export class NotasResumenComponent implements OnChanges {
       return;
     }
 
-    this.notaSeleccionada.notaInterna +=
-      '\nAclaración: ' + this.aclaracion.trim();
+    this.aclarar.emit({ nota: this.notaSeleccionada, texto: this.aclaracion.trim() });
 
     this.cerrarAclaracion();
 

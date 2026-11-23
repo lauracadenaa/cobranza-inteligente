@@ -1,0 +1,73 @@
+<!-- ESTRUCTURA PRINCIPAL -->
+<div class="dashboard-layout">
+
+  <!-- MENÚ LATERAL -->
+  <app-sidebar></app-sidebar>
+
+  <!-- CONTENIDO -->
+  <main class="dashboard-content">
+
+    <div class="admin-layout">
+
+      <!-- ENCABEZADO -->
+      <div class="admin-header-container">
+        <app-dashboard-header
+          [tituloPersonalizado]="'Administración'"
+          [descripcionPersonalizada]="'Administra usuarios, distribución de cargas, capacidades y tiempos de atención'">
+        </app-dashboard-header>
+      </div>
+
+      <!-- PESTAÑAS -->
+      <nav class="admin-tabs">
+
+        <button
+          type="button"
+          [class.activo]="seccionActiva === 'usuarios'"
+          (click)="cambiarSeccion('usuarios')">
+          Usuarios
+        </button>
+
+        <button
+          type="button"
+          [class.activo]="seccionActiva === 'distribucion'"
+          (click)="cambiarSeccion('distribucion')">
+          Distribución de cargas
+        </button>
+
+        <button
+          type="button"
+          [class.activo]="seccionActiva === 'capacidad'"
+          (click)="cambiarSeccion('capacidad')">
+          Capacidad por agente
+        </button>
+
+        <button
+          type="button"
+          [class.activo]="seccionActiva === 'tiempos'"
+          (click)="cambiarSeccion('tiempos')">
+          Tiempos de atención
+        </button>
+
+        <button
+          type="button"
+          [class.activo]="seccionActiva === 'estructura'"
+          (click)="cambiarSeccion('estructura')">
+          Estructura del archivo
+        </button>
+
+      </nav>
+
+      <!-- CONTENIDO DE CADA PESTAÑA -->
+      @switch (seccionActiva) {
+        @case ('usuarios') { <app-usuarios-admin></app-usuarios-admin> }
+        @case ('distribucion') { <app-distribucion-cargas></app-distribucion-cargas> }
+        @case ('capacidad') { <app-capacidad-agente></app-capacidad-agente> }
+        @case ('tiempos') { <app-tiempos-atencion></app-tiempos-atencion> }
+        @default { <app-estructura-archivo></app-estructura-archivo> }
+      }
+
+    </div>
+
+  </main>
+
+</div>

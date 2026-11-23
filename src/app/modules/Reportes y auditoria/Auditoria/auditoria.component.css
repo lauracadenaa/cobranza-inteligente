@@ -1,0 +1,1221 @@
+:host {
+  display: block;
+  width: 100%;
+  min-width: 0;
+}
+
+.auditoria-card {
+  background: #FFFFFF;
+  border: 1px solid #E2E8F0;
+  border-radius: 12px;
+  box-sizing: border-box;
+}
+
+/* =========================================
+   ENCABEZADO Y CONTROLES
+========================================= */
+
+.auditoria-encabezado {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding: 14px 18px;
+}
+
+.auditoria-encabezado h2 {
+  margin: 0;
+  color: #0A3B4E;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.auditoria-encabezado h2 span {
+  margin-left: 6px;
+  color: #64748B;
+  font-size: 11px;
+  font-weight: 400;
+}
+
+.auditoria-controles {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.buscador {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 260px;
+  max-width: 100%;
+  height: 34px;
+  padding: 0 10px;
+  border: 1px solid #E2E8F0;
+  border-radius: 8px;
+  box-sizing: border-box;
+  color: #94A3B8;
+  font-size: 12px;
+}
+
+.buscador input {
+  flex: 1;
+  min-width: 0;
+  border: none;
+  outline: none;
+  background: transparent;
+  color: #334155;
+  font-size: 12px;
+}
+
+.buscador button {
+  border: none;
+  background: transparent;
+  color: #94A3B8;
+  cursor: pointer;
+}
+
+.control-con-menu {
+  position: relative;
+}
+
+.btn-filtros,
+.btn-periodo {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 34px;
+  padding: 0 12px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.btn-filtros {
+  border: 1px solid #E2E8F0;
+  background: #FFFFFF;
+  color: #334155;
+}
+
+.btn-filtros.activo {
+  border-color: #1763F5;
+  color: #1763F5;
+}
+
+.contador-filtros {
+  display: grid;
+  place-items: center;
+  min-width: 16px;
+  height: 16px;
+  border-radius: 999px;
+  background: #1763F5;
+  color: #FFFFFF;
+  font-size: 10px;
+}
+
+.btn-periodo {
+  border: none;
+  background: #1763F5;
+  color: #FFFFFF;
+}
+
+.btn-periodo:hover {
+  background: #0F52D6;
+}
+
+/* Menús flotantes */
+.menu-flotante {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 200px;
+  padding: 12px;
+  border: 1px solid #E2E8F0;
+  border-radius: 10px;
+  background: #FFFFFF;
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.12);
+}
+
+.menu-filtros label {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  color: #183B4A;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.menu-filtros input,
+.rango-personalizado input {
+  height: 32px;
+  padding: 0 8px;
+  border: 1px solid #DCE5EA;
+  border-radius: 6px;
+  color: #334155;
+  font-size: 12px;
+}
+
+.menu-acciones {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.btn-texto {
+  border: none;
+  background: transparent;
+  color: #64748B;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.btn-aplicar {
+  height: 30px;
+  padding: 0 12px;
+  border: none;
+  border-radius: 6px;
+  background: #1763F5;
+  color: #FFFFFF;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.btn-aplicar:disabled {
+  background: #CBD5E1;
+  cursor: not-allowed;
+}
+
+.opcion-periodo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #334155;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.opcion-periodo input {
+  accent-color: #1763F5;
+}
+
+.rango-personalizado {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding-top: 8px;
+  border-top: 1px solid #EEF2F5;
+}
+
+/* =========================================
+   TABLA
+========================================= */
+
+.tabla-contenedor {
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+
+th {
+  padding: 10px 14px;
+  background: #F8FAFC;
+  color: #64748B;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.4px;
+  text-align: left;
+  text-transform: uppercase;
+  white-space: nowrap;
+  border-top: 1px solid #EEF2F5;
+  border-bottom: 1px solid #EEF2F5;
+}
+
+td {
+  padding: 11px 14px;
+  color: #334155;
+  border-bottom: 1px solid #EEF2F5;
+  white-space: nowrap;
+}
+
+.col-id { width: 60px; }
+.col-fecha { width: 150px; }
+.col-usuario { width: 80px; }
+.col-accion { width: 210px; }
+
+td.accion {
+  color: #1763F5;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+}
+
+td.descripcion {
+  max-width: 420px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+tbody.cargando {
+  opacity: 0.5;
+}
+
+.estado-tabla {
+  padding: 32px 14px;
+  color: #64748B;
+  text-align: center;
+}
+
+.estado-error {
+  color: #B42318;
+}
+
+.estado-error button {
+  margin-left: 10px;
+  padding: 5px 10px;
+  border: 1px solid #CBD5E1;
+  border-radius: 6px;
+  background: #FFFFFF;
+  color: #2563EB;
+  cursor: pointer;
+}
+
+/* =========================================
+   PIE Y PAGINACIÓN
+========================================= */
+
+.auditoria-pie {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding: 12px 18px;
+  color: #64748B;
+  font-size: 11px;
+}
+
+.paginacion {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.paginacion button {
+  min-width: 26px;
+  height: 26px;
+  padding: 0 6px;
+  border: 1px solid #E2E8F0;
+  border-radius: 6px;
+  background: #FFFFFF;
+  color: #334155;
+  font-size: 11px;
+  cursor: pointer;
+}
+
+.paginacion button.activa {
+  border-color: #1763F5;
+  background: #1763F5;
+  color: #FFFFFF;
+}
+
+.paginacion button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.puntos {
+  padding: 0 4px;
+}
+
+@media (max-width: 700px) {
+  .buscador {
+    width: 100%;
+  }
+
+  .auditoria-controles {
+    width: 100%;
+  }
+}
+
+/* ================================================== */
+/* FILTROS: copiados de Inicio > Casos en gestión      */
+/* ================================================== */
+
+/* ================================================== */
+/* CONTENEDOR DE FILTROS ACTIVOS */
+/* ================================================== */
+
+.managed-active-filters {
+  width: 100%;
+  min-width: 0;
+  min-height: 40px;
+  height: auto;
+  margin: 0;
+
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+
+  padding: 2px 20px;
+  box-sizing: border-box;
+
+  background: transparent;
+  border-right: none;
+  border-bottom: 1px solid #E2E8F0;
+  border-left: none;
+
+  overflow: hidden;
+}
+
+/* ================================================== */
+/* ETIQUETAS DE FILTROS ACTIVOS */
+/* ================================================== */
+
+.active-filter-tag {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+
+  width: fit-content;
+  min-width: 0;
+  max-width: 100%;
+  height: 29px;
+
+  padding: 0 8px;
+  box-sizing: border-box;
+
+  background-color: #DBEAFE;
+  border: 1px solid #BFDBFE;
+  border-radius: 6px;
+
+  color: #001822;
+  font-family: 'Roboto', sans-serif;
+  font-size: 12px;
+  font-weight: 400;
+
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.remove-active-filter {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 16px;
+  height: 16px;
+
+  padding: 0;
+  border: none;
+  background: transparent;
+
+  color: #64748B;
+  cursor: pointer;
+}
+
+.remove-active-filter:hover {
+  color: #001822;
+}
+
+/* ================================================== */
+/* CONTROLES DEL ENCABEZADO */
+/* ================================================== */
+/* BOTÓN FILTRO */
+/* ================================================== */
+
+.managed-filter {
+  width: 126px;
+  min-width: 126px;
+  height: 40px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+
+  padding: 0;
+  box-sizing: border-box;
+
+  background-color: #FFFFFF;
+  border: 1px solid #CBD5E1;
+  border-radius: 8px;
+
+  font-family: 'Roboto', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  color: #475569;
+
+  cursor: pointer;
+}
+
+.managed-filter:hover:not(.filtros-activos) {
+  background-color: #F1F5F9;
+  color: #0A3B4E;
+}
+
+.managed-filter.filtros-activos img {
+  filter: brightness(0) saturate(100%)
+          invert(32%) sepia(93%)
+          saturate(1845%) hue-rotate(209deg)
+          brightness(97%) contrast(97%);
+}
+
+.managed-filter img {
+  width: 16px;
+  height: 16px;
+  object-fit: contain;
+  flex-shrink: 0;
+
+  filter: brightness(0) saturate(100%)
+          invert(31%) sepia(14%)
+          saturate(747%) hue-rotate(176deg)
+          brightness(94%) contrast(87%);
+}
+
+.managed-filter.filtros-activos {
+  background-color: #2563EB1A;
+  border-color: #2563EB;
+  color: #2563EB;
+}
+
+/* ================================================== */
+/* CÍRCULO CON CANTIDAD DE FILTROS */
+/* ================================================== */
+
+.filter-count {
+  width: 20px;
+  height: 18px;
+  min-width: 20px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 0 6px;
+  box-sizing: border-box;
+  flex-shrink: 0;
+
+  border-radius: 100px;
+  border: none;
+  background-color: #3B82F6;
+
+  font-family: 'Roboto', sans-serif;
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 16px;
+  letter-spacing: 0;
+  text-align: center;
+  color: #FFFFFF;
+
+  opacity: 1;
+}
+
+.filtros-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.filtros-modal {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+
+  width: 440px;
+  height: 462px;
+  min-width: 440px;
+  min-height: 462px;
+
+  padding: 0;
+  margin: 0;
+
+  box-sizing: border-box;
+
+  display: flex;
+  flex-direction: column;
+
+  background-color: #FFFFFF;
+
+  border: 1px solid #E2E8F0;
+  border-radius: 12px;
+
+  opacity: 1;
+
+  z-index: 100;
+
+  box-shadow: 0px 4px 12px rgba(15, 23, 42, 0.12);
+}
+
+/* ================================================== */
+/* ENCABEZADO DEL MODAL */
+/* ================================================== */
+
+.filtros-header {
+  width: 100%;
+  height: 51px;
+  min-height: 51px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  padding: 16px 24px;
+  box-sizing: border-box;
+
+  border-bottom: 1px solid #E2E8F0;
+  flex-shrink: 0;
+}
+
+.filtros-header h3 {
+  width: 46px;
+  height: 19px;
+  margin: 0;
+
+  font-family: 'Roboto', sans-serif;
+  font-weight: 600;
+  font-style: normal;
+  font-size: 16px;
+  line-height: 100%;
+  letter-spacing: 0;
+
+  color: #1E293B;
+
+  opacity: 1;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  box-sizing: border-box;
+}
+
+.cerrar-filtros {
+  width: 24px;
+  height: 24px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 0;
+  background: transparent;
+  border: none;
+
+  color: #64748B;
+  font-size: 20px;
+  cursor: pointer;
+}
+
+.cerrar-filtros:hover {
+  color: #0F172A;
+}
+
+/* ================================================== */
+/* CUERPO DEL MODAL */
+/* ================================================== */
+
+.filtros-body {
+  flex: 1;
+  min-height: 0;
+
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+
+  padding: 24px;
+  box-sizing: border-box;
+
+  overflow-y: auto;
+  overflow-x: hidden;
+
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.filtros-body::-webkit-scrollbar {
+  display: none;
+}
+
+/* ================================================== */
+/* GRUPOS DE FILTROS */
+/* ================================================== */
+
+.filtro-grupo {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* ================================================== */
+/* SUBTÍTULOS DE TODOS LOS FILTROS */
+/* ================================================== */
+
+.filtro-grupo > label,
+.filtro-fechas > label,
+.filtro-riesgo > label {
+  width: 41px;
+  height: 15px;
+  margin: 0;
+
+  font-family: 'Roboto', sans-serif;
+  font-weight: 600;
+  font-style: semibold;
+  font-size: 13px;
+  line-height: 100%;
+  letter-spacing: 0;
+
+  color: #001822;
+
+  opacity: 1;
+  white-space: nowrap;
+  box-sizing: border-box;
+}
+
+/* ================================================== */
+/* CAMPOS DE TEXTO */
+/* ================================================== */
+
+.filtro-grupo > input {
+  width: 100%;
+  height: 40px;
+  min-height: 40px;
+
+  padding: 8px 16px;
+  box-sizing: border-box;
+
+  background-color: #F5F5F5;
+  border: 1px solid #E2E8F0;
+  border-radius: 8px;
+
+  outline: none;
+
+  font-family: 'Roboto', sans-serif;
+  font-size: 12px;
+  font-weight: 400;
+  color: #94A3B8;
+}
+
+.filtro-grupo input::placeholder {
+  color: #94A3B8;
+  opacity: 1;
+}
+
+.filtro-grupo input:focus {
+  border-color: #E2E8F0;
+}
+
+.filtros-modal input,
+.filtros-modal select {
+  font-family: 'Roboto', sans-serif;
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 100%;
+  letter-spacing: 0;
+}
+
+.filtros-modal .con-valor {
+  color: #1E293B;
+}
+
+#filtro-asesor {
+  background-color: #FFFFFF;
+  border-color: #D9E3EA;
+}
+
+#filtro-asesor:focus {
+  border-color: #D9E3EA;
+}
+
+/* ================================================== */
+/* CONTENEDOR DE RIESGO */
+/* ================================================== */
+
+.filtro-riesgo {
+  width: 100%;
+  min-height: 50px;
+
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+
+  box-sizing: border-box;
+}
+
+/* ================================================== */
+/* BOTONES DE RIESGO */
+/* ================================================== */
+
+.filtro-riesgos {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn-riesgo {
+  width: 50px;
+  height: 27px;
+  min-width: 62px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 6px 12px;
+  box-sizing: border-box;
+
+  background: #F1F5F9;
+  border: 1px solid #F1F5F9;
+  border-radius: 100px;
+
+  font-family: 'Roboto', sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 100%;
+  color: #475569;
+
+  cursor: pointer;
+  transition: background-color 0.2s ease,
+              border-color 0.2s ease,
+              color 0.2s ease;
+}
+
+.btn-riesgo.seleccionado {
+  background-color: #EAF2FF;
+  border-color: #2764E7;
+  color: #2764E7;
+}
+
+/* ================================================== */
+/* CAMPOS DE DÍAS DE MORA */
+/* ================================================== */
+
+.filtro-dos-columnas {
+  display: grid;
+  grid-template-columns: repeat(2, 188px);
+  gap: 10px;
+}
+
+.filtro-dos-columnas input {
+  width: 188px;
+  height: 38px;
+  min-width: 0;
+
+  display: flex;
+  align-items: center;
+
+  padding: 8px 12px;
+  box-sizing: border-box;
+
+  background-color: #FFFFFF;
+  border: 1px solid #D9E3EA;
+  border-radius: 8px;
+
+  outline: none;
+
+  font-family: 'Roboto', sans-serif;
+  font-size: 12px;
+  font-weight: 400;
+  color: #94A3B8;
+}
+
+/* ================================================== */
+/* ORIGEN */
+/* ================================================== */
+
+.filtro-origen {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.filtro-origenes {
+  width: 100%;
+
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+/* ================================================== */
+/* BOTONES DE ORIGEN */
+/* ================================================== */
+
+.btn-origen {
+  min-width: 37px;
+  width: auto;
+  height: 27px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 6px 12px;
+  box-sizing: border-box;
+
+  background: #F1F5F9;
+  border: 1px solid #F1F5F9;
+  border-radius: 100px;
+
+  font-family: 'Roboto', sans-serif;
+  font-weight: 500;
+  font-style: normal;
+  font-size: 13px;
+  line-height: 100%;
+  letter-spacing: 0;
+
+  color: #475569;
+  white-space: nowrap;
+
+  cursor: pointer;
+  transition: background-color 0.2s ease,
+              border-color 0.2s ease,
+              color 0.2s ease;
+}
+
+/* ORIGEN SELECCIONADO */
+
+.btn-origen.seleccionado {
+  background-color: #EAF2FF;
+  border-color: #2764E7;
+  color: #2764E7;
+}
+
+/* ================================================== */
+/* CAMPOS DE SELECCIÓN: SEGMENTO, ESTADO Y ASESOR */
+/* ================================================== */
+
+.filtro-select {
+  position: relative;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  width: 392px;
+  max-width: 100%;
+  height: 40px;
+
+  padding: 8px 16px;
+  box-sizing: border-box;
+
+  background-color: #FFFFFF;
+  border: 1px solid #D9E3EA;
+  border-radius: 8px;
+
+  opacity: 1;
+}
+
+.filtro-select input,
+.filtro-select select {
+  display: block;
+  flex: 1;
+
+  min-width: 0;
+  width: 100%;
+  height: 100%;
+
+  padding: 0;
+  box-sizing: border-box;
+
+  border: none;
+  outline: none;
+  background: transparent;
+
+  font-family: 'Roboto', sans-serif;
+  font-size: 12px;
+  font-weight: 400;
+  color: #94A3B8;
+}
+
+.filtro-select select {
+  appearance: none;
+  cursor: pointer;
+}
+
+.filtro-select input::placeholder,
+.filtro-select select:invalid {
+  color: #94A3B8;
+  opacity: 1;
+}
+
+.filtro-select img {
+  position: absolute;
+  width: 12px;
+  height: 12px;
+
+  top: 50%;
+  right: 16px;
+  transform: translateY(-50%);
+
+  object-fit: contain;
+  pointer-events: none;
+  z-index: 5;
+}
+
+/* ================================================== */
+/* FILTROS DE FECHA */
+/* ================================================== */
+
+.filtro-fechas {
+  width: 100%;
+
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+
+  box-sizing: border-box;
+}
+
+/* ================================================== */
+/* FECHA DE CREACIÓN */
+/* ================================================== */
+
+.campo-fecha-creacion {
+  position: relative;
+  width: 100%;
+  height: 40px;
+  flex-shrink: 0;
+}
+
+.campo-fecha-creacion input {
+  display: block;
+  width: 100%;
+  height: 40px;
+
+  padding: 8px 40px 8px 16px;
+  box-sizing: border-box;
+
+  background-color: #FFFFFF;
+  border: 1px solid #D9E3EA;
+  border-radius: 8px;
+
+  outline: none;
+
+  font-family: 'Roboto', sans-serif;
+  font-size: 12px;
+  font-weight: 400;
+  color: #94A3B8;
+}
+
+.campo-fecha-creacion input::placeholder {
+  color: #94A3B8;
+  opacity: 1;
+}
+
+.campo-fecha-creacion img {
+  position: absolute;
+  width: 12px;
+  height: 12px;
+
+  top: 50%;
+  right: 16px;
+  transform: translateY(-50%);
+
+  object-fit: contain;
+  pointer-events: none;
+  z-index: 5;
+}
+
+/* ================================================== */
+/* CONTENEDOR DE FECHA DESDE Y FECHA HASTA */
+/* ================================================== */
+
+.filtro-fechas-contenedor {
+  display: grid;
+  grid-template-columns: repeat(2, 188px);
+  gap: 10px;
+  width: 100%;
+}
+
+.filtro-fechas-contenedor .campo-fecha {
+  position: relative;
+  width: 188px;
+  min-width: 0;
+  height: 38px;
+}
+
+.filtro-fechas-contenedor .campo-fecha input {
+  display: block;
+  width: 188px;
+  height: 38px;
+
+  padding: 8px 35px 8px 12px;
+  box-sizing: border-box;
+
+  background-color: #FFFFFF;
+  border: 1px solid #D9E3EA;
+  border-radius: 8px;
+
+  outline: none;
+
+  font-family: 'Roboto', sans-serif;
+  font-size: 12px;
+  font-weight: 400;
+  color: #94A3B8;
+
+  cursor: pointer;
+}
+
+.filtro-fechas-contenedor .campo-fecha i {
+  position: absolute;
+
+  top: 50%;
+  right: 12px;
+  transform: translateY(-50%);
+
+  font-size: 14px;
+  color: #94A3B8;
+  pointer-events: none;
+}
+
+/* ================================================== */
+/* PIE DEL MODAL */
+/* ================================================== */
+
+.filtros-footer {
+  width: 100%;
+  height: 80px;
+  min-height: 80px;
+
+  box-sizing: border-box;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  padding: 16px;
+
+  background-color: transparent;
+  border-top: 1px solid #E2E8F0;
+
+  flex-shrink: 0;
+}
+
+/* ================================================== */
+/* FILTROS RESTANTES */
+/* ================================================== */
+
+.filtros-restantes {
+  min-width: 74px;
+  height: 31px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 0 10px;
+  box-sizing: border-box;
+
+  background-color: #F1F5F9;
+  border: 1px solid #CBD5E1;
+  border-radius: 6px;
+
+  font-family: 'Roboto', sans-serif;
+  font-weight: 500;
+  font-size: 13px;
+  line-height: 100%;
+  letter-spacing: 0;
+
+  color: #0A3B4E;
+  white-space: nowrap;
+}
+
+/* ================================================== */
+/* BOTONES DEL PIE DEL MODAL */
+/* ================================================== */
+
+.btn-limpiar-filtros,
+.btn-aplicar-filtros {
+  height: 36px;
+  padding: 0 16px;
+
+  border-radius: 7px;
+
+  font-family: 'Roboto', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+
+  cursor: pointer;
+}
+
+.btn-limpiar-filtros {
+  background-color: #FFFFFF;
+  border: 1px solid #CBD5E1;
+  color: #475569;
+}
+
+.btn-limpiar-filtros:hover {
+  background-color: #F8FAFC;
+}
+
+.btn-aplicar-filtros {
+  background-color: #2563EB;
+  border: 1px solid #2563EB;
+  color: #FFFFFF;
+}
+
+.btn-aplicar-filtros:hover {
+  background-color: #1D4ED8;
+}
+
+/* ================================================== */
+
+/* Ajustes propios de Auditoría */
+.auditoria-controles .filtros-modal {
+  height: auto;
+  min-height: 0;
+}
+
+.filtro-grupo > label {
+  width: auto;
+}
+
+.managed-active-filters {
+  border-bottom: none;
+  padding: 0 0 10px;
+}
+
+.auditoria-controles {
+  align-items: center;
+}
+
+@media (max-width: 560px) {
+  .auditoria-controles .filtros-modal {
+    width: calc(100vw - 48px);
+    min-width: 0;
+    right: auto;
+    left: 0;
+  }
+}
+
+#filtro-usuario {
+  background-color: #FFFFFF;
+  border-color: #D9E3EA;
+}
+
+/* El botón de periodo con la misma altura del botón Filtros */
+app-selector-periodo ::ng-deep .periodo-boton,
+app-selector-periodo ::ng-deep .periodo-cerrar {
+  height: 40px;
+}
+
+app-selector-periodo ::ng-deep .periodo-cerrar {
+  width: 40px;
+}

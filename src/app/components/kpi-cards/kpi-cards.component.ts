@@ -1,5 +1,6 @@
 
-import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, DestroyRef, OnInit, inject } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 
 import { DashboardService } from '../../service/dashboard.service';
@@ -38,7 +39,19 @@ export class KpiCardsComponent implements OnInit {
   // INICIALIZACIÓN
   // ==================================================
 
+  private readonly destroyRef = inject(DestroyRef);
+
   ngOnInit(): void {
+
+    this.cargar();
+
+    this.dashboardService.recargar$
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => this.cargar());
+
+  }
+
+  private cargar(): void {
 
     this.dashboardService.getKPIs().subscribe(data => {
 

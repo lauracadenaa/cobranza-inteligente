@@ -1,0 +1,78 @@
+<section class="card">
+
+  <!-- TÍTULO -->
+  <header class="titulo">
+    <div>
+      <h2>
+        Estructura del archivo de carga
+        <span class="chip-lectura">Solo lectura</span>
+      </h2>
+      <p>Consulta los campos, formatos y requisitos que debe cumplir el archivo antes de cargarlo al sistema</p>
+    </div>
+
+    <!-- En Figma el botón va arriba a la derecha -->
+    <button type="button" class="descargar" (click)="descargarPlantilla()">
+      <i class="bi bi-download"></i>
+      Descargar plantilla
+    </button>
+  </header>
+
+  <!-- CÓMO ORGANIZAR EL ARCHIVO -->
+  <h3>Cómo organizar el archivo</h3>
+
+  <div class="pasos">
+    @for (paso of pasos; track paso.numero) {
+      <article class="paso">
+        <span class="numero">{{ paso.numero }}</span>
+        <div>
+          <strong>{{ paso.titulo }}</strong>
+          <small>{{ paso.fila }}</small>
+          <p>{{ paso.descripcion }}</p>
+
+        </div>
+      </article>
+    }
+  </div>
+
+  <!-- TABLA DE CAMPOS -->
+  <div class="tabla-scroll">
+    <table>
+      <thead>
+        <tr>
+          <th>Posición</th>
+          <th>Nombre del campo</th>
+          <th>Tipo de dato</th>
+          <th>Obligatorio</th>
+          <th>Descripción</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (campo of campos; track campo.nombre) {
+          <tr>
+            <td class="posicion">{{ campo.posicion }}</td>
+            <td class="campo">{{ campo.nombre }}</td>
+            <td>{{ campo.tipo }}</td>
+            <td>
+              @if (campo.obligatorio) {
+                <span class="chip si"><i class="bi bi-check-circle"></i> Sí</span>
+              } @else {
+                <span class="chip no"><i class="bi bi-dash-circle"></i> No</span>
+              }
+            </td>
+            <td class="descripcion">{{ campo.descripcion }}</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+
+  <!-- AVISO -->
+  <aside class="importante">
+    <i class="bi bi-info-circle"></i>
+    <div>
+      <strong>Importante</strong>
+      <p>Esta información es de consulta. Para cargar los datos correctamente, verifica que tu archivo siga esta estructura.</p>
+    </div>
+  </aside>
+
+</section>

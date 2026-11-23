@@ -26,7 +26,15 @@ export class CarteraKpisComponent {
   // DATOS RECIBIDOS DE SEGMENTOS
   // =========================================
 
-  @Input() datosSegmentos = {
+  @Input() datosSegmentos: {
+    segmentosActivos: string;
+    segmentoMayorSaldo: string;
+    segmentoMayorMora: string;
+    asociadosSegmentados: string;
+    tasaRecuperacion: string;
+    // Línea pequeña debajo de cada valor (cajita + texto), en el mismo orden
+    detalles?: { porcentaje: string; periodo: string }[];
+  } = {
     segmentosActivos: '—',
     segmentoMayorSaldo: '—',
     segmentoMayorMora: '—',
@@ -246,9 +254,13 @@ export class CarteraKpisComponent {
         this.datosSegmentos.tasaRecuperacion
       ];
 
+      const detalles = this.datosSegmentos.detalles ?? [];
+
       return this.kpisSegmentos.map((kpi, indice) => ({
         ...kpi,
-        valor: valores[indice]
+        valor: valores[indice],
+        porcentaje: detalles[indice]?.porcentaje ?? '',
+        periodo: detalles[indice]?.periodo ?? ''
       }));
 
     }

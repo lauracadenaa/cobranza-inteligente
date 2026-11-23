@@ -12,17 +12,19 @@
   <div class="dashboard-info">
 
     <ng-container *ngIf="casoGestion as caso; else encabezadoGeneral">
-      <h1>
-        <span style="font-size: 24px; letter-spacing: 0;">
+      <h1 class="caso-titulo">
+        <span class="caso-numero">
           {{ caso.id.replace('-OBL-', '-') }}
         </span>
-        <span style="margin-left: 10px; color: #10B981; font-size: 11px; font-weight: 600;">
+        <span class="caso-estado">
+          <i></i>
           {{ formatearEstadoCaso(caso.estado) }}
         </span>
       </h1>
-      <p>
-        Asignado a: {{ caso.asesor || 'Sin asignar' }}
-        &nbsp;&nbsp; Origen: Desborde IA (Riesgo {{ caso.riesgo || 'Sin información' }})
+      <p class="caso-subtitulo">
+        Asignado a&nbsp;<strong>{{ caso.asesor || 'Sin asignar' }}</strong>
+        <span class="caso-separador">·</span>
+        Origen:&nbsp;<span class="caso-origen">{{ textoOrigen(caso.origen) }} (Riesgo {{ caso.riesgo || 'Sin información' }})</span>
       </p>
     </ng-container>
 
@@ -53,16 +55,21 @@
   <div class="refresh-info">
     <img
       src="/imagenes/actualizar.png"
-      alt="Actualizar información"
+      alt=""
       class="refresh-icon"
+      [class.girando]="actualizando"
     >
 
-    <span>Actualizado hace 3 minutos</span>
+    <span>{{ textoActualizacion }}</span>
   </div>
 
-  <span class="refresh-action">
-    Actualizar
-  </span>
+  <button
+    type="button"
+    class="refresh-action"
+    [disabled]="actualizando"
+    (click)="solicitarActualizacion()">
+    {{ actualizando ? 'Actualizando...' : 'Actualizar' }}
+  </button>
 
 </div>
 
@@ -122,14 +129,14 @@
         <!-- CUADRO JD -->
 
         <div class="user-icon">
-          <span>JD</span>
+          <span>{{ usuario?.iniciales || '—' }}</span>
         </div>
 
         <!-- INFORMACIÓN DEL USUARIO -->
 
         <div class="user-details">
-          <strong>{{ header?.nombreUsuario }}</strong>
-          <span>{{ header?.rolUsuario }}</span>
+          <strong>{{ usuario?.nombre || 'Usuario' }}</strong>
+          <span>{{ usuario?.rol || '' }}</span>
         </div>
 
         <!-- CHEVRON DEL USUARIO -->
@@ -148,7 +155,7 @@
         <button
           type="button"
           class="user-dropdown-item"
-          (click)="cerrarSesion()">
+          (click)="pedirCerrarSesion()">
           <i class="bi bi-box-arrow-right" aria-hidden="true"></i>
           <span>Cerrar sesión</span>
         </button>
@@ -161,39 +168,92 @@
 </header>
 
 <!-- ================================================== -->
-<!-- MODAL MOTOR IA -->
+<!-- MODAL MOTOR IA (diseño Figma) -->
+<!-- Por ahora solo cambia el estado en pantalla: no llama al backend -->
 <!-- ================================================== -->
 
-<div
-  class="ia-modal-overlay"
-  *ngIf="isModalIAOpen"
->
+<div class="ia-modal-overlay" *ngIf="isModalIAOpen" (click)="cerrarModalIA()">
 
-  <div class="ia-modal">
+  <div
+    class="ia-modal"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="ia-modal-titulo"
+    (click)="$event.stopPropagation()">
 
-    CONTENIDO
+    <button type="button" class="ia-modal-x" aria-label="Cerrar" (click)="cerrarModalIA()">
+      <i class="bi bi-x-lg"></i>
+    </button>
 
-    <div class="ia-modal-content">
-
-      <h2>
-        Motor IA
-      </h2>
-
-      <p>
-        Configuración del Motor IA
-      </p>
-
+    <div class="ia-modal-icono" [class.encender]="!header?.motorIAActivo">
+      <i class="bi bi-gear"></i>
     </div>
 
-    <!-- CERRAR -->
+    <ng-container *ngIf="header?.motorIAActivo; else textoActivar">
+      <h2 id="ia-modal-titulo">¿Desactivar el Motor IA?</h2>
+      <p>
+        Al apagarlo, se pausarán la priorización inteligente, las recomendaciones
+        y los desbordes automáticos. Las reglas de cobranza seguirán funcionando.
+      </p>
+      <small>La desactivación quedará registrada en auditoría.</small>
 
-    <button
-      type="button"
-      class="ia-modal-close"
-      (click)="cerrarModalIA()"
-    >
-      Cerrar
+      <div class="ia-modal-botones">
+        <button type="button" class="ia-btn-apagar" (click)="confirmarCambioIA()">
+          Continuar sin IA
+        </button>
+        <button type="button" class="ia-btn-secundario" (click)="cerrarModalIA()">
+          Mantener encendido
+        </button>
+      </div>
+    </ng-container>
+
+    <ng-template #textoActivar>
+      <h2 id="ia-modal-titulo">¿Activar el Motor IA?</h2>
+      <p>
+        Al encenderlo, se reanudarán la priorización inteligente, las recomendaciones
+        y los desbordes automáticos.
+      </p>
+      <small>La activación quedará registrada en auditoría.</small>
+
+      <div class="ia-modal-botones">
+        <button type="button" class="ia-btn-encender" (click)="confirmarCambioIA()">
+          Activar IA
+        </button>
+        <button type="button" class="ia-btn-secundario" (click)="cerrarModalIA()">
+          Mantener apagado
+        </button>
+      </div>
+    </ng-template>
+
+  </div>
+
+</div>
+
+
+<!-- ================================================== -->
+<!-- MODAL CERRAR SESIÓN (diseño Figma) -->
+<!-- ================================================== -->
+
+<div class="logout-overlay" *ngIf="modalCerrarSesionAbierto" (click)="cancelarCerrarSesion()">
+
+  <div class="logout-modal" role="dialog" aria-modal="true" aria-labelledby="logout-titulo"
+    (click)="$event.stopPropagation()">
+
+    <button type="button" class="logout-close" aria-label="Cerrar" (click)="cancelarCerrarSesion()">
+      <i class="bi bi-x-lg" aria-hidden="true"></i>
     </button>
+
+    <div class="logout-icon">
+      <i class="bi bi-box-arrow-right" aria-hidden="true"></i>
+    </div>
+
+    <h2 id="logout-titulo">¿Cerrar sesión?</h2>
+    <p>Tendrás que iniciar sesión nuevamente para acceder nuevamente</p>
+
+    <div class="logout-buttons">
+      <button type="button" class="logout-btn-seguir" (click)="cancelarCerrarSesion()">Seguir navegando</button>
+      <button type="button" class="logout-btn-cerrar" (click)="cerrarSesion()">Cerrar sesión</button>
+    </div>
 
   </div>
 

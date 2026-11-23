@@ -90,7 +90,7 @@
 }
 
 .asesor-filtro-button {
-  width: 140px;
+  min-width: 140px;
   height: 40px;
 
   padding: 12px;
@@ -414,16 +414,29 @@
   min-width: 58px;
   max-width: 58px;
 
-  max-height: 159px;
   min-height: 4px;
 
   box-sizing: border-box;
 
-  border-radius: 4px;
-  background: #4361EE;
+  border-radius: 6px 6px 2px 2px;
+  background: #2563EB;
 
   opacity: 1;
   cursor: pointer;
+}
+
+.aging-bar-valor {
+  position: absolute;
+  bottom: calc(100% + 4px);
+  left: 50%;
+  transform: translateX(-50%);
+
+  font-family: 'Roboto', sans-serif;
+  font-size: 10px;
+  font-weight: 600;
+  color: #0A3B4E;
+  white-space: nowrap;
+  pointer-events: none;
 }
 
 .aging-bar-item:hover .aging-bar {

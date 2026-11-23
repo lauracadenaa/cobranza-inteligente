@@ -13,6 +13,9 @@ import {
 } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 import { Subscription } from 'rxjs';
+import { DashboardService } from '../../../../service/dashboard.service';
+
+import { descargarPlantillaCarga } from '../../../../shared/plantilla-carga';
 
 import {
   CarteraService,
@@ -32,8 +35,12 @@ export class IntegracionCarteraComponent implements OnInit, OnDestroy {
 
   constructor(
     private carteraService: CarteraService,
+    private dashboardService: DashboardService,
     private changeDetectorRef: ChangeDetectorRef
   ) {}
+
+  // Nombre de quien está conectado (para las cargas rechazadas que no guarda el backend)
+  private nombreUsuario = 'Tú';
 
   // =========================================
   // ESTADO GENERAL
@@ -55,21 +62,21 @@ export class IntegracionCarteraComponent implements OnInit, OnDestroy {
       titulo: 'Lotes procesados',
       valor: '—',
       variacion: '',
-      descripcion: 'Total registrado',
+      descripcion: '',
       icono: 'lotes'
     },
     {
       titulo: 'Casos creados',
       valor: '—',
       variacion: '',
-      descripcion: 'En la última carga',
+      descripcion: '',
       icono: 'casos'
     },
     {
       titulo: 'Registros rechazados',
       valor: '—',
       variacion: '',
-      descripcion: 'Según historial',
+      descripcion: '',
       icono: 'rechazados'
     },
     {
@@ -152,8 +159,19 @@ export class IntegracionCarteraComponent implements OnInit, OnDestroy {
 
   descargandoErrores = false;
 
+  // Cargas rechazadas que solo existen en el frontend (el backend no creó el lote)
+  get cargasLocales(): any[] {
+    return this.carteraService.cargasRechazadasLocales;
+  }
+
+  private unirConLocales(lista: any[]): any[] {
+    if (this.cargasLocales.length === 0) return lista;
+    return [...this.cargasLocales, ...lista]
+      .sort((a, b) => (b.marcaTiempo ?? 0) - (a.marcaTiempo ?? 0));
+  }
+
   get lotesRecientes(): any[] {
-    return this.lotes.slice(0, 5);
+    return this.unirConLocales(this.lotes).slice(0, 5);
   }
 
   get cargaExitosa(): boolean {
@@ -241,19 +259,133 @@ export class IntegracionCarteraComponent implements OnInit, OnDestroy {
       : 'Pendiente';
   }
 
+  // =========================================
+  // FILTROS DE LA TABLA (igual que Inicio > Casos en gestión)
+  // =========================================
+
+  readonly estadosLote = ['Exitoso', 'Con errores', 'Rechazado', 'Anulado', 'En proceso'];
+
+  // Lo que se está marcando dentro de la ventana
+  filtrosLotes = this.filtrosVacios();
+
+  // Lo que ya se aplicó con "Aplicar filtros"
+  filtrosLotesAplicados = this.filtrosVacios();
+
+  // Todos los lotes (para filtrar más allá de los 5 recientes)
+  todosLosLotes: any[] = [];
+
+  private filtrosVacios() {
+    return {
+      estados: [] as string[],
+      usuario: '',
+      desde: '',
+      hasta: '',
+      rechazados: '' as '' | 'con' | 'sin'
+    };
+  }
+
+  private copiarFiltros(f: ReturnType<IntegracionCarteraComponent['filtrosVacios']>) {
+    return { ...f, estados: [...f.estados] };
+  }
+
+  // true cuando no hay espacio debajo y la ventana se abre hacia arriba
+  filtrosHaciaArriba = false;
+
+  abrirFiltrosLotes(event?: MouseEvent): void {
+    if (!this.mostrarFiltrosLotes) {
+      this.filtrosLotes = this.copiarFiltros(this.filtrosLotesAplicados);
+
+      const boton = event?.currentTarget as HTMLElement | undefined;
+      if (boton) {
+        const abajo = boton.getBoundingClientRect().bottom + window.scrollY;
+        const espacioDebajo = document.documentElement.scrollHeight - abajo;
+        this.filtrosHaciaArriba = espacioDebajo < 480;
+      }
+    }
+    this.mostrarFiltrosLotes = !this.mostrarFiltrosLotes;
+  }
+
+  alternarEstadoFiltro(estado: string): void {
+    const lista = this.filtrosLotes.estados;
+    this.filtrosLotes.estados = lista.includes(estado)
+      ? lista.filter(e => e !== estado)
+      : [...lista, estado];
+  }
+
+  limpiarFiltrosLotes(): void {
+    this.filtrosLotes = this.filtrosVacios();
+    this.filtrosLotesAplicados = this.filtrosVacios();
+    this.mostrarFiltrosLotes = false;
+  }
+
+  aplicarFiltrosLotes(): void {
+    this.filtrosLotesAplicados = this.copiarFiltros(this.filtrosLotes);
+    this.mostrarFiltrosLotes = false;
+  }
+
+  quitarFiltroLote(clave: string): void {
+    const f = this.filtrosLotesAplicados;
+    if (clave.startsWith('estado:')) {
+      f.estados = f.estados.filter(e => e !== clave.replace('estado:', ''));
+    } else if (clave === 'usuario') {
+      f.usuario = '';
+    } else if (clave === 'fechas') {
+      f.desde = '';
+      f.hasta = '';
+    } else if (clave === 'rechazados') {
+      f.rechazados = '';
+    }
+    this.filtrosLotesAplicados = this.copiarFiltros(f);
+  }
+
+  get filtrosLotesVisibles(): { clave: string; texto: string }[] {
+    const f = this.filtrosLotesAplicados;
+    const visibles = f.estados.map(e => ({ clave: `estado:${e}`, texto: `Estado: ${e}` }));
+
+    if (f.usuario.trim()) {
+      visibles.push({ clave: 'usuario', texto: `Usuario: ${f.usuario.trim()}` });
+    }
+    if (f.desde || f.hasta) {
+      visibles.push({ clave: 'fechas', texto: `Fecha: ${f.desde || 'Sin inicio'} - ${f.hasta || 'Sin fin'}` });
+    }
+    if (f.rechazados) {
+      visibles.push({ clave: 'rechazados', texto: f.rechazados === 'con' ? 'Con rechazados' : 'Sin rechazados' });
+    }
+    return visibles;
+  }
+
+  get cantidadFiltrosLotes(): number {
+    return this.filtrosLotesVisibles.length;
+  }
+
   get lotesRecientesFiltrados(): any[] {
     const termino = this.busquedaLotes.trim().toLocaleLowerCase('es-CO');
+    const f = this.filtrosLotesAplicados;
+    const hayFiltro = !!termino || this.cantidadFiltrosLotes > 0;
 
-    return this.lotesRecientes.filter(lote => {
+    // Sin filtros: los 5 más recientes. Con filtros: busca en todas las cargas.
+    const base = hayFiltro && this.todosLosLotes.length > 0 ? this.unirConLocales(this.todosLosLotes) : this.lotesRecientes;
+    const usuario = f.usuario.trim().toLocaleLowerCase('es-CO');
+
+    return base.filter(lote => {
       const coincideBusqueda = !termino ||
-        `${lote.archivo} ${lote.usuario}`
-          .toLocaleLowerCase('es-CO')
-          .includes(termino);
+        `${lote.archivo} ${lote.usuario}`.toLocaleLowerCase('es-CO').includes(termino);
 
-      const coincideEstado =
-        !this.estadoFiltroLotes || lote.estado === this.estadoFiltroLotes;
+      const coincideEstado = f.estados.length === 0 || f.estados.includes(lote.estado) ||
+        (f.estados.includes('En proceso') && !['Exitoso', 'Con errores', 'Rechazado', 'Anulado'].includes(lote.estado));
 
-      return coincideBusqueda && coincideEstado;
+      const coincideUsuario = !usuario || String(lote.usuario).toLocaleLowerCase('es-CO').includes(usuario);
+
+      const dia = lote.fechaIso ? String(lote.fechaIso).substring(0, 10) : '';
+      const coincideDesde = !f.desde || (dia !== '' && dia >= f.desde);
+      const coincideHasta = !f.hasta || (dia !== '' && dia <= f.hasta);
+
+      const rechazados = Number(lote.rechazados) || 0;
+      const coincideRechazados = !f.rechazados ||
+        (f.rechazados === 'con' ? rechazados > 0 : rechazados === 0);
+
+      return coincideBusqueda && coincideEstado && coincideUsuario &&
+        coincideDesde && coincideHasta && coincideRechazados;
     });
   }
 
@@ -263,9 +395,11 @@ export class IntegracionCarteraComponent implements OnInit, OnDestroy {
 
   archivoSeleccionado: File | null = null;
   arrastrandoArchivo = false;
-  layoutSeleccionado = 'Layout Cartera v3.2';
-  tipoCarteraSeleccionado = 'Cartera administrativa';
-  fechaCorte = '2024-05-25';
+
+  // Descarga la plantilla CSV (se arma en el navegador)
+  descargarPlantilla(): void {
+    descargarPlantillaCarga();
+  }
 
   errorArchivo = '';
 
@@ -388,6 +522,13 @@ export class IntegracionCarteraComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.cargarHistorial();
+
+    this.dashboardService.obtenerUsuarioActual().subscribe({
+      next: usuario => {
+        if (usuario?.nombre) this.nombreUsuario = usuario.nombre;
+      },
+      error: () => undefined
+    });
   }
 
   // =========================================
@@ -416,9 +557,13 @@ export class IntegracionCarteraComponent implements OnInit, OnDestroy {
         this.totalPaginas = respuesta.totalPages;
         this.totalLotes = respuesta.totalElements;
 
-        this.actualizarKpis(respuesta.content);
+        // La tabla solo se muestra después de subir un archivo en esta visita
+        this.mostrarHistorialLotes = this.subioArchivo && this.lotesRecientes.length > 0;
+
+        this.cargarKpis();
 
         this.cargandoHistorial = false;
+        this.changeDetectorRef.markForCheck();
 
         if (this.recargaHistorialPendiente) {
           this.recargaHistorialPendiente = false;
@@ -434,7 +579,9 @@ export class IntegracionCarteraComponent implements OnInit, OnDestroy {
         );
 
         this.lotes = [];
+        this.mostrarHistorialLotes = this.subioArchivo && this.lotesRecientes.length > 0;
         this.cargandoHistorial = false;
+        this.changeDetectorRef.markForCheck();
 
         if (this.recargaHistorialPendiente) {
           this.recargaHistorialPendiente = false;
@@ -465,6 +612,9 @@ export class IntegracionCarteraComponent implements OnInit, OnDestroy {
         lote.uploadedAt || lote.createdAt
       ),
 
+      fechaIso: this.diaLocal(lote.uploadedAt || lote.createdAt),
+      marcaTiempo: new Date(lote.uploadedAt || lote.createdAt || 0).getTime() || 0,
+
       leidos: lote.totalRecords ?? 0,
       validos: lote.successfulRecords ?? 0,
       rechazados: lote.failedRecords ?? 0,
@@ -483,11 +633,6 @@ export class IntegracionCarteraComponent implements OnInit, OnDestroy {
     }
   }
 
-  actualizarFiltroEstadoLotes(event: Event): void {
-    if (event.target instanceof HTMLSelectElement) {
-      this.estadoFiltroLotes = event.target.value;
-    }
-  }
 
   // =========================================
   // MENÚ DE ACCIONES DEL LOTE
@@ -507,23 +652,20 @@ export class IntegracionCarteraComponent implements OnInit, OnDestroy {
       return;
     }
 
+    // Como en Figma: el menú se abre a la izquierda del botón, a su misma altura
     const rect = boton.getBoundingClientRect();
-    const anchoMenu = 226;
+    const centroX = rect.left + rect.width / 2;
+    const centroY = rect.top + rect.height / 2;
+    const anchoMenu = 242;
     const altoMenu = 152;
     const margen = 8;
-    const espacioAbajo = window.innerHeight - rect.bottom;
 
-    const top = espacioAbajo >= altoMenu + margen
-      ? rect.bottom + margen
-      : Math.max(margen, rect.top - altoMenu - margen);
-
-    const left = Math.max(
+    const top = Math.max(
       margen,
-      Math.min(
-        rect.right - anchoMenu,
-        window.innerWidth - anchoMenu - margen
-      )
+      Math.min(centroY - 26, window.innerHeight - altoMenu - margen)
     );
+
+    const left = Math.max(margen, centroX - 20 - 16 - anchoMenu);
 
     this.loteMenuPosition = { top, left };
     this.loteMenuAbierto = batchId;
@@ -551,6 +693,12 @@ export class IntegracionCarteraComponent implements OnInit, OnDestroy {
   ): void {
 
     this.cerrarMenuLote();
+
+    // Carga rechazada que el backend no guardó: el CSV se arma con los errores recibidos
+    if ((lote as any)?.local) {
+      this.descargarErroresLocales(lote as any);
+      return;
+    }
 
     if (!lote || !Number.isFinite(Number(lote.batchId))) {
       window.alert('No se encontró el identificador del lote.');
@@ -635,6 +783,85 @@ export class IntegracionCarteraComponent implements OnInit, OnDestroy {
   }
 
   // =========================================
+  // CARGAS RECHAZADAS SIN LOTE EN EL BACKEND
+  // =========================================
+
+  private registrarRechazoLocal(
+    nombreArchivo: string,
+    respuesta: BatchUploadResponse | null,
+    mensaje: string
+  ): void {
+
+    // Si el backend sí creó el lote, ya aparece en el historial real
+    if (respuesta?.batchId != null) return;
+
+    const ahora = new Date();
+    const errores = respuesta?.rowErrors ?? [];
+    const leidos = respuesta?.totalRecords ?? 0;
+
+    this.carteraService.cargasRechazadasLocales = [
+      {
+        id: 'Sin lote',
+        batchId: -ahora.getTime(),
+        local: true,
+        archivo: nombreArchivo || 'Archivo no disponible',
+        usuario: this.nombreUsuario,
+        fecha: this.formatearFecha(ahora.toISOString()),
+        fechaIso: this.diaLocal(ahora.toISOString()),
+        marcaTiempo: ahora.getTime(),
+        leidos,
+        validos: respuesta?.validRecords ?? 0,
+        rechazados: respuesta?.failedRecords ?? (errores.length > 0 ? new Set(errores.map(e => e.rowNumber)).size : leidos),
+        casos: 0,
+        estado: 'Rechazado',
+        mensaje: mensaje || respuesta?.message || 'El archivo fue rechazado.',
+        porcentaje: 0,
+        errores
+      },
+      ...this.carteraService.cargasRechazadasLocales
+    ];
+  }
+
+  private descargarErroresLocales(lote: { archivo: string; mensaje: string; errores: BatchRowError[] }): void {
+
+    const celda = (valor: unknown) => {
+      const texto = valor === null || valor === undefined ? '' : String(valor);
+      return /[",;\n\r]/.test(texto) ? `"${texto.replace(/"/g, '""')}"` : texto;
+    };
+
+    const filas: string[] = [
+      ['Fila', 'Campo', 'Valor recibido', 'Valor esperado', 'Error', 'Código'].join(',')
+    ];
+
+    if (lote.errores?.length) {
+      lote.errores.forEach(error => filas.push([
+        error.rowNumber || '',
+        error.field,
+        error.value,
+        error.expectedValue,
+        error.message,
+        error.errorCode
+      ].map(celda).join(',')));
+    } else {
+      // Error general del archivo (por ejemplo, columnas que no coinciden)
+      filas.push(['', '', '', '', lote.mensaje, ''].map(celda).join(','));
+    }
+
+    const archivo = new Blob(['\uFEFF' + filas.join('\r\n')], { type: 'text/csv;charset=utf-8' });
+    const url = window.URL.createObjectURL(archivo);
+    const enlace = document.createElement('a');
+
+    enlace.href = url;
+    enlace.download = `${(lote.archivo || 'carga').replace(/\.csv$/i, '').replace(/[^a-zA-Z0-9_-]/g, '_')}_errores.csv`;
+
+    document.body.appendChild(enlace);
+    enlace.click();
+    document.body.removeChild(enlace);
+
+    window.setTimeout(() => window.URL.revokeObjectURL(url), 1000);
+  }
+
+  // =========================================
   // FORMATEAR NÚMEROS
   // =========================================
 
@@ -681,46 +908,91 @@ export class IntegracionCarteraComponent implements OnInit, OnDestroy {
       return 'Rechazado';
     }
 
+    if (['CANCELLED', 'CANCELED', 'CANCELLING'].includes(valor)) {
+      return 'Anulado';
+    }
+
     return estado;
   }
 
   // =========================================
-  // ACTUALIZAR KPI CON HISTORIAL REAL
+  // INDICADORES (KPI) CON TODAS LAS CARGAS
+  // Mes actual comparado con el mes anterior.
+  // Si nunca se ha subido un archivo, quedan vacíos (—).
   // =========================================
 
+  private cargarKpis(): void {
+    this.carteraService.getBatches(0, 500).subscribe({
+      next: respuesta => {
+        this.todosLosLotes = (respuesta?.content ?? []).map(lote => this.mapearLote(lote));
+        this.actualizarKpis(respuesta?.content ?? []);
+        this.changeDetectorRef.markForCheck();
+      },
+      error: error => console.error('Error consultando lotes para los indicadores:', error)
+    });
+  }
+
+  // Los recuadros de KPI solo se muestran si ya se subió al menos un archivo
+  hayCargas = false;
+
+  // true después de subir un archivo en esta visita
+  get subioArchivo(): boolean {
+    return this.carteraService.archivoSubidoEnVisita;
+  }
+
+  private marcarArchivoSubido(): void {
+    this.carteraService.archivoSubidoEnVisita = true;
+  }
+
   private actualizarKpis(lotes: BatchHistoryItem[]): void {
-    const loteMasReciente = this.obtenerLoteMasReciente(lotes);
+
+    this.hayCargas = lotes.length > 0;
+
+    if (lotes.length === 0) {
+      this.kpis.forEach(kpi => {
+        kpi.valor = '—';
+        kpi.variacion = '';
+        kpi.descripcion = '';
+      });
+      return;
+    }
+
+    const hoy = new Date();
+    const esteMes = (f: Date) => f.getFullYear() === hoy.getFullYear() && f.getMonth() === hoy.getMonth();
+    const anterior = new Date(hoy.getFullYear(), hoy.getMonth() - 1, 1);
+    const mesAnterior = (f: Date) => f.getFullYear() === anterior.getFullYear() && f.getMonth() === anterior.getMonth();
+
+    const fechaDe = (lote: BatchHistoryItem) => new Date(lote.uploadedAt || lote.createdAt || '');
+
+    const delMes = lotes.filter(l => esteMes(fechaDe(l)));
+    const delAnterior = lotes.filter(l => mesAnterior(fechaDe(l)));
+
+    const sumar = (lista: BatchHistoryItem[], campo: (l: BatchHistoryItem) => number | undefined) =>
+      lista.reduce((total, l) => total + (Number(campo(l)) || 0), 0);
+
+    const indicadores = [
+      { actual: delMes.length, antes: delAnterior.length },
+      { actual: sumar(delMes, l => l.casesCreated), antes: sumar(delAnterior, l => l.casesCreated) },
+      { actual: sumar(delMes, l => l.failedRecords), antes: sumar(delAnterior, l => l.failedRecords) }
+    ];
+
+    indicadores.forEach((dato, i) => {
+      this.kpis[i].valor = dato.actual.toLocaleString('es-CO');
+
+      if (dato.antes > 0) {
+        const cambio = (dato.actual - dato.antes) / dato.antes * 100;
+        this.kpis[i].variacion = (cambio > 0 ? '+' : '') +
+          cambio.toLocaleString('es-CO', { maximumFractionDigits: 1 }) + '%';
+        this.kpis[i].descripcion = 'vs mes anterior';
+      } else {
+        this.kpis[i].variacion = '';
+        this.kpis[i].descripcion = 'Este mes';
+      }
+    });
 
     const ultimaCargaExitosa = this.obtenerLoteMasReciente(
       lotes.filter(lote => this.esEstadoExitoso(lote.status))
     );
-
-    const resultadoCarga = this.resultadoCarga;
-
-    const resultadoCargaDelLote = resultadoCarga &&
-      resultadoCarga.batchId === loteMasReciente?.id
-      ? resultadoCarga
-      : null;
-
-    this.kpis[0].valor = this.totalLotes.toLocaleString('es-CO');
-
-    const casosCreados = loteMasReciente?.casesCreated ??
-      resultadoCargaDelLote?.casesCreated;
-
-    const registrosRechazados = loteMasReciente?.failedRecords ??
-      resultadoCargaDelLote?.failedRecords;
-
-    this.kpis[1].valor = typeof casosCreados === 'number'
-      ? casosCreados.toLocaleString('es-CO')
-      : '—';
-
-    this.kpis[1].descripcion = 'En la última carga';
-
-    this.kpis[2].valor = typeof registrosRechazados === 'number'
-      ? registrosRechazados.toLocaleString('es-CO')
-      : '—';
-
-    this.kpis[2].descripcion = 'En la última carga';
 
     const fechaUltimaCarga = ultimaCargaExitosa
       ? this.formatearFechaUltimaCarga(
@@ -816,11 +1088,7 @@ export class IntegracionCarteraComponent implements OnInit, OnDestroy {
 
   private esLoteFinalizado(lote: BatchHistoryItem): boolean {
     return this.esEstadoFinalizado(lote.status || '') ||
-      this.tieneFechaProcesamiento(lote.processedAt) ||
-      (
-        Number.isFinite(lote.progressPercent) &&
-        lote.progressPercent >= 100
-      );
+      (lote.progressPhase || '').toUpperCase() === 'COMPLETED';
   }
 
   private esEstadoFinalizado(estado: string): boolean {
@@ -950,18 +1218,29 @@ export class IntegracionCarteraComponent implements OnInit, OnDestroy {
               .toLocaleLowerCase('es-CO') === nombreArchivo
           );
 
-          const lote = loteCoincidente ||
+          const lotePorId = this.loteIdActual !== null
+            ? respuesta.content.find(item => item.id === this.loteIdActual)
+            : undefined;
+
+          const lote = lotePorId || loteCoincidente ||
             (lotesNuevos.length === 1 ? lotesNuevos[0] : null);
 
           if (lote) {
             this.loteSeguimiento = lote;
+            this.loteIdActual = lote.id;
             this.envioArchivoCompleto = true;
             this.actualizarProgresoDesdeHistorial(lote);
 
             if (!this.esLoteFinalizado(lote)) {
+              // El paso que se ve depende de la fase que reporta el backend
+              this.pasoActual = Math.max(this.pasoActual, this.pasoSegunFase(lote));
               this.programarConsultaProgreso(version);
+            } else if (!this.suscripcionCarga) {
+              // Carga en segundo plano: el resultado llega por el historial
+              this.terminarCarga();
             }
 
+            this.changeDetectorRef.markForCheck();
             return;
           }
 
@@ -1144,9 +1423,9 @@ export class IntegracionCarteraComponent implements OnInit, OnDestroy {
       return;
     }
 
-    if (!archivo.name.toLowerCase().endsWith('.csv')) {
+    if (!/\.(csv|txt)$/i.test(archivo.name)) {
 
-      this.errorArchivo = 'El archivo debe tener formato CSV.';
+      this.errorArchivo = 'El archivo debe tener formato CSV o TXT.';
 
       if (input) {
         input.value = '';
@@ -1158,7 +1437,7 @@ export class IntegracionCarteraComponent implements OnInit, OnDestroy {
 
     if (archivo.size === 0) {
 
-      this.errorArchivo = 'El archivo CSV está vacío.';
+      this.errorArchivo = 'El archivo está vacío.';
 
       if (input) {
         input.value = '';
@@ -1172,8 +1451,12 @@ export class IntegracionCarteraComponent implements OnInit, OnDestroy {
 
     this.resultadoCarga = null;
     this.archivoSeleccionado = archivo;
-    this.mostrarHistorialLotes = false;
     this.pasoActual = 1;
+
+    // Si se eligió desde "Subir correcciones", arranca de una vez
+    if (this.correccionDe !== null) {
+      this.continuarValidacion();
+    }
   }
 
   // =========================================
@@ -1242,6 +1525,7 @@ export class IntegracionCarteraComponent implements OnInit, OnDestroy {
     this.cargandoArchivo = true;
 
     const version = ++this.cargaVersion;
+    const nombreArchivo = this.archivoSeleccionado.name;
 
     this.iniciarSeguimientoLote(version);
 
@@ -1251,9 +1535,15 @@ export class IntegracionCarteraComponent implements OnInit, OnDestroy {
       carga.progreso = 0;
     });
 
-    this.suscripcionCarga = this.carteraService.uploadCsv(
-      this.archivoSeleccionado
-    ).subscribe({
+    const envio$ = this.correccionDe !== null
+      ? this.carteraService.reuploadCsv(this.correccionDe, this.archivoSeleccionado)
+      : this.carteraService.uploadCsv(this.archivoSeleccionado);
+
+    this.correccionDe = null;
+    this.loteIdActual = null;
+    this.cargaFallida = false;
+
+    this.suscripcionCarga = envio$.subscribe({
 
       next: evento => {
 
@@ -1309,43 +1599,30 @@ export class IntegracionCarteraComponent implements OnInit, OnDestroy {
           this.procesando = false;
           this.cargandoArchivo = false;
 
-          this.pasoActual = Math.max(this.pasoActual, 3);
+          this.cargaFallida = true;
+          this.pasoActual = 5;
 
-          this.mostrarHistorialLotes = true;
+          this.registrarRechazoLocal(nombreArchivo, null, this.errorCarga);
+          this.marcarArchivoSubido();
           this.cargarHistorial();
           this.changeDetectorRef.detectChanges();
 
           return;
         }
 
-        this.detenerSeguimientoLote();
-
-        console.log('Carga de cartera completada:', {
-          lote: respuesta.batchNumber,
-          estado: respuesta.status,
-          registrosProcesados: respuesta.totalRecords,
-          registrosValidos: respuesta.validRecords,
-          registrosRechazados: respuesta.failedRecords,
-          clientesActualizados: respuesta.clientsUpserted,
-          obligacionesActualizadas: respuesta.obligationsUpserted,
-          puntuacionesGeneradas: respuesta.scoresGenerated,
-          casosCreados: respuesta.casesCreated
-        });
-
         this.procesarRespuesta(respuesta);
-
-        this.progreso = 100;
-        this.progresoDisponible = true;
+        this.loteIdActual = respuesta.batchId ?? this.loteIdActual;
         this.envioArchivoCompleto = true;
 
-        this.procesando = false;
-        this.cargandoArchivo = false;
+        // Archivos grandes: el backend responde de una vez y sigue
+        // procesando en segundo plano. Se sigue consultando el progreso.
+        if (!this.esEstadoFinalizado(respuesta.status || '')) {
+          this.pasoActual = Math.max(this.pasoActual, 3);
+          this.changeDetectorRef.markForCheck();
+          return;
+        }
 
-        this.pasoActual = Math.max(this.pasoActual, 3);
-
-        this.mostrarHistorialLotes = true;
-        this.cargarHistorial();
-        this.changeDetectorRef.detectChanges();
+        this.terminarCarga();
       },
 
       // =========================================
@@ -1368,14 +1645,8 @@ export class IntegracionCarteraComponent implements OnInit, OnDestroy {
           this.procesando = false;
           this.cargandoArchivo = false;
 
-          this.pasoActual = Math.max(
-            this.pasoActual,
-            3
-          );
-
           this.detenerSeguimientoLote();
-          this.mostrarHistorialLotes = true;
-          this.cargarHistorial();
+          this.terminarCarga();
 
           console.error(
             'Respuesta de carga diferida falló tras finalizar lote:',
@@ -1398,7 +1669,7 @@ export class IntegracionCarteraComponent implements OnInit, OnDestroy {
 
           this.procesarRespuesta(respuesta);
 
-          this.mostrarHistorialLotes = true;
+          
 
           this.errorCarga =
             respuesta.message ||
@@ -1417,9 +1688,15 @@ export class IntegracionCarteraComponent implements OnInit, OnDestroy {
         this.cargandoArchivo = false;
         this.procesando = false;
 
-        this.pasoActual = 3;
+        this.cargaFallida = true;
+        this.pasoActual = 5;
 
-        this.mostrarHistorialLotes = true;
+        this.registrarRechazoLocal(
+          nombreArchivo,
+          respuesta && typeof respuesta === 'object' && !(respuesta instanceof Blob) ? respuesta : null,
+          this.errorCarga
+        );
+        this.marcarArchivoSubido();
         this.cargarHistorial();
 
         console.error('Error en la carga CSV:', error);
@@ -1448,9 +1725,11 @@ export class IntegracionCarteraComponent implements OnInit, OnDestroy {
         this.cargandoArchivo = false;
         this.procesando = false;
 
-        this.pasoActual = 3;
+        this.cargaFallida = true;
+        this.pasoActual = 5;
 
-        this.mostrarHistorialLotes = true;
+        this.registrarRechazoLocal(nombreArchivo, null, this.errorCarga);
+        this.marcarArchivoSubido();
         this.cargarHistorial();
 
         this.changeDetectorRef.detectChanges();
@@ -1651,7 +1930,8 @@ export class IntegracionCarteraComponent implements OnInit, OnDestroy {
 
     if (
       this.mostrarResumenCancelacion ||
-      this.pasoActual !== 2 ||
+      this.pasoActual < 2 ||
+      this.pasoActual > 4 ||
       !this.cargandoArchivo
     ) {
       return;
@@ -1692,8 +1972,29 @@ export class IntegracionCarteraComponent implements OnInit, OnDestroy {
         timeStyle: 'short'
       }),
 
-      estado: 'Seguimiento detenido; el lote podría continuar en el servidor'
+      estado: this.loteIdActual !== null
+        ? 'Cancelando en el servidor...'
+        : 'Seguimiento detenido; el lote podría continuar en el servidor'
     };
+
+    // Si ya se conoce el lote, se le pide al backend que lo cancele
+    // (borra lo que alcanzó a crear)
+    if (this.loteIdActual !== null) {
+      this.carteraService.cancelBatch(this.loteIdActual).subscribe({
+        next: () => {
+          this.resumenCancelacion.estado = 'Cancelado';
+          this.cargarHistorial();
+          this.changeDetectorRef.markForCheck();
+        },
+        error: error => {
+          console.error('Error cancelando el lote:', error);
+          this.resumenCancelacion.estado = error?.status === 403
+            ? 'Sin permiso para cancelar: el lote podría continuar en el servidor'
+            : 'No se pudo cancelar en el servidor: revisa el historial';
+          this.changeDetectorRef.markForCheck();
+        }
+      });
+    }
 
     this.cargaVersion += 1;
 
@@ -1706,7 +2007,7 @@ export class IntegracionCarteraComponent implements OnInit, OnDestroy {
     this.procesando = false;
 
     this.mostrarResumenCancelacion = true;
-    this.mostrarHistorialLotes = true;
+    this.marcarArchivoSubido();
 
     this.cargarHistorial();
   }
@@ -1743,6 +2044,10 @@ export class IntegracionCarteraComponent implements OnInit, OnDestroy {
     this.mostrarModalCancelar = false;
     this.mostrarResumenCancelacion = false;
 
+    clearTimeout(this.temporizadorPresentacion);
+    this.loteIdActual = null;
+    this.cargaFallida = false;
+
     this.resumenCancelacion = {
       nombreArchivo: '',
       porcentajeAlcanzado: 0,
@@ -1776,6 +2081,15 @@ export class IntegracionCarteraComponent implements OnInit, OnDestroy {
   // FORMATEAR FECHA
   // =========================================
 
+  // Día de la carga como AAAA-MM-DD (hora de Colombia), para los filtros
+  private diaLocal(fecha: string | null): string {
+    const valor = fecha ? new Date(fecha) : null;
+    if (!valor || Number.isNaN(valor.getTime())) return '';
+    const dos = (n: number) => String(n).padStart(2, '0');
+    return `${valor.getFullYear()}-${dos(valor.getMonth() + 1)}-${dos(valor.getDate())}`;
+  }
+
+  // Formato de la tabla: 15/09/2026 14:30
   private formatearFecha(fecha: string | null): string {
 
     if (!fecha) {
@@ -1788,10 +2102,10 @@ export class IntegracionCarteraComponent implements OnInit, OnDestroy {
       return fecha;
     }
 
-    return valor.toLocaleString('es-CO', {
-      dateStyle: 'short',
-      timeStyle: 'short'
-    });
+    const dos = (n: number) => String(n).padStart(2, '0');
+
+    return `${dos(valor.getDate())}/${dos(valor.getMonth() + 1)}/${valor.getFullYear()} ` +
+      `${dos(valor.getHours())}:${dos(valor.getMinutes())}`;
   }
 
   // =========================================
@@ -1800,15 +2114,18 @@ export class IntegracionCarteraComponent implements OnInit, OnDestroy {
 
   formatearTamano(bytes: number): string {
 
+    const formato = (valor: number) =>
+      valor.toLocaleString('es-CO', { maximumFractionDigits: 1 });
+
     if (bytes < 1024) {
       return `${bytes} B`;
     }
 
     if (bytes < 1024 * 1024) {
-      return `${(bytes / 1024).toFixed(2)} KB`;
+      return `${formato(bytes / 1024)} KB`;
     }
 
-    return `${(bytes / (1024 * 1024)).toFixed(2)} MB`;
+    return `${formato(bytes / (1024 * 1024))} MB`;
   }
 
   // =========================================
@@ -1864,11 +2181,262 @@ export class IntegracionCarteraComponent implements OnInit, OnDestroy {
   }
 
   // =========================================
+  // FASE DEL BACKEND → PASO QUE SE VE
+  // STAGING / VALIDATION      → 2 Validar estructura
+  // Validación terminada/QUEUED → 3 Revisar errores
+  // PROMOTION / SCORING        → 4 Confirmar carga
+  // =========================================
+
+  private pasoSegunFase(lote: BatchHistoryItem): number {
+    const fase = (lote.progressPhase || '').toUpperCase();
+    const estado = (lote.status || '').toUpperCase();
+    const mensaje = this.normalizarTexto(lote.progressMessage || '');
+
+    if (fase === 'PROMOTION' || fase === 'SCORING') return 4;
+    if (fase === 'QUEUED') return 3;
+    if (fase === 'VALIDATION' && (estado === 'PROCESSING' || /completada|preparando/.test(mensaje))) return 3;
+    return 2;
+  }
+
+  // =========================================
+  // FIN DE LA CARGA
+  // Si el backend terminó muy rápido, se muestran un momento
+  // los pasos 3 y 4 (con los datos reales) antes del resultado.
+  // =========================================
+
+  private temporizadorPresentacion?: ReturnType<typeof setTimeout>;
+
+  private terminarCarga(): void {
+
+    this.marcarArchivoSubido();
+    this.detenerSeguimientoLote();
+
+    if (this.loteSeguimiento && !this.resultadoCarga) {
+      this.actualizarProgresoDesdeHistorial(this.loteSeguimiento);
+    }
+
+    this.progreso = 100;
+    this.progresoDisponible = true;
+    this.procesando = false;
+    this.cargandoArchivo = false;
+
+    this.cargarHistorial();
+
+    const avanzar = () => {
+      if (this.pasoActual >= 5) return;
+      this.pasoActual += 1;
+      this.changeDetectorRef.markForCheck();
+      if (this.pasoActual < 5) {
+        this.temporizadorPresentacion = setTimeout(avanzar, 1200);
+      }
+    };
+
+    this.pasoActual = Math.max(this.pasoActual, 2);
+    clearTimeout(this.temporizadorPresentacion);
+    this.temporizadorPresentacion = setTimeout(avanzar, 600);
+    this.changeDetectorRef.markForCheck();
+  }
+
+  // =========================================
+  // DATOS PARA LOS PASOS 4 Y 5
+  // =========================================
+
+  // Si la carga terminó con error total (no se pudo procesar)
+  cargaFallida = false;
+
+  // Lote que se está siguiendo (lo da el backend)
+  loteIdActual: number | null = null;
+
+  // Lote "padre" cuando se suben correcciones
+  correccionDe: number | null = null;
+
+  get registrosProcesados(): number {
+    return this.resumenValidacion.registrosLeidos ||
+      this.loteSeguimiento?.totalRecords ||
+      this.loteSeguimiento?.progressTotal || 0;
+  }
+
+  get tasaExito(): string {
+    const total = this.resumenValidacion.registrosLeidos;
+    const tasa = total > 0 ? this.resumenValidacion.registrosValidos / total * 100 : 0;
+    return tasa.toLocaleString('es-CO', { maximumFractionDigits: 1 }) + '%';
+  }
+
+  // Filas del paso 4 (Confirmar carga)
+  get filasConfirmacion(): { nombre: string; texto: string; avance: number; rechazo?: boolean }[] {
+
+    const lote = this.loteSeguimiento;
+    const fase = (lote?.progressPhase || '').toUpperCase();
+    const pasoPromocion = fase === 'PROMOTION' ? Number(lote?.progressCurrent ?? 0) : 0;
+    const terminoPromocion = fase === 'SCORING' || fase === 'COMPLETED' || !!this.resultadoCarga;
+
+    const final = this.resultadoCarga;
+    const validos = this.resumenValidacion.registrosValidos || lote?.successfulRecords || 0;
+
+    const fila = (nombre: string, hecho: boolean, cantidad: number | undefined) => ({
+      nombre,
+      texto: hecho
+        ? (cantidad !== undefined ? `${this.formatearNumero(cantidad)} de ${this.formatearNumero(cantidad)}` : 'Listo')
+        : 'En proceso...',
+      avance: hecho ? 100 : 35
+    });
+
+    const puntuacionTotal = fase === 'SCORING' ? Number(lote?.progressTotal ?? 0) : 0;
+    const puntuacionActual = fase === 'SCORING' ? Number(lote?.progressCurrent ?? 0) : 0;
+    const puntuacionLista = fase === 'COMPLETED' || !!final;
+
+    const rechazados = this.resumenValidacion.registrosRechazados || lote?.failedRecords || 0;
+    const totalRegistros = this.registrosProcesados || 1;
+
+    return [
+      fila('Clientes procesados', terminoPromocion || pasoPromocion >= 1, final?.clientsUpserted),
+      fila('Obligaciones procesadas', terminoPromocion || pasoPromocion >= 2, final?.obligationsUpserted ?? (terminoPromocion ? validos : undefined)),
+      {
+        nombre: 'Puntuaciones generadas',
+        texto: puntuacionLista
+          ? `${this.formatearNumero(final?.scoresGenerated ?? puntuacionActual)} de ${this.formatearNumero(final?.scoresGenerated ?? puntuacionTotal)}`
+          : puntuacionTotal > 0
+            ? `${this.formatearNumero(puntuacionActual)} de ${this.formatearNumero(puntuacionTotal)}`
+            : 'Pendiente',
+        avance: puntuacionLista ? 100 : puntuacionTotal > 0 ? puntuacionActual / puntuacionTotal * 100 : 0
+      },
+      fila('Casos creados', terminoPromocion || pasoPromocion >= 4, final?.casesCreated ?? lote?.casesCreated),
+      {
+        nombre: 'Registros rechazados',
+        texto: this.formatearNumero(rechazados),
+        avance: Math.min(100, rechazados / totalRegistros * 100),
+        rechazo: true
+      }
+    ];
+  }
+
+  get progresoGeneral(): number {
+    if (this.pasoActual >= 5 || this.resultadoCarga) return 100;
+    const lote = this.loteSeguimiento;
+    const fase = (lote?.progressPhase || '').toUpperCase();
+    if (fase === 'PROMOTION') return Math.round(Number(lote?.progressCurrent ?? 0) / 4 * 60);
+    if (fase === 'SCORING') {
+      const total = Number(lote?.progressTotal ?? 0);
+      return 60 + Math.round(total > 0 ? Number(lote?.progressCurrent ?? 0) / total * 40 : 0);
+    }
+    return this.pasoActual === 4 ? 10 : 0;
+  }
+
+  // =========================================
+  // BOTONES DEL RESULTADO
+  // =========================================
+
+  // Lote al que se le van a subir correcciones (mientras se elige el archivo)
+  private correccionPendiente: number | null = null;
+
+  // Abre el selector de archivo para subir las correcciones de este lote
+  subirCorrecciones(input: HTMLInputElement): void {
+    if (this.loteIdActual === null) return;
+    this.correccionPendiente = this.loteIdActual;
+    input.value = '';
+    input.click();
+  }
+
+  // Desde el menú de la tabla
+  subirCorreccionesLote(lote: { batchId: number; local?: boolean }, input: HTMLInputElement): void {
+    this.cerrarMenuLote();
+    if (this.cargandoArchivo) return;
+    // Una carga rechazada sin lote se corrige subiendo el archivo de nuevo (carga normal)
+    this.correccionPendiente = lote.local ? -1 : Number(lote.batchId);
+    input.value = '';
+    input.click();
+  }
+
+  // Se eligió el archivo corregido: se sube como lote "hijo"
+  seleccionarCorreccion(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const archivo = input.files?.[0];
+    const padre = this.correccionPendiente;
+    this.correccionPendiente = null;
+
+    if (!archivo || padre === null || this.cargandoArchivo) return;
+
+    this.finalizarCarga();
+    this.correccionDe = padre === -1 ? null : padre;
+    this.validarArchivo(archivo, input);
+
+    // Si el archivo no pasó la validación, no queda en modo corrección
+    if (!this.archivoSeleccionado) {
+      this.correccionDe = null;
+    }
+  }
+
+  descargarErroresResultado(): void {
+    if (this.loteIdActual === null) return;
+    this.descargarErroresLote({
+      batchId: this.loteIdActual,
+      archivo: this.archivoSeleccionado?.name || 'lote'
+    });
+  }
+
+  // =========================================
+  // ELIMINAR DATOS DE UN LOTE (menú ⋮ de la tabla)
+  // POST /integration/batches/{id}/cancel
+  // El backend anula el lote y borra lo que esa carga creó.
+  // =========================================
+
+  loteAEliminar: { batchId: number; archivo: string; local?: boolean } | null = null;
+  eliminandoLote = false;
+  errorEliminar = '';
+  mensajeEliminar = '';
+
+  pedirEliminarLote(lote: { batchId: number; archivo: string; local?: boolean }): void {
+    this.cerrarMenuLote();
+    this.errorEliminar = '';
+    this.loteAEliminar = lote;
+  }
+
+  cerrarEliminarLote(): void {
+    if (this.eliminandoLote) return;
+    this.loteAEliminar = null;
+  }
+
+  confirmarEliminarLote(): void {
+    const lote = this.loteAEliminar;
+    if (!lote || this.eliminandoLote) return;
+
+    // Carga rechazada sin lote: no hay datos en el backend, solo se quita de la tabla
+    if (lote.local) {
+      this.carteraService.cargasRechazadasLocales =
+        this.carteraService.cargasRechazadasLocales.filter(item => item.batchId !== lote.batchId);
+      this.loteAEliminar = null;
+      this.mostrarHistorialLotes = this.subioArchivo && this.lotesRecientes.length > 0;
+      this.changeDetectorRef.markForCheck();
+      return;
+    }
+
+    this.eliminandoLote = true;
+    this.errorEliminar = '';
+
+    this.carteraService.cancelBatch(Number(lote.batchId)).subscribe({
+      next: () => {
+        this.eliminandoLote = false;
+        this.loteAEliminar = null;
+        this.cargarHistorial();
+        this.changeDetectorRef.markForCheck();
+      },
+      error: (error: HttpErrorResponse) => {
+        this.eliminandoLote = false;
+        this.errorEliminar = error.status === 403
+          ? 'No tienes permiso para eliminar lotes (solo administrador o supervisor).'
+          : error.error?.message || 'No fue posible eliminar los datos del lote.';
+        this.changeDetectorRef.markForCheck();
+      }
+    });
+  }
+
+  // =========================================
   // DESTRUIR COMPONENTE
   // =========================================
 
   ngOnDestroy(): void {
 
+    clearTimeout(this.temporizadorPresentacion);
     this.cargaVersion += 1;
 
     this.detenerSeguimientoLote();

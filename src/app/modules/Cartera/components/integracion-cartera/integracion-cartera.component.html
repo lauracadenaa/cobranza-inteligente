@@ -3,7 +3,8 @@
 <!-- INDICADORES DE INTEGRACIÓN -->
 <!-- ========================================= -->
 
-<section class="integracion-kpis">
+<!-- Como en Figma: los indicadores se ven siempre que existan lotes cargados -->
+<section class="integracion-kpis" *ngIf="hayCargas">
   <article
     class="integracion-kpi"
     [class.kpi-ultima-carga]="kpi.icono === 'fecha'"
@@ -16,6 +17,7 @@
         class="kpi-variacion"
         [class.kpi-ultima-carga-hora]="kpi.icono === 'fecha'">
         <span
+          *ngIf="kpi.variacion"
           class="kpi-porcentaje"
           [class.kpi-hora]="kpi.icono === 'fecha'"
           [class.positivo]="kpi.icono !== 'rechazados'"
@@ -58,923 +60,403 @@
 </section>
 
 <!-- ========================================= -->
-<!-- PANEL DE INTEGRACIÓN -->
+<!-- PANEL DE INTEGRACIÓN (Nueva carga, como en Figma) -->
 <!-- ========================================= -->
 
-<section class="integracion-carga">
+<section class="nc-panel">
 
-  <!-- ENCABEZADO DINÁMICO -->
-  <div class="carga-encabezado">
-    <div>
-      <h3>
-        {{
-          mostrarResumenCancelacion ? 'Resumen de cancelación' :
-          pasoActual === 1 ? 'Nueva carga de cartera' :
-          pasoActual === 2 ? 'Validando estructura y registros' :
-          pasoActual === 3 ? 'Revisando errores' :
-          pasoActual === 4 ? 'Confirmando carga de cartera' :
-          'Cartera procesada'
-        }}
-      </h3>
+  <!-- Selectores de archivo (ocultos) -->
+  <input
+    #inputArchivo
+    type="file"
+    accept=".csv,.txt,text/csv,text/plain"
+    hidden
+    (change)="seleccionarArchivo($event)">
 
-      <p *ngIf="mostrarResumenCancelacion">
-        El procesamiento se detuvo y quedó en un estado parcial.
-      </p>
+  <input
+    #inputCorreccion
+    type="file"
+    accept=".csv,.txt,text/csv,text/plain"
+    hidden
+    (change)="seleccionarCorreccion($event)">
 
-      <p *ngIf="pasoActual === 2 && !mostrarResumenCancelacion">
-        Estamos verificando que el archivo cumpla el formato seleccionado
-        y contenga la información necesaria.
-      </p>
+  <!-- ===== ENCABEZADO ===== -->
+  <div class="nc-encabezado" *ngIf="!mostrarResumenCancelacion">
+    <h3>
+      {{
+        pasoActual === 1 ? 'Nueva carga de cartera' :
+        pasoActual === 2 ? 'Validando estructura y registros' :
+        pasoActual === 3 ? 'Revisando errores' :
+        pasoActual === 4 ? 'Confirmando carga de cartera' :
+        (cargaFallida ? 'Carga rechazada' : 'Cartera procesada')
+      }}
+    </h3>
 
-      <p *ngIf="pasoActual === 3 && !mostrarResumenCancelacion">
-        Revisa el resultado que devolvió el procesamiento del lote.
-      </p>
-
-      <p *ngIf="pasoActual === 5 && !mostrarResumenCancelacion">
-        El procesamiento finalizó y los resultados ya están disponibles.
-      </p>
-    </div>
-  </div>
-
-  <!-- ========================================= -->
-  <!-- PASOS DE INTEGRACIÓN -->
-  <!-- ========================================= -->
-
-  <div class="carga-pasos" *ngIf="!mostrarResumenCancelacion">
-
-  <!-- PASO 1 -->
-  <div
-    class="paso-item"
-    [class.paso-activo]="pasoActual === 1"
-    [class.paso-completado]="pasoActual > 1"
-    [class.paso-pendiente]="pasoActual < 1">
-
-    <span class="paso-numero">
-      <span *ngIf="pasoActual > 1">✓</span>
-      <span *ngIf="pasoActual <= 1">1</span>
-    </span>
-
-    <span class="paso-nombre">Subir archivo</span>
-  </div>
-
-  <!-- PASO 2 -->
-  <div
-    class="paso-item"
-    [class.paso-activo]="pasoActual === 2"
-    [class.paso-completado]="pasoActual > 2"
-    [class.paso-pendiente]="pasoActual < 2">
-
-    <span class="paso-numero">
-      <span *ngIf="pasoActual > 2">✓</span>
-      <span *ngIf="pasoActual <= 2">2</span>
-    </span>
-
-    <span class="paso-nombre">Validar estructura</span>
-  </div>
-
-  <!-- PASO 3 -->
-  <div
-    class="paso-item"
-    [class.paso-activo]="pasoActual === 3"
-    [class.paso-completado]="pasoActual > 3"
-    [class.paso-pendiente]="pasoActual < 3">
-
-    <span class="paso-numero">
-      <span *ngIf="pasoActual > 3">✓</span>
-      <span *ngIf="pasoActual <= 3">3</span>
-    </span>
-
-    <span class="paso-nombre">Revisar errores</span>
-  </div>
-
-  <!-- PASO 4 -->
-  <div
-    class="paso-item"
-    [class.paso-activo]="pasoActual === 4"
-    [class.paso-completado]="pasoActual > 4"
-    [class.paso-pendiente]="pasoActual < 4">
-
-    <span class="paso-numero">
-      <span *ngIf="pasoActual > 4">✓</span>
-      <span *ngIf="pasoActual <= 4">4</span>
-    </span>
-
-    <span class="paso-nombre">Confirmar carga</span>
-  </div>
-
-  <!-- PASO 5 -->
-  <div
-    class="paso-item"
-    [class.paso-activo]="pasoActual === 5"
-    [class.paso-completado]="pasoActual > 5"
-    [class.paso-pendiente]="pasoActual < 5">
-
-    <span class="paso-numero">
-      <span *ngIf="pasoActual > 5">✓</span>
-      <span *ngIf="pasoActual <= 5">5</span>
-    </span>
-
-    <span class="paso-nombre">Resultado</span>
-  </div>
-
-  <!-- BOTÓN PASO 1 -->
-  <button
-    *ngIf="pasoActual === 1"
-    type="button"
-    class="btn-continuar-validacion"
-    [disabled]="!archivoSeleccionado"
-    (click)="continuarValidacion()">
-    Continuar validación
-  </button>
-
-  <button
-    *ngIf="pasoActual === 2 && cargandoArchivo"
-    type="button"
-    class="btn-cancelar-procesamiento"
-    (click)="abrirModalCancelar()">
-    Cancelar procesamiento
-  </button>
-
-  <!-- BOTÓN PASO 3 -->
-  <button
-    *ngIf="pasoActual === 3 && hayResultadoCarga"
-    type="button"
-    class="btn-continuar-validacion"
-    (click)="continuarAConfirmacion()">
-    Continuar
-  </button>
-
-  <button
-    *ngIf="pasoActual === 3 && !hayResultadoCarga"
-    type="button"
-    class="btn-volver-archivo"
-    (click)="finalizarCarga()">
-    Cerrar
-  </button>
-
-</div>
-
-  <!-- OBSERVACIONES -->
-  <p
-    class="estado-observaciones"
-    *ngIf="
-      pasoActual >= 3 &&
-      resumenValidacion.registrosRechazados > 0 &&
-      !mostrarResumenCancelacion
-    "
-    role="status">
-    Procesado con observaciones
-  </p>
-
-  <!-- ========================================= -->
-  <!-- RESUMEN DE CANCELACIÓN -->
-  <!-- ========================================= -->
-
-  <div
-    class="cancelacion-resumen-contenido"
-    *ngIf="mostrarResumenCancelacion">
-
-    <div class="cancelacion-resumen-encabezado">
-      <div>
-        <h4>Resumen de cancelación</h4>
-
-        <p>
-          El procesamiento se detuvo y quedó en un estado parcial.
-        </p>
-      </div>
-
-      <span class="cancelacion-resumen-estado">
-        {{ resumenCancelacion.estado }}
-      </span>
-    </div>
-
-    <div class="cancelacion-resumen-grid">
-
-      <div class="cancelacion-resumen-tarjeta">
-        <span>Nombre del archivo</span>
-        <strong>{{ resumenCancelacion.nombreArchivo }}</strong>
-      </div>
-
-      <div class="cancelacion-resumen-tarjeta">
-        <span>Porcentaje alcanzado</span>
-        <strong>{{ resumenCancelacion.porcentajeAlcanzado }}%</strong>
-      </div>
-
-      <div class="cancelacion-resumen-tarjeta">
-        <span>Registros procesados</span>
-        <strong>
-          {{ resumenCancelacion.registrosProcesados | number }}
-        </strong>
-      </div>
-
-      <div class="cancelacion-resumen-tarjeta">
-        <span>Registros pendientes</span>
-        <strong>
-          {{ resumenCancelacion.registrosPendientes | number }}
-        </strong>
-      </div>
-
-      <div class="cancelacion-resumen-tarjeta">
-        <span>Fecha y hora de cancelación</span>
-        <strong>{{ resumenCancelacion.fechaHora }}</strong>
-      </div>
-
-      <div class="cancelacion-resumen-tarjeta">
-        <span>Estado</span>
-        <strong>{{ resumenCancelacion.estado }}</strong>
-      </div>
-
-    </div>
-
-    <p class="cancelacion-resumen-mensaje">
-      El seguimiento se detuvo en esta pantalla. Revisa el historial para
-      confirmar si el servidor terminó de procesar el archivo.
+    <p *ngIf="pasoActual === 2">
+      Estamos verificando que el archivo cumpla el formato seleccionado y contenga la información necesaria.
     </p>
+    <p *ngIf="pasoActual === 3">
+      Estamos clasificando los registros válidos, las observaciones y los registros rechazados.
+    </p>
+    <p *ngIf="pasoActual === 4">
+      Estamos creando o actualizando clientes, obligaciones, puntuaciones y casos de gestión.
+    </p>
+    <p *ngIf="pasoActual === 5">
+      {{ cargaFallida ? 'El archivo no se pudo procesar. Revisa el detalle y vuelve a intentarlo.' : 'El procesamiento finalizó y los resultados ya están disponibles.' }}
+    </p>
+  </div>
 
-    <div class="cancelacion-resumen-acciones">
-      <button
-        type="button"
-        class="btn-subir-archivo"
-        (click)="subirOtroArchivo()">
-        Subir otro archivo
-      </button>
-    </div>
+  <!-- ===== PASOS ===== -->
+  <div
+    class="nc-pasos-fila"
+    [class.sin-boton]="pasoActual === 2 || pasoActual === 5"
+    *ngIf="!mostrarResumenCancelacion">
 
+    <ol class="nc-pasos">
+      <li
+        *ngFor="let paso of pasos"
+        class="nc-paso"
+        [class.activo]="pasoActual === paso.numero"
+        [class.completo]="pasoActual > paso.numero">
+        <span class="nc-paso-circulo">
+          <i *ngIf="pasoActual > paso.numero" class="bi bi-check-lg" aria-hidden="true"></i>
+          <ng-container *ngIf="pasoActual <= paso.numero">{{ paso.numero }}</ng-container>
+        </span>
+        <span class="nc-paso-nombre">{{ paso.numero === 1 ? 'Subir archivo' : paso.nombre }}</span>
+      </li>
+    </ol>
+
+    <button
+      *ngIf="pasoActual === 1"
+      type="button"
+      class="nc-btn-primario"
+      [disabled]="!archivoSeleccionado"
+      (click)="continuarValidacion()">
+      Continuar validación
+    </button>
+
+    <button
+      *ngIf="(pasoActual === 3 || pasoActual === 4) && cargandoArchivo"
+      type="button"
+      class="nc-btn-secundario"
+      (click)="abrirModalCancelar()">
+      Cancelar procesamiento
+    </button>
   </div>
 
   <!-- ========================================= -->
-  <!-- PASO 1: SELECCIÓN DEL ARCHIVO -->
+  <!-- PASO 1: SUBIR ARCHIVO -->
   <!-- ========================================= -->
 
-  <div
-    class="carga-contenido"
-    *ngIf="pasoActual === 1 && !mostrarResumenCancelacion">
+  <ng-container *ngIf="pasoActual === 1 && !mostrarResumenCancelacion">
 
     <div
-      class="carga-area"
-      [class.carga-area-arrastrando]="arrastrandoArchivo"
+      class="nc-zona"
+      [class.con-archivo]="archivoSeleccionado"
+      [class.arrastrando]="arrastrandoArchivo"
       (dragover)="arrastrarArchivo($event)"
       (dragleave)="salirArrastreArchivo($event)"
       (drop)="soltarArchivo($event)">
 
-      <input
-        #inputArchivo
-        type="file"
-        accept=".csv,text/csv"
-        hidden
-        (change)="seleccionarArchivo($event)">
-
       <ng-container *ngIf="!archivoSeleccionado">
+        <svg class="nc-nube" viewBox="0 0 32 32" aria-hidden="true">
+          <path d="M22.5 24h3a5.5 5.5 0 0 0 .4-11 9.5 9.5 0 0 0-18.2 2.4A4.5 4.5 0 0 0 8.5 24h2"></path>
+          <path d="M16 28V17"></path>
+          <path d="m12 21 4-4 4 4"></path>
+        </svg>
 
-        <div class="carga-icono" aria-hidden="true">
-          <svg viewBox="0 0 32 32">
-            <path d="M22.5 24h3a5.5 5.5 0 0 0 .4-11 9.5 9.5 0 0 0-18.2 2.4A4.5 4.5 0 0 0 8.5 24h2"></path>
-            <path d="M16 28V17"></path>
-            <path d="m12 21 4-4 4 4"></path>
-          </svg>
-        </div>
+        <p class="nc-zona-titulo">Arrastra y suelta tu archivo aquí</p>
+        <p class="nc-zona-o">o</p>
 
-        <h4>Arrastra y suelta tu archivo aquí</h4>
-
-        <p>o</p>
-
-        <button
-          type="button"
-          class="btn-seleccionar"
-          (click)="inputArchivo.click()">
+        <button type="button" class="nc-btn-secundario" (click)="inputArchivo.click()">
           Seleccionar archivo
         </button>
 
-        <span class="carga-formatos">
-          Formato permitido: CSV
-        </span>
-
+        <p class="nc-zona-formatos">Formatos permitidos: CSV, TXT &nbsp;|&nbsp; Tamaño máximo: 500 MB</p>
       </ng-container>
 
-      <ng-container *ngIf="archivoSeleccionado">
+      <div class="nc-archivo" *ngIf="archivoSeleccionado">
+        <div class="nc-archivo-fila">
+          <span class="nc-archivo-icono"><i class="bi bi-file-earmark-text" aria-hidden="true"></i></span>
 
-        <div class="archivo-seleccionado-icono">✓</div>
+          <div class="nc-archivo-datos">
+            <strong>{{ archivoSeleccionado.name }}</strong>
+            <span>
+              Formato: <b>{{ archivoSeleccionado.name.split('.').pop()?.toUpperCase() }}</b>
+              &nbsp;&nbsp;Tamaño: <b>{{ formatearTamano(archivoSeleccionado.size) }}</b>
+            </span>
+          </div>
 
-        <h4>Archivo seleccionado</h4>
-
-        <div class="archivo-informacion">
-          <strong>{{ archivoSeleccionado.name }}</strong>
-          <span>{{ formatearTamano(archivoSeleccionado.size) }}</span>
-        </div>
-
-        <div class="archivo-acciones">
-          <span class="archivo-listo">
+          <span class="nc-listo">
+            <i class="bi bi-check-circle" aria-hidden="true"></i>
             Archivo listo para validar
           </span>
-
-          <button
-            type="button"
-            class="btn-quitar-archivo"
-            (click)="quitarArchivo(inputArchivo)">
-            Eliminar archivo
-          </button>
         </div>
 
-      </ng-container>
-
-      <p class="error-archivo" *ngIf="errorArchivo">
-        {{ errorArchivo }}
-      </p>
-
-    </div>
-
-    <div class="carga-detalles">
-
-      <label class="detalle-campo">
-        <span>Layout</span>
-        <select [(ngModel)]="layoutSeleccionado" aria-label="Layout de cartera">
-          <option value="Layout Cartera v3.2">Layout Cartera v3.2</option>
-        </select>
-      </label>
-
-      <label class="detalle-campo">
-        <span>Tipo de cartera</span>
-        <select [(ngModel)]="tipoCarteraSeleccionado" aria-label="Tipo de cartera">
-          <option value="Cartera administrativa">Cartera administrativa</option>
-          <option value="Cartera preventiva">Cartera preventiva</option>
-          <option value="Cartera prejudicial">Cartera prejudicial</option>
-        </select>
-      </label>
-
-      <label class="detalle-campo">
-        <span>Fecha de corte</span>
-        <input
-          type="date"
-          [(ngModel)]="fechaCorte"
-          aria-label="Fecha de corte de cartera">
-      </label>
-
-      <div class="plantilla-descarga">
-        <button type="button" class="btn-plantilla">
-          <svg viewBox="0 0 24 24" aria-hidden="true">
-            <path d="M12 3v12"></path>
-            <path d="m7 10 5 5 5-5"></path>
-            <path d="M5 17v3h14v-3"></path>
-          </svg>
-          Descargar plantilla
+        <button type="button" class="nc-eliminar" (click)="quitarArchivo(inputArchivo)">
+          <i class="bi bi-trash3" aria-hidden="true"></i>
+          Eliminar archivo
         </button>
       </div>
 
+      <p class="nc-error" *ngIf="errorArchivo" role="alert">{{ errorArchivo }}</p>
     </div>
 
-  </div>
+    <button type="button" class="nc-plantilla" (click)="descargarPlantilla()">
+      <i class="bi bi-download" aria-hidden="true"></i>
+      Descargar plantilla
+    </button>
+
+  </ng-container>
 
   <!-- ========================================= -->
   <!-- PASO 2: VALIDAR ESTRUCTURA -->
   <!-- ========================================= -->
 
-  <div
-    class="validacion-contenido"
-    *ngIf="pasoActual === 2 && !mostrarResumenCancelacion">
+  <div class="nc-validacion" *ngIf="pasoActual === 2 && !mostrarResumenCancelacion">
 
-    <div class="validacion-resumen">
+    <div class="nc-caja nc-validacion-progreso">
+      <div class="nc-archivo-fila">
+        <span class="nc-archivo-icono"><i class="bi bi-file-earmark-text" aria-hidden="true"></i></span>
+        <strong class="nc-archivo-nombre">{{ archivoSeleccionado?.name }}</strong>
+      </div>
 
-      <div class="validacion-bloque">
-        <span class="validacion-etiqueta">Archivo CSV</span>
-
-        <div class="validacion-archivo">
-          <span class="validacion-archivo-icono">▤</span>
-
-          <div class="validacion-archivo-datos">
-            <strong>{{ archivoSeleccionado?.name }}</strong>
-
-            <span *ngIf="archivoSeleccionado">
-              {{ formatearTamano(archivoSeleccionado.size) }}
-            </span>
-          </div>
+      <div class="nc-linea">
+        <span>Progreso</span>
+        <b class="azul">{{ progresoDisponible ? progreso + '%' : '...' }}</b>
+      </div>
+      <div class="nc-barra">
+        <div
+          class="nc-barra-avance"
+          [class.indeterminada]="!progresoDisponible"
+          [style.width.%]="progreso">
         </div>
       </div>
 
-      <div class="validacion-bloque">
-
-        <div class="validacion-fila">
-          <span class="validacion-etiqueta">Progreso</span>
-
-          <strong class="validacion-valor">
-            {{
-              progresoDisponible
-                ? progreso + '%'
-                : (envioArchivoCompleto ? 'Procesando' : 'En curso')
-            }}
-          </strong>
-        </div>
-
-        <div class="progreso-fondo">
-          <div
-            class="progreso-avance"
-            [class.progreso-indeterminado]="
-              !progresoDisponible || (procesando && progreso === 0)
-            "
-            [style.width.%]="progreso">
-          </div>
-        </div>
-
-        <span class="validacion-ayuda">
-          {{ loteSeguimiento?.progressMessage ||
-            (envioArchivoCompleto
-              ? 'Procesando registros en el servidor...'
-              : 'Subiendo el archivo al servidor...') }}
-        </span>
-
-      </div>
-
-      <div class="validacion-bloque validacion-dato">
-        <span class="validacion-etiqueta">Registros analizados</span>
-
-        <strong class="validacion-valor">
+      <div class="nc-linea">
+        <span>Registros analizados</span>
+        <b>
           {{
             loteSeguimiento
-              ? formatearNumero(loteSeguimiento.progressCurrent) + ' de ' +
-                formatearNumero(loteSeguimiento.progressTotal)
-              : 'Esperando datos'
+              ? formatearNumero(loteSeguimiento.progressCurrent) + ' de ' + formatearNumero(loteSeguimiento.progressTotal)
+              : (envioArchivoCompleto ? 'Preparando...' : 'Subiendo archivo...')
           }}
-        </strong>
+        </b>
+      </div>
+      <div class="nc-linea">
+        <span>Validación actual</span>
+        <b class="azul">
+          {{ etapaActualValidacion <= etapasValidacion.length ? etapasValidacion[etapaActualValidacion - 1].nombre : 'Finalizando' }}
+        </b>
+      </div>
+      <div class="nc-linea">
+        <span>Tiempo transcurrido</span>
+        <b>{{ tiempoTranscurrido }}</b>
       </div>
 
-      <div class="validacion-bloque validacion-dato">
-        <span class="validacion-etiqueta">Validación actual</span>
-
-        <strong class="validacion-valor">
-          {{
-            loteSeguimiento?.progressPhase ||
-              (envioArchivoCompleto ? 'Procesando' : 'Subiendo')
-          }}
-        </strong>
-      </div>
-
-      <div class="validacion-bloque validacion-dato">
-        <span class="validacion-etiqueta">Tiempo transcurrido</span>
-
-        <strong class="validacion-valor">
-          {{ tiempoTranscurrido }}
-        </strong>
-      </div>
-
-      <p class="validacion-seguimiento-error" *ngIf="errorSeguimiento">
-        {{ errorSeguimiento }}
-      </p>
-
+      <p class="nc-aviso-suave" *ngIf="errorSeguimiento">{{ errorSeguimiento }}</p>
     </div>
 
-    <div class="validacion-lista-panel">
-
-      <div class="validacion-lista-encabezado">
-        <div>
-          <h4>Validación</h4>
-          <p>Etapas de revisión del archivo</p>
-        </div>
-
-        <span
-          class="validacion-pendiente-etiqueta"
-          [class.validacion-finalizada]="!procesando && cargaExitosa"
-          [class.validacion-fallida]="!procesando && hayResultadoCarga && !cargaExitosa">
-          {{
-            procesando
-              ? (loteSeguimiento ? 'Procesando lote' : 'Subiendo archivo')
-              : (cargaExitosa ? 'Completada' : 'Finalizó con errores')
-          }}
-        </span>
-      </div>
-
-      <div class="validacion-lista">
-
-        <div
-          class="validacion-etapa"
+    <div class="nc-caja nc-validacion-lista">
+      <span class="nc-etiqueta">Validación</span>
+      <ul>
+        <li
           *ngFor="let etapa of etapasValidacion"
-          [class.etapa-completada]="estadoEtapaValidacion(etapa.numero) === 'Completado'"
-          [class.etapa-en-proceso]="estadoEtapaValidacion(etapa.numero) === 'En proceso'"
-          [class.etapa-pendiente]="estadoEtapaValidacion(etapa.numero) === 'Pendiente'">
-
-          <span class="etapa-numero">
-            {{ estadoEtapaValidacion(etapa.numero) === 'Completado' ? '✓' : etapa.numero }}
+          [class.hecha]="estadoEtapaValidacion(etapa.numero) === 'Completado'"
+          [class.actual]="estadoEtapaValidacion(etapa.numero) === 'En proceso'">
+          <span class="nc-punto">
+            <i *ngIf="estadoEtapaValidacion(etapa.numero) === 'Completado'" class="bi bi-check" aria-hidden="true"></i>
           </span>
+          {{ etapa.nombre }}
+        </li>
+      </ul>
+    </div>
 
-          <div class="etapa-informacion">
-            <strong>{{ etapa.nombre }}</strong>
-          </div>
+  </div>
 
-          <span
-            class="etapa-estado"
-            [class.etapa-estado-completado]="estadoEtapaValidacion(etapa.numero) === 'Completado'"
-            [class.etapa-estado-activo]="estadoEtapaValidacion(etapa.numero) === 'En proceso'">
-            {{ estadoEtapaValidacion(etapa.numero) }}
-          </span>
+  <!-- ========================================= -->
+  <!-- PASO 3: REVISAR ERRORES -->
+  <!-- ========================================= -->
 
-        </div>
+  <div class="nc-revision" *ngIf="pasoActual === 3 && !mostrarResumenCancelacion">
 
+    <div class="nc-linea nc-linea-grande">
+      <span>Registros procesados</span>
+      <b>{{ formatearNumero(registrosProcesados) }}</b>
+    </div>
+
+    <div class="nc-conteos">
+      <div class="nc-conteo">
+        <span><i class="verde"></i>Válidos</span>
+        <strong>{{ formatearNumero(resumenValidacion.registrosValidos) }}</strong>
+      </div>
+      <div class="nc-conteo">
+        <span><i class="amarillo"></i>Observaciones</span>
+        <strong>{{ formatearNumero(resumenValidacion.registrosObservaciones) }}</strong>
+      </div>
+      <div class="nc-conteo">
+        <span><i class="rojo"></i>Rechazados</span>
+        <strong>{{ formatearNumero(resumenValidacion.registrosRechazados) }}</strong>
+      </div>
+    </div>
+
+    <div class="nc-linea">
+      <span>Progreso</span>
+      <b class="azul">{{ progresoDisponible ? progreso + '%' : '...' }}</b>
+    </div>
+    <div class="nc-barra">
+      <div class="nc-barra-avance" [class.indeterminada]="!progresoDisponible" [style.width.%]="progreso"></div>
+    </div>
+
+  </div>
+
+  <!-- ========================================= -->
+  <!-- PASO 4: CONFIRMAR CARGA -->
+  <!-- ========================================= -->
+
+  <div class="nc-confirmacion" *ngIf="pasoActual === 4 && !mostrarResumenCancelacion">
+
+    <div class="nc-fila-progreso" *ngFor="let fila of filasConfirmacion">
+      <div class="nc-linea">
+        <b>{{ fila.nombre }}</b>
+        <b>{{ fila.texto }}</b>
+      </div>
+      <div class="nc-barra">
+        <div class="nc-barra-avance" [class.roja]="fila.rechazo" [style.width.%]="fila.avance"></div>
+      </div>
+    </div>
+
+    <div class="nc-fila-progreso nc-general">
+      <div class="nc-linea">
+        <b>Progreso general</b>
+        <b>{{ progresoGeneral }}%</b>
+      </div>
+      <div class="nc-barra">
+        <div class="nc-barra-avance" [style.width.%]="progresoGeneral"></div>
       </div>
     </div>
 
   </div>
 
   <!-- ========================================= -->
-  <!-- PASO 3: REVISAR RESULTADOS -->
+  <!-- PASO 5: RESULTADO -->
   <!-- ========================================= -->
 
-  <div
-    class="errores-contenido"
-    *ngIf="pasoActual === 3 && !mostrarResumenCancelacion">
+  <div class="nc-resultado" *ngIf="pasoActual === 5 && !mostrarResumenCancelacion">
 
-    <div class="errores-encabezado">
-      <div>
-        <h4>Resultado de la validación</h4>
-        <p *ngIf="hayResultadoCarga">
-          Se procesaron {{ resumenValidacion.registrosLeidos }}
-          registros del archivo seleccionado.
-        </p>
-        <p *ngIf="!hayResultadoCarga">{{ errorCarga }}</p>
-      </div>
-
-      <span
-        class="errores-estado"
-        [class.errores-estado-error]="!cargaExitosa">
-        {{ cargaExitosa ? 'Validación completada' : 'Carga con errores' }}
-      </span>
-    </div>
-
-    <div class="errores-resumen" *ngIf="hayResultadoCarga">
-
-      <div class="resumen-tarjeta resumen-validos">
-        <span>Registros válidos</span>
-        <strong>{{ resumenValidacion.registrosValidos }}</strong>
-      </div>
-
-      <div class="resumen-tarjeta resumen-observaciones">
-        <span>Registros con observaciones</span>
-        <strong>{{ resumenValidacion.registrosObservaciones }}</strong>
-      </div>
-
-      <div class="resumen-tarjeta resumen-rechazados">
-        <span>Registros rechazados</span>
-        <strong>{{ resumenValidacion.registrosRechazados }}</strong>
-      </div>
-
-    </div>
-
-    <div class="errores-validaciones" *ngIf="hayResultadoCarga">
-      <div class="validacion-lista-panel">
-
-        <div class="validacion-lista-encabezado">
-          <div>
-            <h4>Validaciones realizadas</h4>
-            <p>Resultado de las etapas revisadas en el archivo</p>
-          </div>
-
-          <span
-            class="validacion-pendiente-etiqueta"
-            [class.validacion-finalizada]="cargaExitosa"
-            [class.validacion-fallida]="!cargaExitosa">
-            {{ cargaExitosa ? 'Completadas' : 'Revisar resultado' }}
-          </span>
-        </div>
-
-        <div class="validacion-lista">
-          <div
-            class="validacion-etapa"
-            *ngFor="let etapa of etapasValidacion"
-            [class.etapa-completada]="estadoEtapaValidacion(etapa.numero) === 'Completado'"
-            [class.etapa-en-proceso]="estadoEtapaValidacion(etapa.numero) === 'En proceso'"
-            [class.etapa-pendiente]="estadoEtapaValidacion(etapa.numero) === 'Pendiente'">
-
-            <span class="etapa-numero">
-              {{ estadoEtapaValidacion(etapa.numero) === 'Completado' ? '✓' : etapa.numero }}
-            </span>
-
-            <div class="etapa-informacion">
-              <strong>{{ etapa.nombre }}</strong>
-            </div>
-
-            <span
-              class="etapa-estado"
-              [class.etapa-estado-completado]="estadoEtapaValidacion(etapa.numero) === 'Completado'"
-              [class.etapa-estado-activo]="estadoEtapaValidacion(etapa.numero) === 'En proceso'">
-              {{ estadoEtapaValidacion(etapa.numero) }}
-            </span>
-          </div>
-        </div>
-
-      </div>
-    </div>
-
-    <div
-      class="errores-aviso"
-      [class.errores-aviso-error]="!hayResultadoCarga || !cargaExitosa"
-      *ngIf="!hayResultadoCarga || !cargaExitosa || resumenValidacion.registrosRechazados > 0">
-      <ng-container *ngIf="hayResultadoCarga; else errorCargaAviso">
-        {{ mensajeResultado }}
-      </ng-container>
-      <ng-template #errorCargaAviso>{{ errorCarga }}</ng-template>
-    </div>
-
-  </div>
-
-  <!-- ========================================= -->
-  <!-- PASO 4: CONFIRMAR LA CARGA PROCESADA -->
-  <!-- ========================================= -->
-
-  <div
-    class="confirmacion-contenido"
-    *ngIf="pasoActual === 4 && hayResultadoCarga && !mostrarResumenCancelacion">
-
-    <div class="confirmacion-encabezado">
-      <div class="confirmacion-titulo">
-        <span class="confirmacion-icono" aria-hidden="true">✓</span>
-        <div>
-          <h4>Confirma el resultado de la carga</h4>
-          <p>Revisa el resumen antes de continuar al resultado final.</p>
-        </div>
-      </div>
-
-      <span class="confirmacion-estado">
-        <span class="estado-punto"></span>
-        {{ cargaExitosa ? 'Procesamiento completado' : 'Procesamiento con errores' }}
-      </span>
-    </div>
-
-    <div class="confirmacion-indicadores">
-      <div class="confirmacion-indicador">
-        <div class="indicador-superior">
-          <span class="indicador-icono" aria-hidden="true">▤</span>
-          <div class="indicador-textos">
-            <strong>Registros procesados</strong>
-            <span>{{ formatearNumero(resumenValidacion.registrosLeidos) }} registros</span>
-          </div>
-          <span class="indicador-porcentaje">100%</span>
-        </div>
-        <div class="confirmacion-barra-fondo">
-          <div class="confirmacion-barra-avance" [style.width.%]="100"></div>
-        </div>
-      </div>
-
-      <div class="confirmacion-indicador">
-        <div class="indicador-superior">
-          <span class="indicador-icono" aria-hidden="true">✓</span>
-          <div class="indicador-textos">
-            <strong>Registros válidos</strong>
-            <span>{{ formatearNumero(resumenValidacion.registrosValidos) }} registros</span>
-          </div>
-          <span class="indicador-porcentaje">
-            {{
-              resumenValidacion.registrosLeidos > 0
-                ? (resumenValidacion.registrosValidos / resumenValidacion.registrosLeidos * 100 | number:'1.0-1')
-                : 0
-            }}%
-          </span>
-        </div>
-        <div class="confirmacion-barra-fondo">
-          <div
-            class="confirmacion-barra-avance"
-            [style.width.%]="
-              resumenValidacion.registrosLeidos > 0
-                ? resumenValidacion.registrosValidos / resumenValidacion.registrosLeidos * 100
-                : 0
-            ">
-          </div>
-        </div>
-      </div>
-
-      <div class="confirmacion-indicador">
-        <div class="indicador-superior">
-          <span class="indicador-icono" aria-hidden="true">!</span>
-          <div class="indicador-textos">
-            <strong>Registros rechazados</strong>
-            <span>{{ formatearNumero(resumenValidacion.registrosRechazados) }} registros</span>
-          </div>
-          <span class="indicador-porcentaje">
-            {{
-              resumenValidacion.registrosLeidos > 0
-                ? (resumenValidacion.registrosRechazados / resumenValidacion.registrosLeidos * 100 | number:'1.0-1')
-                : 0
-            }}%
-          </span>
-        </div>
-        <div class="confirmacion-barra-fondo">
-          <div
-            class="confirmacion-barra-avance barra-rechazados"
-            [style.width.%]="
-              resumenValidacion.registrosLeidos > 0
-                ? resumenValidacion.registrosRechazados / resumenValidacion.registrosLeidos * 100
-                : 0
-            ">
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="confirmacion-progreso-general">
-      <div class="progreso-general-textos">
-        <div>
-          <strong>Procesamiento del archivo</strong>
-          <span>El servidor devolvió el resultado de la carga.</span>
-        </div>
-        <span class="progreso-general-porcentaje">100%</span>
-      </div>
-      <div class="confirmacion-barra-fondo barra-general">
-        <div class="confirmacion-barra-avance" [style.width.%]="100"></div>
-      </div>
-    </div>
-
-    <div class="confirmacion-pie">
-      <span class="confirmacion-pie-icono" aria-hidden="true">i</span>
-      <p>Al continuar, podrás consultar el resumen final y los registros rechazados.</p>
-    </div>
-
-    <button
-      type="button"
-      class="btn-continuar-validacion"
-      (click)="verResultadosTemporalmente()">
-      Ver resultado
-    </button>
-
-  </div>
-
-  <!-- ========================================= -->
-  <!-- PASO 5: RESULTADOS -->
-  <!-- ========================================= -->
-
-  <div
-    class="resultados-contenido"
-    *ngIf="pasoActual === 5 && !mostrarResumenCancelacion">
-
-    <div class="resultados-encabezado">
-      <div>
-        <h4>Cartera procesada</h4>
-        <p>El procesamiento finalizó y los resultados ya están disponibles.</p>
-      </div>
-
-      <span class="resultados-estado">
-        <span class="resultados-punto"></span>
-        {{ cargaExitosa ? 'Carga completada' : 'Carga con errores' }}
-      </span>
-    </div>
-
-    <div class="resultados-grid">
-
-      <div class="resultado-tarjeta">
-        <span>Registros procesados</span>
-        <strong>{{ resumenValidacion.registrosLeidos | number }}</strong>
-      </div>
-
-      <div class="resultado-tarjeta">
-        <span>Registros válidos</span>
-        <strong>{{ resumenValidacion.registrosValidos | number }}</strong>
-      </div>
-
-      <div class="resultado-tarjeta" *ngIf="resultadoCarga">
-        <span>Clientes creados o actualizados</span>
-        <strong>{{ cargasConfirmacion[0].cantidad | number }}</strong>
-      </div>
-
-      <div class="resultado-tarjeta" *ngIf="resultadoCarga">
-        <span>Obligaciones creadas o actualizadas</span>
-        <strong>{{ cargasConfirmacion[1].cantidad | number }}</strong>
-      </div>
-
-      <div class="resultado-tarjeta" *ngIf="resultadoCarga">
-        <span>Puntuaciones generadas</span>
-        <strong>{{ cargasConfirmacion[2].cantidad | number }}</strong>
-      </div>
-
-      <div
-        class="resultado-tarjeta"
-        *ngIf="resultadoCarga || loteSeguimiento?.casesCreated != null">
-        <span>Casos creados</span>
-        <strong>
-          {{
-            resultadoCarga
-              ? (cargasConfirmacion[3].cantidad | number)
-              : (loteSeguimiento?.casesCreated | number)
-          }}
-        </strong>
-      </div>
-
-      <div
-        class="resultado-tarjeta resultado-rechazados"
-        *ngIf="resumenValidacion.registrosRechazados > 0">
-
-        <span>Registros rechazados</span>
-
-        <strong>
-          {{ resumenValidacion.registrosRechazados | number }}
-        </strong>
-      </div>
-
-      <div class="resultado-tarjeta resultado-tasa">
-        <span>Tasa de éxito</span>
-
-        <strong>
-          {{
-            resumenValidacion.registrosLeidos > 0
-              ? (resumenValidacion.registrosValidos / resumenValidacion.registrosLeidos * 100 | number:'1.0-1')
-              : 0
-          }}%
-        </strong>
-      </div>
-
-    </div>
-
-    <p
-      class="resultados-mensaje resultados-mensaje-error"
-      *ngIf="!cargaExitosa || resumenValidacion.registrosRechazados > 0">
+    <span
+      class="nc-insignia"
+      [class.rojo]="cargaFallida"
+      [class.verde]="!cargaFallida && resumenValidacion.registrosRechazados === 0">
       {{
-        resumenValidacion.registrosRechazados > 0 && cargaExitosa
-          ? 'Algunos registros fueron rechazados durante el procesamiento.'
-          : mensajeResultado
+        cargaFallida ? 'Carga rechazada' :
+        resumenValidacion.registrosRechazados > 0 ? 'Procesado con observaciones' : 'Procesado correctamente'
+      }}
+    </span>
+
+    <div class="nc-resultado-grid">
+      <div class="nc-dato"><span>Registros procesados</span><strong>{{ formatearNumero(registrosProcesados) }}</strong></div>
+      <div class="nc-dato"><span>Registros válidos</span><strong>{{ formatearNumero(resumenValidacion.registrosValidos) }}</strong></div>
+      <div class="nc-dato"><span>Clientes creados o actualizados</span><strong>{{ resultadoCarga ? formatearNumero(resultadoCarga.clientsUpserted) : '—' }}</strong></div>
+      <div class="nc-dato"><span>Obligaciones creadas o actualizadas</span><strong>{{ resultadoCarga ? formatearNumero(resultadoCarga.obligationsUpserted) : '—' }}</strong></div>
+      <div class="nc-dato"><span>Puntuaciones generadas</span><strong>{{ resultadoCarga ? formatearNumero(resultadoCarga.scoresGenerated) : '—' }}</strong></div>
+      <div class="nc-dato"><span>Casos creados</span><strong>{{ formatearNumero(resultadoCarga?.casesCreated ?? loteSeguimiento?.casesCreated ?? '—') }}</strong></div>
+      <div class="nc-dato" [class.rechazo]="resumenValidacion.registrosRechazados > 0">
+        <span>Registros rechazados</span><strong>{{ formatearNumero(resumenValidacion.registrosRechazados) }}</strong>
+      </div>
+      <div class="nc-dato"><span>Tasa de éxito</span><strong>{{ tasaExito }}</strong></div>
+    </div>
+
+    <p class="nc-resultado-mensaje">
+      {{
+        cargaFallida ? (mensajeResultado || errorCarga || 'No fue posible procesar el archivo.') :
+        resumenValidacion.registrosRechazados > 0
+          ? 'Algunos registros no pudieron procesarse. Descarga el archivo de errores para corregirlos y volver a cargarlos.'
+          : 'Todos los registros fueron procesados correctamente.'
       }}
     </p>
 
-    <p
-      class="resultados-mensaje"
-      *ngIf="cargaExitosa && resumenValidacion.registrosRechazados === 0">
-      Todos los registros fueron procesados correctamente.
-    </p>
-
-    <div class="resultados-acciones">
-
+    <div class="nc-resultado-botones">
       <button
-        *ngIf="resumenValidacion.registrosRechazados > 0"
+        *ngIf="resumenValidacion.registrosRechazados > 0 && loteIdActual !== null"
         type="button"
-        class="btn-subir-correcciones">
+        class="nc-btn-primario"
+        (click)="subirCorrecciones(inputCorreccion)">
         Subir correcciones
       </button>
 
-      <button
-        *ngIf="resumenValidacion.registrosRechazados > 0"
-        type="button"
-        class="btn-descargar-errores">
-        Descargar archivo de errores
-      </button>
-
-      <button
-        type="button"
-        class="btn-finalizar"
-        (click)="finalizarCarga()">
+      <button type="button" class="nc-btn-secundario" (click)="finalizarCarga()">
         Finalizar
       </button>
 
-      <button
-        type="button"
-        class="btn-subir-archivo"
-        (click)="subirOtroArchivo()">
+      <button type="button" class="nc-btn-secundario" (click)="subirOtroArchivo()">
         Subir otro archivo
       </button>
 
+      <button
+        *ngIf="resumenValidacion.registrosRechazados > 0 && loteIdActual !== null"
+        type="button"
+        class="nc-plantilla"
+        [disabled]="descargandoErrores"
+        (click)="descargarErroresResultado()">
+        <i class="bi bi-download" aria-hidden="true"></i>
+        {{ descargandoErrores ? 'Descargando...' : 'Descargar archivo de errores' }}
+      </button>
     </div>
 
+  </div>
+
+  <!-- ========================================= -->
+  <!-- RESUMEN DE CANCELACIÓN -->
+  <!-- ========================================= -->
+
+  <div class="nc-cancelacion" *ngIf="mostrarResumenCancelacion">
+    <div class="nc-encabezado">
+      <h3>Procesamiento cancelado</h3>
+      <p>{{ resumenCancelacion.estado }}</p>
+    </div>
+
+    <div class="nc-resultado-grid">
+      <div class="nc-dato"><span>Archivo</span><strong>{{ resumenCancelacion.nombreArchivo }}</strong></div>
+      <div class="nc-dato"><span>Porcentaje alcanzado</span><strong>{{ resumenCancelacion.porcentajeAlcanzado }}%</strong></div>
+      <div class="nc-dato"><span>Registros procesados</span><strong>{{ formatearNumero(resumenCancelacion.registrosProcesados) }}</strong></div>
+      <div class="nc-dato"><span>Fecha y hora</span><strong>{{ resumenCancelacion.fechaHora }}</strong></div>
+    </div>
+
+    <div class="nc-resultado-botones">
+      <button type="button" class="nc-btn-primario" (click)="subirOtroArchivo()">Subir otro archivo</button>
+    </div>
   </div>
 
   <!-- ========================================= -->
   <!-- MODAL: CONFIRMAR CANCELACIÓN -->
   <!-- ========================================= -->
 
-  <div
-    class="modal-cancelacion-fondo"
-    *ngIf="mostrarModalCancelar"
-    role="presentation">
-
+  <div class="modal-cancelacion-fondo" *ngIf="mostrarModalCancelar" role="presentation" (click)="cerrarModalCancelar()">
     <div
       class="modal-cancelacion"
       role="dialog"
       aria-modal="true"
-      aria-labelledby="titulo-modal-cancelar">
+      aria-labelledby="titulo-modal-cancelar"
+      (click)="$event.stopPropagation()">
 
-      <div class="modal-cancelacion-icono">
-        !
-      </div>
+      <div class="modal-cancelacion-icono">!</div>
 
-      <h3 id="titulo-modal-cancelar">
-        ¿Cancelar procesamiento?
-      </h3>
+      <h3 id="titulo-modal-cancelar">¿Cancelar procesamiento?</h3>
 
       <p>
-        Se detendrá el seguimiento en esta pantalla y se cancelará la solicitud
-        del navegador. Si el servidor ya recibió el archivo, podría continuar
-        procesándolo; podrás revisar su estado en el historial.
+        Se detendrá la carga de <b>{{ archivoSeleccionado?.name }}</b> y se eliminará
+        lo que este lote haya alcanzado a crear. Esta acción no se puede deshacer.
       </p>
 
       <div class="modal-cancelacion-acciones">
-
-        <button
-          type="button"
-          class="btn-seguir-procesando"
-          (click)="cerrarModalCancelar()">
+        <button type="button" class="btn-seguir-procesando" (click)="cerrarModalCancelar()">
           Seguir procesando
         </button>
-
-        <button
-          type="button"
-          class="btn-confirmar-cancelacion"
-          (click)="confirmarCancelacion()">
-          Dejar de esperar
+        <button type="button" class="btn-confirmar-cancelacion" (click)="confirmarCancelacion()">
+          Cancelar carga
         </button>
-
       </div>
-
     </div>
   </div>
 
@@ -987,7 +469,7 @@
 <section
   class="lotes-panel"
   [class.lotes-panel-vacio]="
-    !mostrarHistorialLotes || (!cargandoHistorial && lotes.length === 0)
+    !mostrarHistorialLotes || (!cargandoHistorial && lotesRecientes.length === 0)
   ">
 
   <!-- ESTADO VACÍO -->
@@ -995,7 +477,7 @@
     class="lotes-vacio"
     *ngIf="
       !mostrarHistorialLotes ||
-      (!cargandoHistorial && lotes.length === 0)
+      (!cargandoHistorial && lotesRecientes.length === 0)
     "
     role="status">
 
@@ -1021,7 +503,7 @@
 
   <!-- ÚLTIMOS LOTES -->
   <ng-container
-    *ngIf="mostrarHistorialLotes && !cargandoHistorial && lotes.length > 0">
+    *ngIf="mostrarHistorialLotes && !cargandoHistorial && lotesRecientes.length > 0">
     <div class="lotes-encabezado">
       <h3>Lotes Cargados</h3>
 
@@ -1039,30 +521,130 @@
             (input)="actualizarBusquedaLotes($event)">
         </label>
 
-        <div class="lotes-filtro">
+        <!-- FILTROS (igual que en Inicio > Casos en gestión) -->
+        <div class="filtros-container">
+
           <button
             type="button"
-            class="btn-filtros"
-            [class.filtro-activo]="mostrarFiltrosLotes"
+            class="managed-filter"
+            [class.filtros-activos]="mostrarFiltrosLotes"
             [attr.aria-expanded]="mostrarFiltrosLotes"
-            (click)="mostrarFiltrosLotes = !mostrarFiltrosLotes">
-            <svg viewBox="0 0 24 24" aria-hidden="true">
-              <path d="M4 5h16l-6.2 7.1v5l-3.6 1.9v-6.9z"></path>
-            </svg>
-            Filtros
+            (click)="abrirFiltrosLotes($event)">
+            <img src="imagenes/Filtro.png" alt="">
+            <span>Filtros</span>
+            <span class="filter-count" *ngIf="cantidadFiltrosLotes > 0">
+              {{ cantidadFiltrosLotes }}
+            </span>
           </button>
 
-          <select
-            *ngIf="mostrarFiltrosLotes"
-            aria-label="Filtrar por estado"
-            [value]="estadoFiltroLotes"
-            (change)="actualizarFiltroEstadoLotes($event)">
-            <option value="">Todos los estados</option>
-            <option value="Exitoso">Exitoso</option>
-            <option value="Con errores">Con errores</option>
-            <option value="Rechazado">Rechazado</option>
-          </select>
+          <div class="filtros-modal" [class.hacia-arriba]="filtrosHaciaArriba" *ngIf="mostrarFiltrosLotes">
+            <div class="filtros-header">
+              <h3>Filtros</h3>
+              <button type="button" class="cerrar-filtros" aria-label="Cerrar filtros" (click)="mostrarFiltrosLotes = false">
+                <i class="bi bi-x"></i>
+              </button>
+            </div>
+
+            <div class="filtros-body">
+
+              <!-- ESTADO -->
+              <div class="filtro-grupo">
+                <label>Estado</label>
+                <div class="filtro-opciones">
+                  <button
+                    *ngFor="let estado of estadosLote"
+                    type="button"
+                    class="btn-opcion"
+                    [class.seleccionado]="filtrosLotes.estados.includes(estado)"
+                    [attr.aria-pressed]="filtrosLotes.estados.includes(estado)"
+                    (click)="alternarEstadoFiltro(estado)">
+                    {{ estado }}
+                  </button>
+                </div>
+              </div>
+
+              <!-- USUARIO -->
+              <div class="filtro-grupo">
+                <label for="filtro-usuario-lote">Usuario</label>
+                <input
+                  id="filtro-usuario-lote"
+                  type="text"
+                  placeholder="Buscar usuario..."
+                  [class.con-valor]="filtrosLotes.usuario.trim() !== ''"
+                  [(ngModel)]="filtrosLotes.usuario">
+              </div>
+
+              <!-- FECHA DE CARGA -->
+              <div class="filtro-grupo">
+                <label>Fecha de carga</label>
+                <div class="filtro-fechas-contenedor">
+                  <div class="campo-fecha">
+                    <input
+                      type="date"
+                      aria-label="Desde"
+                      [class.con-valor]="filtrosLotes.desde !== ''"
+                      [(ngModel)]="filtrosLotes.desde">
+                  </div>
+                  <div class="campo-fecha">
+                    <input
+                      type="date"
+                      aria-label="Hasta"
+                      [class.con-valor]="filtrosLotes.hasta !== ''"
+                      [(ngModel)]="filtrosLotes.hasta">
+                  </div>
+                </div>
+              </div>
+
+              <!-- CON RECHAZADOS -->
+              <div class="filtro-grupo">
+                <label>Registros rechazados</label>
+                <div class="filtro-opciones">
+                  <button
+                    type="button"
+                    class="btn-opcion"
+                    [class.seleccionado]="filtrosLotes.rechazados === 'con'"
+                    (click)="filtrosLotes.rechazados = filtrosLotes.rechazados === 'con' ? '' : 'con'">
+                    Con rechazados
+                  </button>
+                  <button
+                    type="button"
+                    class="btn-opcion"
+                    [class.seleccionado]="filtrosLotes.rechazados === 'sin'"
+                    (click)="filtrosLotes.rechazados = filtrosLotes.rechazados === 'sin' ? '' : 'sin'">
+                    Sin rechazados
+                  </button>
+                </div>
+              </div>
+
+            </div>
+
+            <div class="filtros-footer">
+              <button type="button" class="btn-limpiar-filtros" (click)="limpiarFiltrosLotes()">
+                Limpiar
+              </button>
+              <button type="button" class="btn-aplicar-filtros" (click)="aplicarFiltrosLotes()">
+                Aplicar filtros
+              </button>
+            </div>
+          </div>
         </div>
+      </div>
+    </div>
+
+    <!-- FILTROS ACTIVOS -->
+    <div class="managed-active-filters" *ngIf="filtrosLotesVisibles.length > 0">
+      <div class="active-filter-tag" *ngFor="let filtro of filtrosLotesVisibles.slice(0, 3)">
+        <span>{{ filtro.texto }}</span>
+        <button
+          type="button"
+          class="remove-active-filter"
+          aria-label="Quitar filtro"
+          (click)="quitarFiltroLote(filtro.clave)">
+          <i class="bi bi-x"></i>
+        </button>
+      </div>
+      <div class="active-filter-tag filtros-restantes" *ngIf="filtrosLotesVisibles.length > 3">
+        +{{ filtrosLotesVisibles.length - 3 }} filtros
       </div>
     </div>
 
@@ -1118,7 +700,8 @@
         class="estado-lote"
         [class.estado-procesado]="lote.estado === 'Exitoso'"
         [class.estado-errores]="lote.estado === 'Con errores'"
-        [class.estado-rechazado]="lote.estado === 'Rechazado'">
+        [class.estado-rechazado]="lote.estado === 'Rechazado'"
+        [class.estado-anulado]="lote.estado === 'Anulado'">
         {{ lote.estado }}
       </span>
     </td>
@@ -1133,8 +716,10 @@
           [attr.aria-label]="'Acciones para ' + lote.archivo"
           [attr.aria-expanded]="loteMenuAbierto === lote.batchId"
           [attr.aria-controls]="'menu-lote-' + lote.batchId"
+          [class.abierto]="loteMenuAbierto === lote.batchId"
           (click)="alternarMenuLote(lote.batchId, $event)">
-          <span aria-hidden="true">⋮</span>
+          <span *ngIf="loteMenuAbierto !== lote.batchId" aria-hidden="true">⋮</span>
+          <i *ngIf="loteMenuAbierto === lote.batchId" class="bi bi-x-lg" aria-hidden="true"></i>
         </button>
 
         <div
@@ -1167,8 +752,8 @@
   type="button"
   class="lote-menu-opcion"
   role="menuitem"
-  disabled
-  title="Funcionalidad pendiente de implementación">
+  [disabled]="cargandoArchivo || (lote.rechazados === 0 && !lote.local)"
+  (click)="subirCorreccionesLote(lote, inputCorreccion)">
 
   <svg viewBox="0 0 24 24" aria-hidden="true">
     <path d="M12 16V4"></path>
@@ -1184,8 +769,8 @@
   type="button"
   class="lote-menu-opcion lote-menu-opcion-peligro"
   role="menuitem"
-  disabled
-  title="Funcionalidad pendiente de implementación">
+  [disabled]="cargandoArchivo || lote.estado === 'Anulado'"
+  (click)="pedirEliminarLote(lote)">
 
   <svg viewBox="0 0 24 24" aria-hidden="true">
     <path d="M4 7h16"></path>
@@ -1215,8 +800,44 @@
     </div>
 
     <div class="lotes-pie">
-      Mostrando {{ lotesRecientesFiltrados.length }} de
-      {{ lotesRecientes.length }} archivos recientes
+      Mostrando {{ lotesRecientesFiltrados.length ? 1 : 0 }} a {{ lotesRecientesFiltrados.length }}
+      archivos cargados
     </div>
   </ng-container>
+
+  <!-- MODAL: CONFIRMAR ELIMINAR DATOS DE UN LOTE -->
+  <div class="modal-cancelacion-fondo" *ngIf="loteAEliminar" role="presentation" (click)="cerrarEliminarLote()">
+    <div
+      class="modal-cancelacion"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="titulo-eliminar-lote"
+      (click)="$event.stopPropagation()">
+
+      <div class="modal-cancelacion-icono">!</div>
+
+      <h3 id="titulo-eliminar-lote">¿Eliminar los datos de este lote?</h3>
+
+      <p *ngIf="!loteAEliminar.local">
+        Se anulará <b>{{ loteAEliminar.archivo }}</b> y se borrarán los clientes,
+        obligaciones y casos que esta carga creó. Esta acción no se puede deshacer.
+      </p>
+      <p *ngIf="loteAEliminar.local">
+        <b>{{ loteAEliminar.archivo }}</b> fue rechazado y no creó ningún dato.
+        Solo se quitará de esta tabla.
+      </p>
+
+      <p class="error-eliminar" *ngIf="errorEliminar">{{ errorEliminar }}</p>
+
+      <div class="modal-cancelacion-acciones">
+        <button type="button" class="btn-seguir-procesando" [disabled]="eliminandoLote" (click)="cerrarEliminarLote()">
+          No, conservar
+        </button>
+        <button type="button" class="btn-confirmar-cancelacion" [disabled]="eliminandoLote" (click)="confirmarEliminarLote()">
+          {{ eliminandoLote ? 'Eliminando...' : 'Sí, eliminar' }}
+        </button>
+      </div>
+    </div>
+  </div>
+
 </section>

@@ -34,15 +34,79 @@
         type="button"
         class="btn-back"
         (click)="regresarACola()">
-        ‹ Volver a la cola
+        <i class="bi bi-chevron-left"></i>
+        Volver a la cola
       </button>
 
-      <button
-        type="button"
-        class="btn-actions"
-        (click)="abrirAcciones()">
-        ↑ Acciones
-      </button>
+      <!-- ACCIONES (como en Figma) -->
+      <div class="acciones-caso" (click)="$event.stopPropagation()">
+
+        <button
+          type="button"
+          class="btn-actions"
+          aria-haspopup="menu"
+          [attr.aria-expanded]="mostrarAcciones"
+          (click)="abrirAcciones()">
+          <i class="bi" [class.bi-chevron-down]="!mostrarAcciones" [class.bi-chevron-up]="mostrarAcciones"></i>
+          Acciones
+        </button>
+
+        <div class="menu-acciones-caso" role="menu" *ngIf="mostrarAcciones" [class.con-submenu]="submenuEstadoAbierto">
+
+          <div class="menu-item-con-submenu">
+            <button
+              type="button"
+              role="menuitem"
+              class="menu-item"
+              [class.activo]="submenuEstadoAbierto"
+              [attr.aria-expanded]="submenuEstadoAbierto"
+              (click)="submenuEstadoAbierto = !submenuEstadoAbierto">
+              <i class="bi bi-arrow-left-right"></i>
+              <span>Cambiar estado</span>
+              <i class="bi bi-chevron-right flecha"></i>
+            </button>
+
+            <div class="submenu-estados" role="menu" *ngIf="submenuEstadoAbierto">
+              <button
+                *ngFor="let estado of estadosCaso"
+                type="button"
+                role="menuitemradio"
+                class="menu-item"
+                [class.actual]="esEstadoActual(estado.valor)"
+                [attr.aria-checked]="esEstadoActual(estado.valor)"
+                (click)="cambiarEstadoCaso(estado)">
+                <span>{{ estado.texto }}</span>
+                <i *ngIf="esEstadoActual(estado.valor)" class="bi bi-check-lg flecha"></i>
+              </button>
+            </div>
+          </div>
+
+          <button type="button" role="menuitem" class="menu-item" (click)="accionAsignarAsesor()">
+            <i class="bi bi-person-gear"></i>
+            <span>Asignar asesor</span>
+          </button>
+
+          <button type="button" role="menuitem" class="menu-item" (click)="accionEnviarLink()">
+            <i class="bi bi-cash-coin"></i>
+            <span>Enviar link de pago</span>
+          </button>
+
+          <hr>
+
+          <button type="button" role="menuitem" class="menu-item" (click)="accionAgregarNota()">
+            <i class="bi bi-file-earmark"></i>
+            <span>Agregar nota</span>
+          </button>
+
+          <hr>
+
+          <button type="button" role="menuitem" class="menu-item peligro" (click)="accionCerrarCaso()">
+            <i class="bi bi-check-circle"></i>
+            <span>Cerrar caso</span>
+          </button>
+
+        </div>
+      </div>
 
     </div>
 
@@ -56,7 +120,7 @@
     class="kpis-wrapper"
     *ngIf="seccionActiva === 'resumen'">
 
-    <app-casos-kpis [caso]="casoActual"></app-casos-kpis>
+    <app-casos-kpis [caso]="casoActual" [score]="scoreIA"></app-casos-kpis>
 
   </div>
 
@@ -68,127 +132,55 @@
     class="case-information-grid"
     *ngIf="seccionActiva === 'resumen'">
 
+    <!-- Columna principal (izquierda), como en Figma -->
+    <div class="resumen-columna-principal">
+
+      <div class="resumen-fila-superior">
     <!-- =================================
          3.1 PERSONA ASOCIADA
     ================================== -->
 
     <article class="case-information-card persona-card">
 
-      <div class="information-card-header">
-        <h3>Persona asociada</h3>
-      </div>
-
-      <div class="persona-profile">
-
-        <div class="persona-avatar">
+      <!-- Nombre con la etiqueta "Asociado" (como en Figma) -->
+      <div class="persona-encabezado">
+        <i class="bi bi-person persona-icono" aria-hidden="true"></i>
+        <h4>
           {{
-            (clienteDetalle?.fullName || casoActual.asociado)
-              ?.charAt(0)?.toUpperCase() || 'A'
+            cargandoCliente
+              ? 'Consultando cliente...'
+              : (clienteDetalle?.fullName || casoActual.asociado || 'Sin información')
           }}
-        </div>
+        </h4>
+        <span class="persona-chip">Asociado</span>
+      </div>
 
-        <div class="persona-information">
+      <p class="persona-aviso" *ngIf="errorCliente && !cargandoCliente">{{ errorCliente }}</p>
 
-          <h4>
+      <ul class="persona-datos" *ngIf="!cargandoCliente">
+        <li>
+          <i class="bi bi-credit-card-2-front" aria-hidden="true"></i>
+          <span>
             {{
-              cargandoCliente
-                ? 'Consultando cliente...'
-                : (clienteDetalle?.fullName || casoActual.asociado || 'Sin información')
+              clienteDetalle
+                ? ((clienteDetalle.documentType || 'Documento') + ' ' + (clienteDetalle.documentNumber || 'No disponible'))
+                : (casoActual.documento || 'Documento no disponible')
             }}
-          </h4>
-
-          <span>Asociado</span>
-
-        </div>
-
-      </div>
-
-      <div class="information-divider"></div>
-
-      <div *ngIf="cargandoCliente" class="information-data">
-
-        <div class="data-item">
-          <span>Información del cliente</span>
-          <strong>Consultando información del backend...</strong>
-        </div>
-
-      </div>
-
-      <div
-        *ngIf="errorCliente && !cargandoCliente"
-        class="information-data">
-
-        <div class="data-item">
-          <span>Información del cliente</span>
-          <strong>{{ errorCliente }}</strong>
-        </div>
-
-      </div>
-
-      <div
-        class="information-data"
-        *ngIf="!cargandoCliente && clienteDetalle">
-
-        <div class="data-item">
-          <span>{{ clienteDetalle.documentType || 'Documento' }}</span>
-
-          <strong>
-            {{ clienteDetalle.documentNumber || 'No disponible' }}
-          </strong>
-        </div>
-
-        <div class="data-item">
-          <span>Número de celular</span>
-
-          <strong>
-            {{
-              clienteDetalle.mobile ||
-              clienteDetalle.phone ||
-              'No disponible'
-            }}
-          </strong>
-        </div>
-
-        <div class="data-item">
-          <span>Correo electrónico</span>
-
-          <strong>
-            {{ clienteDetalle.email || 'No disponible' }}
-          </strong>
-        </div>
-
-        <div class="data-item">
-          <span>Contacto preferido</span>
-          <strong>No definido</strong>
-        </div>
-
-      </div>
-
-      <div
-        class="information-data"
-        *ngIf="!cargandoCliente && !clienteDetalle && !errorCliente">
-
-        <div class="data-item">
-          <span>Documento</span>
-          <strong>{{ casoActual.documento || 'No disponible' }}</strong>
-        </div>
-
-        <div class="data-item">
-          <span>Número de celular</span>
-          <strong>{{ casoActual.celular || 'No disponible' }}</strong>
-        </div>
-
-        <div class="data-item">
-          <span>Correo electrónico</span>
-          <strong>{{ casoActual.correoElectronico || 'No disponible' }}</strong>
-        </div>
-
-        <div class="data-item">
-          <span>Contacto preferido</span>
-          <strong>No definido</strong>
-        </div>
-
-      </div>
+          </span>
+        </li>
+        <li>
+          <i class="bi bi-telephone" aria-hidden="true"></i>
+          <span>{{ clienteDetalle?.mobile || clienteDetalle?.phone || casoActual.celular || 'Celular no disponible' }}</span>
+        </li>
+        <li>
+          <i class="bi bi-envelope" aria-hidden="true"></i>
+          <span>{{ clienteDetalle?.email || casoActual.correoElectronico || 'Correo no disponible' }}</span>
+        </li>
+        <li>
+          <i class="bi bi-chat-square persona-preferido-icono" aria-hidden="true"></i>
+          <span>Contacto preferido: <strong class="persona-preferido">{{ contactoPreferido }}</strong></span>
+        </li>
+      </ul>
 
     </article>
 
@@ -199,246 +191,49 @@
     <article class="case-information-card contexto-card">
 
       <div class="information-card-header contexto-header">
-
-        <h3>Contexto de IA</h3>
-
-        <div class="score-container">
-
-          <span>Score</span>
-
-          <strong>
-            <ng-container *ngIf="cargandoScoring">
-              ...
-            </ng-container>
-
-            <ng-container *ngIf="!cargandoScoring && scoreIA !== null">
-              {{ scoreIA }}/1000
-            </ng-container>
-
-            <ng-container *ngIf="!cargandoScoring && scoreIA === null">
-              N/D
-            </ng-container>
-          </strong>
-
-        </div>
-
+        <h3>Contexto IA del caso</h3>
+        <span class="score-chip">
+          Score
+          {{ cargandoScoring ? '...' : (scoreIA !== null ? scoreIA + ' / 1000' : 'N/D') }}
+        </span>
       </div>
 
-      <div
-        class="contexto-main-information"
-        *ngIf="cargandoScoring">
+      <p class="contexto-aviso" *ngIf="cargandoScoring">Consultando información del backend...</p>
+      <p class="contexto-aviso" *ngIf="!cargandoScoring && errorScoring">{{ errorScoring }}</p>
 
-        <div class="contexto-data-item">
-          <span>Scoring IA</span>
-          <strong>Consultando información del backend...</strong>
-        </div>
+      <!-- Etiqueta a la izquierda y valor a la derecha (como en Figma) -->
+      <dl class="contexto-filas" *ngIf="!cargandoScoring && scoringResumen">
+        <dt>Mejor siguiente acción</dt>
+        <dd>{{ siguienteAccionIA ? formatearAccion(siguienteAccionIA) : 'No disponible' }}</dd>
 
-      </div>
+        <dt>Canal sugerido</dt>
+        <dd>{{ canalRecomendadoIA ? formatearCanal(canalRecomendadoIA) : 'No disponible' }}</dd>
 
-      <div
-        class="contexto-main-information"
-        *ngIf="!cargandoScoring && errorScoring">
+        <dt>Propensión de pago</dt>
+        <dd [ngClass]="'propension-' + propensionClase">{{ propensionTexto }}</dd>
 
-        <div class="contexto-data-item">
-          <span>Información del scoring</span>
-          <strong>{{ errorScoring }}</strong>
-        </div>
-
-      </div>
-
-      <div
-        class="contexto-main-information"
-        *ngIf="!cargandoScoring && scoringResumen">
-
-        <div class="contexto-data-item">
-          <span>Mejor siguiente acción</span>
-
-          <strong>
-            {{
-              siguienteAccionIA
-                ? formatearAccion(siguienteAccionIA)
-                : 'No disponible'
-            }}
-          </strong>
-        </div>
-
-        <div class="contexto-data-item">
-          <span>Canal sugerido</span>
-
-          <strong>
-            {{
-              canalRecomendadoIA
-                ? formatearCanal(canalRecomendadoIA)
-                : 'No disponible'
-            }}
-          </strong>
-        </div>
-
-        <div class="contexto-data-item">
-          <span>Probabilidad de recaudo</span>
-
-          <strong>
-            {{
-              probabilidadRecaudoIA !== null
-                ? (probabilidadRecaudoIA | number:'1.0-2') + '%'
-                : 'No disponible'
-            }}
-          </strong>
-        </div>
-
-        <div class="contexto-data-item">
-          <span>Nivel de riesgo</span>
-
-          <strong>
-            {{ nivelRiesgoIA || 'No disponible' }}
-          </strong>
-        </div>
-
-        <div class="contexto-data-item">
-          <span>Segmento recomendado</span>
-
-          <strong>
-            {{ segmentoRecomendadoIA || 'No disponible' }}
-          </strong>
-        </div>
-
-      </div>
+        <dt>Motivo de prioridad</dt>
+        <dd>{{ motivoPrioridad }}</dd>
+      </dl>
 
       <div class="information-divider"></div>
 
       <div class="efectividad-container">
-
         <h4>Histórico de efectividad</h4>
-
-        <div class="efectividad-items">
-
-          <div class="efectividad-item whatsapp">
-            <span>WhatsApp</span>
-            <strong>No disponible</strong>
-          </div>
-
-          <div class="efectividad-item sms">
-            <span>SMS</span>
-            <strong>No disponible</strong>
-          </div>
-
-          <div class="efectividad-item llamada">
-            <span>Llamada</span>
-            <strong>No disponible</strong>
-          </div>
-
+        <div class="efectividad-chips">
+          <span class="efectividad-chip whatsapp">WhatsApp {{ efectividadCanal('WHATSAPP') }}</span>
+          <span class="efectividad-chip sms">SMS {{ efectividadCanal('SMS') }}</span>
+          <span class="efectividad-chip llamada">Llamada {{ efectividadCanal('LLAMADA') }}</span>
         </div>
-
       </div>
 
-      <button
-        type="button"
-        class="btn-explicacion-score"
-        (click)="verExplicacionScore()">
-
+      <button type="button" class="btn-explicacion-score" (click)="verExplicacionScore()">
         Ver explicación del score
-        <span>›</span>
-
       </button>
 
     </article>
 
-    <!-- =====================================
-         3.3 ACCIONES RÁPIDAS
-    ====================================== -->
-
-    <article class="case-information-card acciones-card">
-
-      <div class="information-card-header">
-        <h3>Acciones rápidas</h3>
       </div>
-
-      <div class="quick-actions-grid">
-
-        <button
-          type="button"
-          class="quick-action-button"
-          (click)="generarLink()">
-
-          <img
-            src="/imagenes/Gestioncasos/Generar-link.png"
-            alt="Generar link">
-
-          <span>Generar link</span>
-        </button>
-
-        <button
-          type="button"
-          class="quick-action-button"
-          (click)="contactarWhatsApp()">
-
-          <img
-            src="/imagenes/Gestioncasos/WhatsApp.png"
-            alt="WhatsApp">
-
-          <span>WhatsApp</span>
-        </button>
-
-        <button
-          type="button"
-          class="quick-action-button"
-          (click)="llamarAsociado()">
-
-          <img
-            src="/imagenes/Gestioncasos/Llamar.png"
-            alt="Llamar">
-
-          <span>Llamar</span>
-        </button>
-
-        <button
-          type="button"
-          class="quick-action-button"
-          (click)="enviarEmail()">
-
-          <img
-            src="/imagenes/Gestioncasos/Enviar-email.png"
-            alt="Enviar Email">
-
-          <span>Enviar Email</span>
-        </button>
-
-        <button
-          type="button"
-          class="quick-action-button"
-          (click)="crearPromesa()">
-
-          <img
-            src="/imagenes/Gestioncasos/Crear-promesa.png"
-            alt="Crear promesa">
-
-          <span>Crear promesa</span>
-        </button>
-
-        <button
-          type="button"
-          class="quick-action-button"
-          (click)="enviarSMS()">
-
-          <img
-            src="/imagenes/Gestioncasos/Enviar-SMS.png"
-            alt="Enviar SMS">
-
-          <span>Enviar SMS</span>
-        </button>
-
-      </div>
-
-      <button
-        type="button"
-        class="quick-action-escalate"
-        (click)="escalarCaso()">
-
-        <span>Escalar caso</span>
-
-      </button>
-
-    </article>
 
     <!-- =====================================
          3.4 CONTEXTO Y RECOMENDACIÓN DE IA
@@ -449,8 +244,8 @@
       <div class="recomendacion-header">
 
         <div class="recomendacion-title">
+          <i class="bi bi-cpu recomendacion-icono" aria-hidden="true"></i>
           <h3>Contexto y recomendación de IA</h3>
-          <span class="ia-indicator">IA</span>
         </div>
 
         <span class="recomendacion-actualizado">
@@ -486,25 +281,18 @@
         <div class="recomendacion-indicators">
 
           <div class="propension-indicator">
-
-            <span>Probabilidad de recaudo:</span>
-
-            <strong>
-              {{
-                probabilidadRecaudoIA !== null
-                  ? (probabilidadRecaudoIA | number:'1.0-2') + '%'
-                  : 'No disponible'
-              }}
-            </strong>
-
+            <i class="punto-propension" [ngClass]="'propension-' + propensionClase"></i>
+            <span>Propensión de pago:</span>
+            <strong [ngClass]="'propension-' + propensionClase">{{ propensionTexto }}</strong>
           </div>
 
           <div class="confianza-indicator">
-
             <span>Confianza de la recomendación:</span>
-
-            <strong>No disponible</strong>
-
+            <ng-container *ngIf="confianzaRecomendacion !== null; else sinConfianza">
+              <span class="confianza-barra"><i [style.width.%]="confianzaRecomendacion"></i></span>
+              <strong>{{ confianzaRecomendacion }}%</strong>
+            </ng-container>
+            <ng-template #sinConfianza><strong>No disponible</strong></ng-template>
           </div>
 
         </div>
@@ -513,28 +301,26 @@
 
           <div class="recomendacion-info-box">
 
-            <h4>Detalle del cálculo</h4>
+            <h4><i class="bi bi-exclamation-circle titulo-icono rojo" aria-hidden="true"></i> Motivo de desborde</h4>
 
-            <p class="motivo-desborde-text">
+            <p class="motivo-desborde-text" [class.texto-rojo]="desborde?.triggered">
+              {{
+                desborde?.triggered
+                  ? (condicionesDesborde.join(' + ') || 'Desborde a gestión humana')
+                  : (desborde ? 'Sin desborde activo' : 'No disponible')
+              }}
+            </p>
+
+            <p class="motivo-desborde-detail">
               Nivel de riesgo:
               {{ nivelRiesgoIA || 'No disponible' }}
-            </p>
-
-            <p class="motivo-desborde-detail">
-              Segmento recomendado:
-              {{ segmentoRecomendadoIA || 'No disponible' }}
-            </p>
-
-            <p class="motivo-desborde-detail">
-              Origen del cálculo:
-              {{ origenCalculoIA || 'No disponible' }}
             </p>
 
           </div>
 
           <div class="recomendacion-info-box">
 
-            <h4>Mejor siguiente acción</h4>
+            <h4><i class="bi bi-graph-up-arrow titulo-icono" aria-hidden="true"></i> Mejor siguiente acción</h4>
 
             <p class="motivo-desborde-text">
               {{
@@ -549,36 +335,6 @@
               {{
                 canalRecomendadoIA
                   ? formatearCanal(canalRecomendadoIA)
-                  : 'No disponible'
-              }}
-            </p>
-
-            <p class="motivo-desborde-detail">
-              Versión del modelo:
-              {{ versionModeloIA || 'No disponible' }}
-            </p>
-
-          </div>
-
-          <div class="recomendacion-info-box guion-sugerido-box">
-
-            <h4>Información del motor IA</h4>
-
-            <p class="motivo-desborde-text">
-              Motor:
-              {{ motorUtilizadoIA || 'No disponible' }}
-            </p>
-
-            <p class="motivo-desborde-detail">
-              Motivo de fallback:
-              {{ motivoFallbackIA || 'No reportado' }}
-            </p>
-
-            <p class="motivo-desborde-detail">
-              Probabilidad de recaudo:
-              {{
-                probabilidadRecaudoIA !== null
-                  ? (probabilidadRecaudoIA | number:'1.0-2') + '%'
                   : 'No disponible'
               }}
             </p>
@@ -600,6 +356,142 @@
     </article>
 
     
+    <!-- =================================
+         3.6 TIPIFICACIÓN RÁPIDA
+    ================================== -->
+
+    <article class="case-information-card tipificacion-card">
+
+      <div class="information-card-header">
+
+        <h3>Tipificación rápida</h3>
+
+      </div>
+
+      <div class="tipificacion-content">
+
+        <p class="tipificacion-description">
+          Selecciona el resultado de tu gestión y la próxima acción
+        </p>
+
+        <div class="tipificacion-fields-row">
+
+          <div class="tipificacion-field">
+
+            <label for="resultado-contacto">
+              Resultado de contacto <span>*</span>
+            </label>
+
+            <select id="resultado-contacto" name="resultadoContacto" [(ngModel)]="tipificacion.resultado">
+              <option value="">Seleccionar resultado</option>
+              <option value="contacto-efectivo">Contacto efectivo</option>
+              <option value="sin-respuesta">Sin respuesta</option>
+              <option value="no-contactado">No contactado</option>
+              <option value="numero-equivocado">Número equivocado</option>
+              <option value="tercero-contactado">Contacto con tercero</option>
+              <option value="promesa-pago">Promesa de pago</option>
+              <option value="rechaza-pago">Rechaza realizar el pago</option>
+            </select>
+
+          </div>
+
+          <div class="tipificacion-field">
+
+            <label for="proxima-accion">
+              Próxima acción <span>*</span>
+            </label>
+
+            <select id="proxima-accion" name="proximaAccion" [(ngModel)]="tipificacion.proximaAccion">
+              <option value="">Seleccionar próxima acción</option>
+              <option value="nueva-llamada">Programar nueva llamada</option>
+              <option value="enviar-whatsapp">Enviar WhatsApp</option>
+              <option value="enviar-sms">Enviar SMS</option>
+              <option value="enviar-email">Enviar email</option>
+              <option value="crear-promesa">Crear promesa de pago</option>
+              <option value="seguimiento">Realizar seguimiento</option>
+              <option value="escalar-caso">Escalar caso</option>
+              <option value="sin-accion">Sin acción adicional</option>
+            </select>
+
+          </div>
+
+        </div>
+
+        <div class="tipificacion-field tipificacion-note-field">
+
+          <label for="comentario-gestion">
+            Comentario / nota
+          </label>
+
+          <textarea
+            id="comentario-gestion"
+            name="comentarioGestion"
+            [(ngModel)]="tipificacion.comentario"
+            maxlength="500"
+            placeholder="Escribe una nota sobre la gestión realizada...">
+          </textarea>
+
+        </div>
+
+        <div class="tipificacion-actions">
+
+          <button
+            type="button"
+            class="btn-tipificacion-guardar"
+            [disabled]="guardandoTipificacion || !tipificacion.resultado || !tipificacion.proximaAccion"
+            (click)="guardarGestion()">
+            <i class="bi bi-floppy" aria-hidden="true"></i>
+            {{ guardandoTipificacion ? 'Guardando...' : 'Guardar gestión' }}
+          </button>
+
+        </div>
+
+      </div>
+
+    </article>
+
+    </div>
+
+    <!-- Columna lateral (derecha): acciones e historial -->
+    <div class="resumen-columna-lateral">
+
+    <!-- =====================================
+         3.3 ACCIONES RÁPIDAS
+    ====================================== -->
+
+    <article class="case-information-card acciones-card">
+
+      <div class="information-card-header">
+        <h3>Acciones rápidas</h3>
+      </div>
+
+      <!-- Como en Figma: 4 acciones (el link de pago está en el botón "Acciones" de arriba) -->
+      <div class="quick-actions-grid quick-actions-4">
+
+        <button type="button" class="quick-action-button" (click)="contactarWhatsApp()">
+          <i class="bi bi-chat-square quick-icono whatsapp" aria-hidden="true"></i>
+          <span>WhatsApp</span>
+        </button>
+
+        <button type="button" class="quick-action-button" (click)="llamarAsociado()">
+          <i class="bi bi-telephone quick-icono llamar" aria-hidden="true"></i>
+          <span>Llamar</span>
+        </button>
+
+        <button type="button" class="quick-action-button" (click)="enviarEmail()">
+          <i class="bi bi-envelope quick-icono" aria-hidden="true"></i>
+          <span>Enviar Email</span>
+        </button>
+
+        <button type="button" class="quick-action-button" (click)="enviarSMS()">
+          <i class="bi bi-chat-left-text quick-icono" aria-hidden="true"></i>
+          <span>Enviar SMS</span>
+        </button>
+
+      </div>
+
+    </article>
+
 <!-- =================================
      3.5 HISTORIAL DE CONTACTOS
 ================================== -->
@@ -716,97 +608,7 @@
 
 </article>
 
-    <!-- =================================
-         3.6 TIPIFICACIÓN RÁPIDA
-    ================================== -->
-
-    <article class="case-information-card tipificacion-card">
-
-      <div class="information-card-header">
-
-        <h3>Tipificación rápida</h3>
-
-        <span class="tipificacion-indicator">
-          Gestión del caso
-        </span>
-
-      </div>
-
-      <div class="tipificacion-content">
-
-        <p class="tipificacion-description">
-          Selecciona el resultado de tu gestión y la próxima acción
-        </p>
-
-        <div class="tipificacion-fields-row">
-
-          <div class="tipificacion-field">
-
-            <label for="resultado-contacto">
-              Resultado de contacto <span>*</span>
-            </label>
-
-            <select id="resultado-contacto">
-              <option value="">Seleccionar resultado</option>
-              <option value="contacto-efectivo">Contacto efectivo</option>
-              <option value="sin-respuesta">Sin respuesta</option>
-              <option value="no-contactado">No contactado</option>
-              <option value="numero-equivocado">Número equivocado</option>
-              <option value="tercero-contactado">Contacto con tercero</option>
-              <option value="promesa-pago">Promesa de pago</option>
-              <option value="rechaza-pago">Rechaza realizar el pago</option>
-            </select>
-
-          </div>
-
-          <div class="tipificacion-field">
-
-            <label for="proxima-accion">
-              Próxima acción <span>*</span>
-            </label>
-
-            <select id="proxima-accion">
-              <option value="">Seleccionar próxima acción</option>
-              <option value="nueva-llamada">Programar nueva llamada</option>
-              <option value="enviar-whatsapp">Enviar WhatsApp</option>
-              <option value="enviar-sms">Enviar SMS</option>
-              <option value="enviar-email">Enviar email</option>
-              <option value="crear-promesa">Crear promesa de pago</option>
-              <option value="seguimiento">Realizar seguimiento</option>
-              <option value="escalar-caso">Escalar caso</option>
-              <option value="sin-accion">Sin acción adicional</option>
-            </select>
-
-          </div>
-
-        </div>
-
-        <div class="tipificacion-field tipificacion-note-field">
-
-          <label for="comentario-gestion">
-            Comentario / nota
-          </label>
-
-          <textarea
-            id="comentario-gestion"
-            placeholder="Escribe una nota sobre la gestión realizada...">
-          </textarea>
-
-        </div>
-
-        <div class="tipificacion-actions">
-
-          <button
-            type="button"
-            class="btn-tipificacion-guardar">
-            Guardar gestión
-          </button>
-
-        </div>
-
-      </div>
-
-    </article>
+    </div>
 
   </section>
 
@@ -815,7 +617,9 @@
   ====================================== -->
 
   <app-historial-bitacora
-    *ngIf="seccionActiva === 'historial'">
+    *ngIf="seccionActiva === 'historial'"
+    [eventos]="eventosBitacora"
+    [cargando]="cargandoHistorialContactos">
   </app-historial-bitacora>
 
  <!-- =====================================
@@ -824,7 +628,11 @@
 
 <app-notas-resumen
   *ngIf="seccionActiva === 'notas'"
-  [notas]="notasCaso">
+  [notas]="notasCaso"
+  [guardando]="guardandoNota"
+  [error]="errorNota"
+  (guardar)="guardarNotaCaso($event)"
+  (aclarar)="guardarAclaracionCaso($any($event))">
 </app-notas-resumen>
 
   <!-- =====================================
@@ -1004,13 +812,13 @@
 
           <div>
             <h3>
-              {{ linkPagoGenerado ? 'Link enviado' : 'Generar Link de pago' }}
+              {{ linkPagoGenerado ? (linkEnviado ? 'Link enviado' : 'Link generado') : 'Generar Link de pago' }}
             </h3>
 
             <p>
               {{
                 linkPagoGenerado
-                  ? 'El enlace de pago ha sido generado y enviado exitosamente.'
+                  ? (linkEnviado ? 'El enlace se abrió en el canal elegido para enviarlo al asociado.' : 'El enlace de pago fue generado. Falta enviarlo al asociado.')
                   : 'Configura y envía un enlace de pago asociado a este caso.'
               }}
             </p>
@@ -1088,14 +896,18 @@
           *ngIf="linkPagoGenerado">
 
           <img
-            src="/imagenes/Gestioncasos/Link-enviado.png"
+            src="/imagenes/Gestioncasos/Generar-link.png"
             alt="Link enviado"
             class="payment-success-image">
 
-          <h3>Link enviado</h3>
+          <h3>{{ linkEnviado ? 'Link enviado' : 'Link generado' }}</h3>
 
           <p>
-            El enlace de pago ha sido generado y enviado exitosamente.
+            {{
+              linkEnviado
+                ? 'Se abrió ' + formatearCanal(canalPago) + ' con el mensaje listo y quedó registrado en el caso.'
+                : 'El enlace de pago está listo. Envíalo al asociado con el botón "Enviar por ' + formatearCanal(canalPago) + '".'
+            }}
           </p>
 
         </aside>
@@ -1345,14 +1157,23 @@
 
             <!-- ACCIONES DEL ÉXITO -->
 
-            <div class="payment-success-actions">
+            <p class="payment-estado" *ngIf="estadoPago">
+              Estado del pago: <strong>{{ estadoPago }}</strong>
+            </p>
 
+            <div class="payment-success-actions">
               <button
                 type="button"
-                class="btn-success-detail">
-
-                Ver detalle
-
+                class="btn-success-send"
+                (click)="enviarLinkPago()">
+                {{ linkEnviado ? 'Volver a enviar' : 'Enviar por ' + formatearCanal(canalPago) }}
+              </button>
+              <button
+                type="button"
+                class="btn-success-detail"
+                [disabled]="consultandoEstadoPago"
+                (click)="consultarEstadoPago()">
+                {{ consultandoEstadoPago ? 'Consultando...' : 'Ver detalle' }}
               </button>
 
               <button
@@ -1422,4 +1243,76 @@
 
   </div>
 
+</div>
+
+
+<!-- Aviso de las acciones (vista previa) -->
+<div class="aviso-acciones" *ngIf="avisoAcciones" role="status">{{ avisoAcciones }}</div>
+
+
+<!-- =====================================
+     VENTANAS DE ACCIONES (asignar, cerrar)
+====================================== -->
+
+<div class="accion-fondo" *ngIf="ventanaAccion" (click)="cerrarVentanaAccion()">
+  <div class="accion-modal" role="dialog" aria-modal="true" aria-labelledby="titulo-accion" (click)="$event.stopPropagation()">
+
+    <div class="accion-encabezado">
+      <h3 id="titulo-accion">
+        {{
+          ventanaAccion === 'asignar' ? 'Asignar asesor' : 'Cerrar caso'
+        }}
+      </h3>
+      <button type="button" aria-label="Cerrar" (click)="cerrarVentanaAccion()"><i class="bi bi-x-lg"></i></button>
+    </div>
+
+    <p class="accion-caso">{{ caso?.id }} · {{ caso?.asociado }}</p>
+
+    <!-- ASIGNAR -->
+    <ng-container *ngIf="ventanaAccion === 'asignar'">
+      <label class="accion-campo">
+        Asesor *
+        <select [(ngModel)]="asesorCasoId" name="asesorCaso" [disabled]="asesoresCaso.length === 0">
+          <option [ngValue]="null" disabled>{{ asesoresCaso.length ? 'Selecciona un asesor' : 'Cargando asesores...' }}</option>
+          <option
+            *ngFor="let a of asesoresCaso"
+            [ngValue]="a.advisorId"
+            [disabled]="!a.active || a.atCapacity">
+            {{ a.fullName }} · {{ a.activeCases }}/{{ a.effectiveMaxCases || '—' }} casos{{ a.atCapacity ? ' (sin cupo)' : '' }}
+          </option>
+        </select>
+      </label>
+    </ng-container>
+
+    <!-- CERRAR -->
+    <ng-container *ngIf="ventanaAccion === 'cerrar'">
+      <label class="accion-campo">
+        ¿Cómo se cierra el caso? *
+        <select [(ngModel)]="tipoCierre" name="tipoCierre">
+          <option value="" disabled>Selecciona el tipo de cierre</option>
+          <option *ngFor="let t of tiposCierre" [value]="t.valor">{{ t.texto }}</option>
+        </select>
+      </label>
+      <label class="accion-campo">
+        Detalle (opcional)
+        <textarea rows="3" maxlength="300" [(ngModel)]="detalleCierre" name="detalleCierre"></textarea>
+      </label>
+      <p class="accion-ayuda aviso">El caso queda cerrado y sale de la cola de gestión.</p>
+    </ng-container>
+
+    <p class="accion-error" *ngIf="errorAccion" role="alert">{{ errorAccion }}</p>
+
+    <div class="accion-botones">
+      <button type="button" class="accion-secundario" [disabled]="guardandoAccion" (click)="cerrarVentanaAccion()">Cancelar</button>
+      <button
+        type="button"
+        class="accion-primario"
+        [class.peligro]="ventanaAccion === 'cerrar'"
+        [disabled]="guardandoAccion"
+        (click)="confirmarVentanaAccion()">
+        {{ guardandoAccion ? 'Guardando...' : (ventanaAccion === 'cerrar' ? 'Cerrar caso' : 'Confirmar') }}
+      </button>
+    </div>
+
+  </div>
 </div>

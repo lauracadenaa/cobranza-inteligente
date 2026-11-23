@@ -493,7 +493,7 @@ tbody tr:hover {
 
 .managed-cases-table table {
   width: 100%;
-  min-width: 850px;
+  min-width: 760px;
 }
 
 .managed-cases-table thead {
@@ -510,7 +510,7 @@ tbody tr:hover {
 
 .managed-cases-table thead th {
   height: 44px;
-  padding: 0 16px;
+  padding: 0 12px;
   box-sizing: border-box;
 
   text-align: left;
@@ -546,14 +546,14 @@ tbody tr:hover {
 
 .managed-cases-table tbody td {
   height: 52px;
-  padding: 0 16px;
+  padding: 0 12px;
   box-sizing: border-box;
 
   text-align: left;
   vertical-align: middle;
 
   font-family: 'Roboto', sans-serif;
-  font-size: clamp(12px, 0.75rem + 0.15vw, 14px);
+  font-size: 13px;
   font-weight: 400;
   line-height: 140%;
   letter-spacing: 0;
@@ -567,6 +567,29 @@ tbody tr:hover {
 /* NOMBRE DE LOS CASOS */
 /* ================================================== */
 
+.asesor-celda {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.asesor-avatar {
+  width: 22px;
+  height: 22px;
+  flex-shrink: 0;
+
+  display: inline-grid;
+  place-items: center;
+
+  border: 1px solid #BFD3FF;
+  border-radius: 50%;
+  background: #EAF1FF;
+  color: #2764E7;
+
+  font-size: 9px;
+  font-weight: 700;
+}
+
 .managed-cases-table tbody td:first-child,
 .managed-cases-table tbody td:first-child a {
   width: 137px;
@@ -574,7 +597,7 @@ tbody tr:hover {
 
   font-family: 'Roboto', sans-serif;
   font-weight: 500;
-  font-size: clamp(12px, 0.75rem + 0.15vw, 14px);
+  font-size: 13px;
   line-height: 140%;
   letter-spacing: 0;
 
@@ -718,7 +741,6 @@ tbody tr:hover {
 
 .quick-card {
   width: 100%;
-  max-width: 360px;
   height: 67px;
   min-width: 0;
 
@@ -740,6 +762,18 @@ tbody tr:hover {
 
   cursor: pointer;
   transition: 0.2s;
+}
+
+/* Colores de cada acción, como en Figma */
+.quick-card:nth-child(1),
+.quick-card:nth-child(2) {
+  background: #EEF4FF;
+  border-color: #D6E4FF;
+}
+
+.quick-card:nth-child(3) {
+  background: #E9F8F4;
+  border-color: #CDEFE5;
 }
 
 .quick-card:hover {
@@ -1688,4 +1722,41 @@ tbody tr:hover {
     height: 67px;
     min-height: 67px;
   }
+}
+
+
+/* ================================================== */
+/* TABLA DE CASOS: CABE SIN DESPLAZARSE (Figma) */
+/* Los textos largos se cortan con "…" y el texto completo sale al pasar el mouse */
+/* ================================================== */
+
+.managed-cases-table tbody td.celda-corta {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.managed-cases-table tbody td.celda-caso {
+  max-width: 150px;
+}
+
+.managed-cases-table tbody td.celda-asociado {
+  max-width: 190px;
+}
+
+.asesor-celda {
+  max-width: 170px;
+}
+
+.asesor-nombre {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.pagination-button.pagination-dots,
+.pagination-button.pagination-dots:disabled {
+  cursor: default;
+  background: transparent;
+  border-color: transparent;
+  color: #64748B;
 }

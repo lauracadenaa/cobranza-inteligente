@@ -1,0 +1,648 @@
+<div class="dashboard-layout">
+
+  <!-- SIDEBAR -->
+  <app-sidebar></app-sidebar>
+
+  <!-- CONTENIDO PRINCIPAL -->
+  <main class="dashboard-content">
+
+    <!-- ENCABEZADO (muestra el usuario real que inició sesión) -->
+    <div class="header-container">
+      <app-dashboard-header
+        [tituloPersonalizado]="'Links y pagos'"
+        [descripcionPersonalizada]="'Consulta los links enviados, los pagos realizados y el estado de la integración con PSE'">
+      </app-dashboard-header>
+    </div>
+
+    <!-- INDICADORES KPI -->
+    <section class="kpi-grid">
+
+      <article class="kpi-card" *ngFor="let kpi of kpis">
+
+        <div class="kpi-top">
+          <span>{{ kpi.titulo }}</span>
+
+          <span class="kpi-icon" [ngClass]="'icon-' + kpi.icono">
+            <ng-container [ngSwitch]="kpi.icono">
+              <i *ngSwitchCase="'money'" class="bi bi-cash" aria-hidden="true"></i>
+              <i *ngSwitchCase="'send'" class="bi bi-send" aria-hidden="true"></i>
+              <i *ngSwitchCase="'check'" class="bi bi-check-circle" aria-hidden="true"></i>
+              <i *ngSwitchCase="'chart'" class="bi bi-bar-chart-line" aria-hidden="true"></i>
+            </ng-container>
+          </span>
+        </div>
+
+        <h2>{{ kpi.valor }}</h2>
+
+        <div class="kpi-comparison">
+          <ng-container *ngIf="kpi.variacion; else sinComparacion">
+            <span>{{ kpi.variacion }}</span>
+            <small>vs 30 días anteriores</small>
+          </ng-container>
+          <ng-template #sinComparacion>
+            <small>Últimos 30 días</small>
+          </ng-template>
+        </div>
+
+      </article>
+
+      <!-- Mientras carga, 4 tarjetas vacías para que no salte el diseño -->
+      <ng-container *ngIf="!kpis.length">
+        <article class="kpi-card cargando-tarjeta" *ngFor="let i of [1, 2, 3, 4]">
+          <div class="kpi-top"><span>{{ cargando ? 'Cargando...' : '—' }}</span></div>
+        </article>
+      </ng-container>
+
+    </section>
+
+    <!-- PANEL DE ANÁLISIS -->
+    <section class="analytics-grid">
+
+      <!-- EVOLUCIÓN -->
+      <article class="panel evolution-panel">
+
+        <h3>Evolución de links y pagos (Últimos 30 días)</h3>
+
+        <div class="chart-legend">
+          <span><i class="legend-blue"></i> Links enviados</span>
+          <span><i class="legend-green"></i> Pagos realizados</span>
+        </div>
+
+        <div class="chart-container">
+
+          <div class="chart-y-labels">
+            <span *ngFor="let marca of etiquetasY">{{ marca }}</span>
+          </div>
+
+          <div class="chart-content">
+
+            <svg viewBox="0 0 500 150" preserveAspectRatio="none">
+
+              <defs>
+                <linearGradient id="blueGradient" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="#2864F0" stop-opacity=".30"/>
+                  <stop offset="100%" stop-color="#2864F0" stop-opacity="0"/>
+                </linearGradient>
+
+                <linearGradient id="greenGradient" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="#10B981" stop-opacity=".30"/>
+                  <stop offset="100%" stop-color="#10B981" stop-opacity="0"/>
+                </linearGradient>
+              </defs>
+
+              <g class="chart-grid-lines">
+                <line x1="0" y1="10" x2="500" y2="10"/>
+                <line x1="0" y1="42" x2="500" y2="42"/>
+                <line x1="0" y1="74" x2="500" y2="74"/>
+                <line x1="0" y1="106" x2="500" y2="106"/>
+                <line x1="0" y1="138" x2="500" y2="138"/>
+              </g>
+
+              <ng-container *ngIf="grafico.lineaLinks">
+                <path [attr.d]="grafico.areaLinks" fill="url(#blueGradient)"/>
+                <path [attr.d]="grafico.areaPagos" fill="url(#greenGradient)"/>
+                <path [attr.d]="grafico.lineaLinks" class="blue-line"/>
+                <path [attr.d]="grafico.lineaPagos" class="green-line"/>
+              </ng-container>
+
+            </svg>
+
+            <div class="chart-x-labels">
+              <span *ngFor="let etiqueta of grafico.etiquetasX">{{ etiqueta }}</span>
+            </div>
+
+          </div>
+        </div>
+
+      </article>
+
+      <!-- EFECTIVIDAD POR CANAL -->
+      <article class="panel channel-panel">
+
+        <h3>Efectividad por canal</h3>
+
+        <p class="panel-description">
+          Porcentaje de links enviados por cada canal que finalizaron en pago
+        </p>
+
+        <div class="channel-list">
+
+          <div class="channel-item" *ngFor="let canal of canales">
+
+            <div class="channel-name">{{ canal.nombre }}</div>
+
+            <div class="channel-data">
+              <div class="progress-track">
+                <div class="progress-value" [style.width.%]="canal.porcentaje"></div>
+              </div>
+
+              <div class="channel-details">
+                <strong>{{ canal.porcentaje }}%</strong>
+                <span>{{ canal.pagados }} pagados de {{ canal.enviados }} enviados</span>
+              </div>
+            </div>
+
+          </div>
+
+          <p class="panel-description" *ngIf="!cargando && !canales.length">
+            Todavía no hay links enviados.
+          </p>
+
+        </div>
+
+      </article>
+
+      <!-- ESTADO DE PASARELA -->
+      <article class="panel gateway-panel">
+
+        <h3>Estado de pasarela</h3>
+
+        <div class="gateway-name">
+          <div class="gateway-icon"><i class="bi bi-bank" aria-hidden="true"></i></div>
+          <strong>PSE</strong>
+        </div>
+
+        <div class="gateway-information">
+          <small>Links activos (sin pagar)</small>
+          <strong>{{ cargando ? '—' : linksActivos }}</strong>
+        </div>
+
+        <div class="gateway-information">
+          <small>Última transacción</small>
+          <strong>{{ cargando ? '—' : ultimaTransaccion }}</strong>
+        </div>
+
+      </article>
+
+    </section>
+
+    <!-- CONTENEDOR DE PAGOS Y LINKS (+ panel de detalle a la derecha) -->
+    <div class="transactions-layout" [class.con-detalle]="registroSeleccionado">
+
+    <section class="transactions-panel">
+
+      <!-- CABECERA DE TABLA -->
+      <div class="transactions-header">
+
+        <div class="transactions-title">
+          <h2>{{ pestanaActiva === 'pagos' ? 'Pagos' : 'Links de pago' }}</h2>
+          <p>
+            {{ pestanaActiva === 'pagos'
+              ? 'Consulta los pagos confirmados mediante PSE y su relación con la cartera'
+              : 'Consulta los links generados, su estado y los pagos asociados'
+            }}
+          </p>
+        </div>
+
+        <div class="transactions-actions">
+
+          <button class="tab-button" [class.active]="pestanaActiva === 'links'"
+            (click)="cambiarPestana('links')">
+            Links de pago
+          </button>
+
+          <button class="tab-button" [class.active]="pestanaActiva === 'pagos'"
+            (click)="cambiarPestana('pagos')">
+            Pagos
+          </button>
+
+          <button class="create-button" *ngIf="!registroSeleccionado" (click)="abrirModalCrear()">
+            <i class="bi bi-plus-lg" aria-hidden="true"></i> Crear link de pago
+          </button>
+
+        </div>
+
+      </div>
+
+      <!-- BUSCADOR Y FILTROS -->
+      <div class="table-toolbar">
+
+        <div class="toolbar-left">
+
+          <div class="search-box">
+            <i class="bi bi-search" aria-hidden="true"></i>
+            <input
+              type="text"
+              [(ngModel)]="busqueda"
+              (ngModelChange)="paginaActual = 1"
+              [placeholder]="registroSeleccionado ? 'Buscar...' : 'Buscar por link, asociado, documento u obligación...'">
+          </div>
+
+          <button class="filter-button" (click)="mostrarFiltros = !mostrarFiltros">
+            <i class="bi bi-funnel" aria-hidden="true"></i> Filtros
+          </button>
+
+        </div>
+
+        <div class="update-area">
+          <span class="update-label">{{ textoActualizado }}</span>
+          <button type="button" class="refresh-button" title="Actualizar"
+            [disabled]="cargando" (click)="refrescar()">
+            <i class="bi bi-arrow-repeat" aria-hidden="true"></i>
+          </button>
+        </div>
+
+      </div>
+
+      <!-- FILTROS -->
+      <div class="filter-content" *ngIf="mostrarFiltros">
+
+        <label>
+          Estado
+          <select [(ngModel)]="filtroEstado" (ngModelChange)="paginaActual = 1">
+            <option value="Todos">Todos</option>
+            <option *ngFor="let estado of estadosDisponibles" [value]="estado">{{ estado }}</option>
+          </select>
+        </label>
+
+        <button (click)="filtroEstado = 'Todos'; paginaActual = 1">Limpiar filtros</button>
+
+      </div>
+
+      <!-- TABLA -->
+      <div class="table-container">
+
+        <table>
+
+          <thead>
+            <tr>
+              <th>{{ pestanaActiva === 'pagos' ? 'ID PAGO' : 'ID LINK' }}</th>
+              <th>ASOCIADO</th>
+              <th *ngIf="!registroSeleccionado">OBLIGACIÓN</th>
+              <th>VALOR</th>
+              <th>{{ pestanaActiva === 'pagos' ? 'ORIGEN' : 'CANAL' }}</th>
+              <th>ESTADO</th>
+              <th *ngIf="!registroSeleccionado">{{ pestanaActiva === 'pagos' ? 'FECHA DE PAGO' : 'FECHA DE ENVÍO' }}</th>
+              <th>ACCIONES</th>
+            </tr>
+          </thead>
+
+          <tbody>
+
+            <tr *ngIf="cargando && !registrosFiltrados.length">
+              <td [attr.colspan]="registroSeleccionado ? 6 : 8" class="empty-state">Cargando información...</td>
+            </tr>
+
+            <tr *ngIf="errorCarga && !cargando">
+              <td [attr.colspan]="registroSeleccionado ? 6 : 8" class="empty-state">
+                <p class="error-carga">{{ errorCarga }}</p>
+                <button type="button" class="filter-button" (click)="cargar()">Reintentar</button>
+              </td>
+            </tr>
+
+            <tr *ngFor="let registro of registrosPagina"
+              [class.fila-seleccionada]="registro === registroSeleccionado">
+
+              <td class="id-cell">{{ registro.codigo }}</td>
+
+              <td>
+                <span class="asociado-nombre">{{ registro.asociado }}</span>
+                <small class="asociado-doc" *ngIf="registro.documento">{{ registro.documento }}</small>
+              </td>
+
+              <td *ngIf="!registroSeleccionado">{{ registro.obligacion }}</td>
+
+              <td class="amount-cell">{{ formatearValor(registro.valor) }}</td>
+
+              <td>{{ nombreCanal(registro.canal) }}</td>
+
+              <td>
+                <span class="status-badge" [ngClass]="obtenerClaseEstado(registro.estado)">
+                  {{ registro.estado }}
+                </span>
+              </td>
+
+              <td *ngIf="!registroSeleccionado">
+                {{ fechaCorta(pestanaActiva === 'pagos' ? registro.fecha : registro.creado) }}
+              </td>
+
+              <td>
+                <button type="button" class="detail-link" (click)="abrirDetalle(registro)">
+                  Ver detalle
+                </button>
+              </td>
+
+            </tr>
+
+            <tr *ngIf="!cargando && !errorCarga && registrosFiltrados.length === 0">
+              <td [attr.colspan]="registroSeleccionado ? 6 : 8" class="empty-state">
+                {{ busqueda || filtroEstado !== 'Todos' ? 'No hay resultados con esa búsqueda.' : 'Todavía no hay registros.' }}
+              </td>
+            </tr>
+
+          </tbody>
+
+        </table>
+
+      </div>
+
+      <div class="table-footer">
+        <span>{{ textoMostrando }}</span>
+
+        <nav class="pagination" aria-label="Paginación">
+          <button type="button" class="page-arrow" title="Página anterior"
+            [disabled]="paginaActual <= 1" (click)="irAPagina(paginaActual - 1)">
+            <i class="bi bi-chevron-left" aria-hidden="true"></i>
+          </button>
+
+          <ng-container *ngFor="let pagina of paginas">
+            <button type="button" class="page-number" *ngIf="pagina !== null"
+              [class.active]="pagina === paginaActual" (click)="irAPagina(pagina)">
+              {{ pagina }}
+            </button>
+            <span class="page-dots" *ngIf="pagina === null">…</span>
+          </ng-container>
+
+          <button type="button" class="page-arrow" title="Página siguiente"
+            [disabled]="paginaActual >= totalPaginas" (click)="irAPagina(paginaActual + 1)">
+            <i class="bi bi-chevron-right" aria-hidden="true"></i>
+          </button>
+        </nav>
+      </div>
+
+    </section>
+
+    <!-- ================================================== -->
+    <!-- PANEL: DETALLE DEL PAGO                              -->
+    <!-- ================================================== -->
+    <aside class="detail-panel detail-pago"
+      *ngIf="registroSeleccionado && pestanaActiva === 'pagos'">
+
+      <div class="detail-top">
+        <h3>Detalle del pago</h3>
+        <button type="button" class="detail-close" title="Cerrar" (click)="cerrarDetalle()">
+          <i class="bi bi-x-lg" aria-hidden="true"></i>
+        </button>
+      </div>
+
+      <div>
+        <div class="detail-id-row">
+          <span class="detail-id">{{ registroSeleccionado.codigo }}</span>
+          <span class="status-badge" [ngClass]="obtenerClaseEstado(registroSeleccionado.estado)">
+            {{ registroSeleccionado.estado }}
+          </span>
+        </div>
+        <p class="detail-subtitle">Registrado el {{ formatearFecha(registroSeleccionado.fecha) }}</p>
+      </div>
+
+      <div class="detail-section">
+        <h4>Información del pago</h4>
+        <dl>
+          <dt>Valor pagado</dt><dd>{{ formatearValor(registroSeleccionado.valor) }}</dd>
+          <dt>Medio</dt><dd>PSE</dd>
+          <dt>Fecha y hora</dt><dd>{{ formatearFecha(registroSeleccionado.fecha) }}</dd>
+        </dl>
+      </div>
+
+      <div class="detail-section">
+        <h4>Asociado</h4>
+        <p class="detail-name">{{ registroSeleccionado.asociado }}</p>
+        <small class="detail-doc">{{ registroSeleccionado.documento }}</small>
+      </div>
+
+      <div class="detail-section">
+        <h4>Relación con la cartera</h4>
+        <dl>
+          <dt>Obligación</dt><dd class="azul">{{ registroSeleccionado.obligacion }}</dd>
+          <dt>Nivel de riesgo</dt><dd>{{ textoRiesgo(registroSeleccionado.riesgo) }}</dd>
+          <dt>Score IA</dt><dd>{{ registroSeleccionado.score ?? '—' }}</dd>
+        </dl>
+      </div>
+
+      <div class="detail-section">
+        <h4>Origen y actualización</h4>
+        <dl>
+          <dt>Origen</dt><dd>Link de pago</dd>
+          <dt>Link relacionado</dt><dd class="azul">{{ linkRelacionado(registroSeleccionado)?.codigo ?? '—' }}</dd>
+          <dt>Canal de envío</dt><dd>{{ nombreCanal(registroSeleccionado.canal) }}</dd>
+          <dt>Fecha de envío</dt><dd>{{ formatearFecha(registroSeleccionado.creado) }}</dd>
+        </dl>
+      </div>
+
+      <div class="detail-section">
+        <h4>Información de la transacción</h4>
+        <dl>
+          <dt>Transacción</dt><dd>{{ registroSeleccionado.transaccion ?? '—' }}</dd>
+        </dl>
+      </div>
+
+      <div class="detail-buttons">
+        <button type="button" class="detail-btn-primary" (click)="irAlCaso()">Ir al caso</button>
+        <button type="button" class="detail-btn-outline" (click)="verObligacion()">Ver obligación</button>
+        <button type="button" class="detail-btn-text"
+          *ngIf="linkRelacionado(registroSeleccionado)"
+          (click)="verLink(registroSeleccionado)">Ver link</button>
+      </div>
+
+    </aside>
+
+    <!-- ================================================== -->
+    <!-- PANEL: DETALLE DEL LINK                              -->
+    <!-- ================================================== -->
+    <aside class="detail-panel detail-link-panel"
+      *ngIf="registroSeleccionado && pestanaActiva === 'links'">
+
+      <div class="detail-top">
+        <h3>Detalle del link</h3>
+        <button type="button" class="detail-close" title="Cerrar" (click)="cerrarDetalle()">
+          <i class="bi bi-dash-lg" aria-hidden="true"></i>
+        </button>
+      </div>
+
+      <div>
+        <div class="detail-id-row">
+          <span class="detail-id">{{ registroSeleccionado.codigo }}</span>
+          <span class="status-badge" [ngClass]="obtenerClaseEstado(registroSeleccionado.estado)">
+            {{ registroSeleccionado.estado }}
+          </span>
+        </div>
+        <p class="detail-subtitle">Enviado el {{ formatearFecha(registroSeleccionado.creado) }}</p>
+      </div>
+
+      <div class="detail-section">
+        <h4>Información del link</h4>
+        <dl>
+          <dt>Valor solicitado</dt><dd>{{ formatearValor(registroSeleccionado.valor) }}</dd>
+          <dt>Canal de envío</dt><dd>{{ nombreCanal(registroSeleccionado.canal) }}</dd>
+          <dt>Fecha de envío</dt><dd>{{ formatearFecha(registroSeleccionado.creado) }}</dd>
+          <dt>Fecha de expiración</dt><dd>{{ formatearFecha(registroSeleccionado.expira) }}</dd>
+          <dt>Estado</dt><dd>{{ registroSeleccionado.estado }}</dd>
+        </dl>
+      </div>
+
+      <div class="detail-section">
+        <h4>Asociado</h4>
+        <p class="detail-name">{{ registroSeleccionado.asociado }}</p>
+        <small class="detail-doc">{{ registroSeleccionado.documento }}</small>
+      </div>
+
+      <div class="detail-section">
+        <h4>Relación con la cartera</h4>
+        <dl>
+          <dt>Obligación</dt><dd class="azul">{{ registroSeleccionado.obligacion }}</dd>
+          <dt>Días de mora</dt><dd>{{ registroSeleccionado.diasMora ?? '—' }}</dd>
+        </dl>
+      </div>
+
+      <div class="detail-section">
+        <h4>Pago relacionado</h4>
+        <dl *ngIf="pagoRelacionado(registroSeleccionado) as pago; else sinPago">
+          <dt>Pago</dt><dd class="azul">{{ pago.codigo }}</dd>
+          <dt>Valor pagado</dt><dd>{{ formatearValor(pago.valor) }}</dd>
+          <dt>Fecha del pago</dt><dd>{{ formatearFecha(pago.fecha) }}</dd>
+          <dt>Medio</dt><dd>PSE</dd>
+          <dt>Transacción</dt><dd>{{ pago.transaccion ?? '—' }}</dd>
+        </dl>
+        <ng-template #sinPago>
+          <p class="detail-empty">Este link todavía no tiene un pago registrado.</p>
+        </ng-template>
+      </div>
+
+      <div class="detail-buttons">
+        <button type="button" class="detail-btn-primary"
+          *ngIf="pagoRelacionado(registroSeleccionado)"
+          (click)="verPago(registroSeleccionado)">Ver pago</button>
+        <button type="button" class="detail-btn-primary"
+          *ngIf="!pagoRelacionado(registroSeleccionado) && registroSeleccionado.url && puedeCancelar(registroSeleccionado)"
+          (click)="copiarUrl(registroSeleccionado.url)">Copiar link</button>
+        <button type="button" class="detail-btn-outline" (click)="irAlCaso()">Ir al caso</button>
+        <button type="button" class="detail-btn-text" (click)="verObligacion()">Ver obligación</button>
+        <button type="button" class="detail-btn-text peligro"
+          *ngIf="puedeCancelar(registroSeleccionado)"
+          (click)="pedirCancelar(registroSeleccionado)">Cancelar link</button>
+      </div>
+
+    </aside>
+
+    </div>
+
+  </main>
+
+</div>
+
+<!-- ================================================== -->
+<!-- MODAL: CREAR LINK DE PAGO                            -->
+<!-- ================================================== -->
+<div class="modal-overlay" *ngIf="mostrarModalCrear" (click)="cerrarModalCrear()">
+
+  <div class="modal-content" (click)="$event.stopPropagation()">
+
+    <div class="modal-header">
+      <div>
+        <h2>{{ linkCreado ? 'Link de pago generado' : 'Crear link de pago' }}</h2>
+        <p>
+          {{ linkCreado
+            ? 'El link se generó en la pasarela y quedó guardado.'
+            : 'Elige la obligación y el sistema generará un link real de pago por PSE.' }}
+        </p>
+      </div>
+
+      <button class="close-button" [disabled]="creando" (click)="cerrarModalCrear()">×</button>
+    </div>
+
+    <!-- Resultado -->
+    <div class="link-creado" *ngIf="linkCreado">
+      <dl>
+        <dt>Link</dt><dd>{{ linkCreado.codigo }}</dd>
+        <dt>Asociado</dt><dd>{{ linkCreado.asociado }}</dd>
+        <dt>Obligación</dt><dd>{{ linkCreado.obligacion }}</dd>
+        <dt>Valor</dt><dd>{{ formatearValor(linkCreado.valor) }}</dd>
+        <dt>Vence</dt><dd>{{ formatearFecha(linkCreado.expira) }}</dd>
+      </dl>
+
+      <div class="url-box" *ngIf="linkCreado.url; else sinUrl">
+        <code>{{ linkCreado.url }}</code>
+        <button type="button" class="cancel-button" (click)="copiarUrl(linkCreado.url)">Copiar</button>
+      </div>
+      <ng-template #sinUrl>
+        <p class="form-error">La pasarela no devolvió la dirección del link.</p>
+      </ng-template>
+
+      <div class="modal-actions">
+        <button type="button" class="create-button" (click)="cerrarModalCrear()">Listo</button>
+      </div>
+    </div>
+
+    <!-- Formulario -->
+    <form *ngIf="!linkCreado" (ngSubmit)="crearLink()">
+
+      <label>
+        Número de obligación
+        <input
+          type="text"
+          name="obligacion"
+          list="lista-obligaciones"
+          [(ngModel)]="nuevoLink.obligacion"
+          (ngModelChange)="alCambiarObligacion()"
+          [placeholder]="cargandoObligaciones ? 'Cargando obligaciones...' : 'Escribe o elige una obligación'"
+          [disabled]="cargandoObligaciones || creando"
+          autocomplete="off">
+        <datalist id="lista-obligaciones">
+          <option *ngFor="let o of obligaciones" [value]="o.obligationNumber">
+            {{ formatearValor(o.totalBalance) }} · {{ o.daysPastDue }} días de mora
+          </option>
+        </datalist>
+        <small class="form-help" *ngIf="obligacionElegida">
+          {{ asociadoElegido ? asociadoElegido + ' · ' : '' }}Saldo total {{ formatearValor(obligacionElegida.totalBalance) }}
+        </small>
+      </label>
+
+      <label>
+        Valor del pago
+        <input type="number" name="valor" min="1" [(ngModel)]="nuevoLink.valor"
+          placeholder="Ingresa el valor" [disabled]="creando">
+      </label>
+
+      <label>
+        Canal de envío
+        <select name="canal" [(ngModel)]="nuevoLink.canal" [disabled]="creando">
+          <option *ngFor="let c of canalesEnvio" [value]="c.valor">{{ c.texto }}</option>
+        </select>
+      </label>
+
+      <label>
+        Vigencia
+        <select name="vigencia" [(ngModel)]="nuevoLink.vigencia" [disabled]="creando">
+          <option *ngFor="let h of vigencias" [ngValue]="h">{{ h }} horas</option>
+        </select>
+      </label>
+
+      <p class="form-error" *ngIf="errorCrear">{{ errorCrear }}</p>
+
+      <div class="modal-actions">
+        <button type="button" class="cancel-button" [disabled]="creando" (click)="cerrarModalCrear()">
+          Cancelar
+        </button>
+        <button type="submit" class="create-button" [disabled]="creando || cargandoObligaciones">
+          {{ creando ? 'Generando...' : 'Crear link' }}
+        </button>
+      </div>
+
+    </form>
+
+  </div>
+
+</div>
+
+<!-- ================================================== -->
+<!-- MODAL: CONFIRMAR CANCELACIÓN                         -->
+<!-- ================================================== -->
+<div class="modal-overlay" *ngIf="linkACancelar" (click)="cerrarCancelar()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <div>
+        <h2>¿Cancelar {{ linkACancelar.codigo }}?</h2>
+        <p>El asociado ya no podrá pagar con este link. Esta acción no se puede deshacer.</p>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button type="button" class="cancel-button" [disabled]="cancelando" (click)="cerrarCancelar()">Volver</button>
+      <button type="button" class="create-button peligro" [disabled]="cancelando" (click)="confirmarCancelar()">
+        {{ cancelando ? 'Cancelando...' : 'Cancelar link' }}
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- MENSAJE CORTO -->
+<div class="aviso" role="status" *ngIf="mensaje">{{ mensaje }}</div>

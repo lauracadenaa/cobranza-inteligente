@@ -10,18 +10,8 @@
     <!-- ====================================== -->
 
     <app-dashboard-header
-      [tituloPersonalizado]="
-        pestanaActiva === 'Análisis de cartera'
-          ? 'Análisis de cartera'
-          : 'Cartera'
-      "
-      [descripcionPersonalizada]="
-        pestanaActiva === 'Integración de cartera'
-          ? 'Carga y procesa la información de cartera'
-          : pestanaActiva === 'Análisis de cartera'
-            ? 'Explora tendencias, concentraciones y variaciones relevantes de la cartera en mora'
-            : 'Consulta y compara los segmentos de cartera'
-      ">
+      [tituloPersonalizado]="'Cartera'"
+      [descripcionPersonalizada]="'Vista general y análisis de cartera en mora'">
     </app-dashboard-header>
 
     <!-- ====================================== -->
@@ -30,7 +20,49 @@
 
     <app-cartera-tabs
       (pestanaSeleccionada)="seleccionarPestana($event)">
+
+      <button
+        *ngIf="pestanaActiva === 'Integración de cartera'"
+        type="button"
+        class="btn-sincronizar"
+        [disabled]="sincronizando"
+        (click)="pedirSincronizacion()">
+        <i class="bi bi-database"></i>
+        {{ sincronizando ? 'Sincronizando...' : 'Sincronizar con CORE' }}
+      </button>
+
+      <!-- Período del análisis (como en Figma) -->
+      <app-selector-periodo
+        *ngIf="pestanaActiva === 'Análisis de cartera'"
+        [tipoInicial]="periodoAnalisis?.tipo ?? '12m'"
+        (cambio)="periodoAnalisis = $event">
+      </app-selector-periodo>
+
     </app-cartera-tabs>
+
+    <!-- Resultado de la sincronización -->
+    <p
+      *ngIf="mensajeSincronizacion"
+      class="aviso-sincronizacion"
+      [class.error]="errorSincronizacion"
+      role="status">
+      {{ mensajeSincronizacion }}
+    </p>
+
+    <!-- Confirmación antes de sincronizar -->
+    <div
+      class="sync-fondo"
+      *ngIf="confirmarSincronizacionAbierta"
+      (click)="cancelarSincronizacion()">
+      <div class="sync-modal" (click)="$event.stopPropagation()">
+        <h3>¿Sincronizar con CORE?</h3>
+        <p>Se traerá la información de cartera desde el sistema del banco. Este proceso puede tardar unos minutos.</p>
+        <div class="sync-botones">
+          <button type="button" class="sync-cancelar" (click)="cancelarSincronizacion()">Cancelar</button>
+          <button type="button" class="sync-confirmar" (click)="sincronizarCore()">Sincronizar</button>
+        </div>
+      </div>
+    </div>
 
     <!-- ====================================== -->
     <!-- SEGMENTOS -->
@@ -47,7 +79,7 @@
     <!-- ====================================== -->
 
     <ng-container *ngIf="pestanaActiva === 'Análisis de cartera'">
-      <app-analisis-cartera></app-analisis-cartera>
+      <app-analisis-cartera [periodo]="periodoAnalisis"></app-analisis-cartera>
     </ng-container>
     <!-- ====================================== -->
     <!-- INTEGRACIÓN DE CARTERA -->

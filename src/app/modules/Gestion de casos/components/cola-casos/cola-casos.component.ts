@@ -7,6 +7,7 @@ import {
   OnInit,
   Output,
   EventEmitter,
+  HostListener,
   SimpleChanges
 } from '@angular/core';
 
@@ -17,8 +18,59 @@ import { ManagedCase } from '../../../../models/dashboard.models';
 
 import {
   CaseService,
-  BackendCase
+  BackendCase,
+  AsesorCarga
 } from '../../../../service/case.service';
+import { ContextoCasos, DashboardService } from '../../../../service/dashboard.service';
+import { CarteraService, ScoreSummary } from '../../../../service/cartera.service';
+import { forkJoin, of } from 'rxjs';
+import { catchError } from 'rxjs/operators';
+
+// ==================================================
+// ORIGEN DEL CASO (misma regla que Inicio > Casos en gestión)
+// - Escalado por regla fija (intentos, riesgo, saldo, jurídico) → Regla automática
+// - Escalado por otra razón de la IA → Desborde IA
+// - Sin escalar y creado por carga de archivo → Integración de cartera
+// - Sin escalar y sin carga de archivo → Integración CORE
+// ==================================================
+
+const MOTIVOS_POR_REGLA = ['MAX_CONTACT_ATTEMPTS', 'HIGH_RISK_SCORE', 'HIGH_BALANCE', 'LEGAL_REQUIRED'];
+
+function calcularOrigenCaso(caso: BackendCase): string {
+  const motivo = (caso.escalationReason ?? '').toUpperCase();
+
+  if (motivo) {
+    return MOTIVOS_POR_REGLA.includes(motivo) ? 'reglaAutomatica' : 'desbordeIA';
+  }
+
+  if (Number(caso.aiEscalationCount ?? 0) > 0) {
+    return 'desbordeIA';
+  }
+
+  return caso.batchId !== null && caso.batchId !== undefined
+    ? 'integracionCartera'
+    : 'integracionCore';
+}
+
+// "Hace 32 min", "Ayer 4:20 p. m.", "15/09/2026"
+export function tiempoRelativo(fecha: string): string {
+  const valor = fecha ? new Date(fecha) : null;
+  if (!valor || Number.isNaN(valor.getTime())) return '—';
+
+  const minutos = Math.floor((Date.now() - valor.getTime()) / 60000);
+  const hora = valor.toLocaleTimeString('es-CO', { hour: 'numeric', minute: '2-digit' });
+
+  if (minutos < 1) return 'Hace un momento';
+  if (minutos < 60) return `Hace ${minutos} min`;
+
+  const hoy = new Date();
+  const ayer = new Date(hoy.getFullYear(), hoy.getMonth(), hoy.getDate() - 1);
+  const mismoDia = (a: Date, b: Date) => a.toDateString() === b.toDateString();
+
+  if (mismoDia(valor, hoy)) return `Hoy ${hora}`;
+  if (mismoDia(valor, ayer)) return `Ayer ${hora}`;
+  return valor.toLocaleDateString('es-CO', { day: '2-digit', month: '2-digit', year: 'numeric' });
+}
 
 @Component({
   selector: 'app-cola-casos',
@@ -34,6 +86,9 @@ export class ColaCasosComponent implements OnInit, OnChanges {
 
   @Input() casos: ManagedCase[] = [];
   @Input() detalleAbierto = false;
+
+  // Número de caso que se pidió abrir desde otra pantalla (por ejemplo, el inicio)
+  @Input() casoAAbrir: string | null = null;
   @Output() casoDetalleChange = new EventEmitter<ManagedCase | null>();
 
   casosOriginales: ManagedCase[] = [];
@@ -74,6 +129,38 @@ export class ColaCasosComponent implements OnInit, OnChanges {
   errorAsignacion = '';
 motivoDesborde = 'Desborde IA';
 
+  // Paso de la ventana: primero el formulario, luego la revisión
+  pasoAsignacion: 'formulario' | 'revision' = 'formulario';
+
+  // Mensaje corto al confirmar (abajo a la derecha)
+  mensajeAsignacion = '';
+  private temporizadorAsignacion: ReturnType<typeof setTimeout> | null = null;
+
+  // Nombres para mostrar en la revisión
+  private readonly nombresCola: Record<string, string> = {
+    CASOS_CRITICOS: 'Casos críticos',
+    GENERAL: 'General',
+    PREVENTIVA: 'Preventiva',
+    ADMINISTRATIVA: 'Administrativa',
+    PREJURIDICA: 'Prejurídica'
+  };
+
+  private readonly nombresMotivo: Record<string, string> = {
+    BALANCEO_CARGA: 'Balanceo de carga',
+    CAMBIO_SEGMENTO: 'Cambio de segmento',
+    ESPECIALIZACION: 'Especialización del asesor',
+    ESCALAMIENTO: 'Escalamiento',
+    OTRO: 'Otro'
+  };
+
+  nombreCola(valor: string): string {
+    return this.nombresCola[valor] ?? valor;
+  }
+
+  nombreMotivo(valor: string): string {
+    return this.nombresMotivo[valor] ?? valor;
+  }
+
   // =========================================
   // FILTROS
   // =========================================
@@ -87,13 +174,30 @@ motivoDesborde = 'Desborde IA';
     estado: '',
     fechaExacta: '',
     fechaDesde: '',
-    fechaHasta: ''
+    fechaHasta: '',
+    origenes: [] as string[]
   };
 
   filtrosAplicados = {
     ...this.filtros,
-    riesgos: [] as ManagedCase['riesgo'][]
+    riesgos: [] as ManagedCase['riesgo'][],
+    origenes: [] as string[]
   };
+
+  // Mismas opciones de origen que en Inicio > Casos en gestión
+  readonly opcionesOrigen = [
+    { clave: 'desbordeIA', texto: 'Desborde IA' },
+    { clave: 'reglaAutomatica', texto: 'Regla o política automática' },
+    { clave: 'integracionCore', texto: 'Integración CORE' },
+    { clave: 'integracionCartera', texto: 'Integración de cartera' }
+  ];
+
+  alternarOrigen(clave: string): void {
+    const lista = this.filtros.origenes;
+    this.filtros.origenes = lista.includes(clave)
+      ? lista.filter(o => o !== clave)
+      : [...lista, clave];
+  }
 
   // =========================================
   // PAGINACIÓN
@@ -108,8 +212,54 @@ motivoDesborde = 'Desborde IA';
 
   constructor(
     private caseService: CaseService,
-    private changeDetectorRef: ChangeDetectorRef
+    private changeDetectorRef: ChangeDetectorRef,
+    private dashboardService: DashboardService,
+    private carteraService: CarteraService
   ) {}
+
+  // =========================================
+  // CONTEXTO IA DEL RESUMEN RÁPIDO (scoring real del cliente)
+  // =========================================
+
+  scoringResumenRapido: ScoreSummary | null = null;
+  cargandoScoringRapido = false;
+  private scoringPorCliente = new Map<number, ScoreSummary | null>();
+
+  private cargarScoringRapido(caso: ManagedCase | null): void {
+    this.scoringResumenRapido = null;
+    const clienteId = caso?.clientId;
+    if (clienteId == null) return;
+
+    if (this.scoringPorCliente.has(clienteId)) {
+      this.scoringResumenRapido = this.scoringPorCliente.get(clienteId) ?? null;
+      return;
+    }
+
+    this.cargandoScoringRapido = true;
+    this.carteraService.getScoreSummary(clienteId).subscribe({
+      next: resumen => {
+        this.scoringPorCliente.set(clienteId, resumen);
+        if (this.casoSeleccionado?.clientId === clienteId) this.scoringResumenRapido = resumen;
+        this.cargandoScoringRapido = false;
+        this.changeDetectorRef.markForCheck();
+      },
+      error: () => {
+        this.scoringPorCliente.set(clienteId, null);
+        this.cargandoScoringRapido = false;
+        this.changeDetectorRef.markForCheck();
+      }
+    });
+  }
+
+  textoProbabilidad(probabilidad: number | null | undefined): string {
+    if (probabilidad == null) return '—';
+    if (probabilidad >= 0.6) return 'Alta';
+    if (probabilidad >= 0.3) return 'Media';
+    return 'Baja';
+  }
+
+  // Nombres de asesores y tiempos límite (SLA); misma lógica del Inicio
+  private contexto: ContextoCasos | null = null;
 
   // =========================================
   // INICIALIZACIÓN
@@ -148,9 +298,14 @@ motivoDesborde = 'Desborde IA';
     this.cargando = true;
     this.errorCarga = '';
 
-    this.caseService.obtenerTodosLosCasos().subscribe({
+    forkJoin({
+      respuesta: this.caseService.obtenerTodosLosCasos(),
+      contexto: this.dashboardService.obtenerContextoCasos().pipe(catchError(() => of(null)))
+    }).subscribe({
 
-      next: (respuesta: BackendCase[]) => {
+      next: ({ respuesta, contexto }) => {
+
+        this.contexto = contexto;
 
         this.casosOriginales = respuesta.map(caso =>
           this.adaptarCaso(caso)
@@ -160,6 +315,8 @@ motivoDesborde = 'Desborde IA';
         this.paginaActual = 1;
 
         this.aplicarBusquedaYFiltros();
+
+        this.abrirCasoPedido();
 
         this.changeDetectorRef.detectChanges();
 
@@ -208,11 +365,10 @@ adaptarCaso(caso: BackendCase): ManagedCase {
   const riesgo =
     mapaRiesgos[riesgoBackend] ?? 'Sin información';
 
-  const asesor =
-    caso.escalatedAdvisorName ||
-    (caso.assignedTo != null
-      ? `Asesor #${caso.assignedTo}`
-      : 'Sin asignar');
+  const asesor = this.contexto
+    ? this.dashboardService.nombreAsesor(caso, this.contexto)
+    : caso.escalatedAdvisorName ||
+      (caso.assignedTo != null ? `Asesor #${caso.assignedTo}` : 'Sin asignar');
 
   const segmento =
     caso.client?.segment ||
@@ -256,7 +412,14 @@ saldoVencido:
       caso.obligation?.daysPastDue ??
       0,
 
-    tiempoLimite: 'Sin información',
+    // Fecha de creación + días máximos para contactar según el segmento
+    tiempoLimite: this.contexto
+      ? this.dashboardService.calcularTiempoLimite(
+          caso,
+          segmento || this.dashboardService.mapSegment(caso.obligation?.daysPastDue),
+          this.contexto.diasSla
+        )
+      : 'Sin información',
 
     // Asignación
     asesor,
@@ -264,7 +427,23 @@ saldoVencido:
     // Información del caso
     estado: caso.status || '',
     segmento,
-    fechaCreacion: caso.createdAt || ''
+    fechaCreacion: caso.createdAt || '',
+
+    // De dónde salió el caso (misma regla que en el Inicio)
+    origen: calcularOrigenCaso(caso),
+
+    // Ruta del caso (cola, skill, producto y región que asignó el backend)
+    colaActual: caso.queueName || caso.queueCode || '',
+    skillRuta: caso.routeSkill || '',
+    productoRuta: caso.routeProduct || '',
+    regionRuta: caso.routeRegion || '',
+
+    // Última gestión: última actualización del caso + intentos de contacto
+    fechaActualizacion: caso.updatedAt || caso.createdAt || '',
+    ultimaGestion: tiempoRelativo(caso.updatedAt || ''),
+    ultimaGestionDetalle: Number(caso.contactAttempts ?? 0) > 0
+      ? `${caso.contactAttempts} ${Number(caso.contactAttempts) === 1 ? 'intento' : 'intentos'} de contacto`
+      : 'Sin intentos de contacto'
 
   };
 
@@ -290,10 +469,12 @@ saldoVencido:
 
     this.filtros = {
       ...this.filtrosAplicados,
-      riesgos: [...this.filtrosAplicados.riesgos]
+      riesgos: [...this.filtrosAplicados.riesgos],
+      origenes: [...this.filtrosAplicados.origenes]
     };
 
-    this.mostrarModalFiltros = true;
+    // Como en el Inicio: el botón abre y cierra la ventana
+    this.mostrarModalFiltros = !this.mostrarModalFiltros;
 
   }
 
@@ -323,7 +504,8 @@ saldoVencido:
 
     this.filtrosAplicados = {
       ...this.filtros,
-      riesgos: [...this.filtros.riesgos]
+      riesgos: [...this.filtros.riesgos],
+      origenes: [...this.filtros.origenes]
     };
 
     this.mostrarModalFiltros = false;
@@ -346,14 +528,18 @@ saldoVencido:
       estado: '',
       fechaExacta: '',
       fechaDesde: '',
-      fechaHasta: ''
+      fechaHasta: '',
+      origenes: []
 
     };
 
     this.filtrosAplicados = {
       ...this.filtros,
-      riesgos: []
+      riesgos: [],
+      origenes: []
     };
+
+    this.mostrarModalFiltros = false;
 
     this.paginaActual = 1;
 
@@ -428,7 +614,12 @@ saldoVencido:
       const coincideFechaHasta =
         !f.fechaHasta || (!!fecha && fecha <= f.fechaHasta);
 
+      const coincideOrigen =
+        f.origenes.length === 0 ||
+        f.origenes.includes(caso.origen ?? '');
+
       return coincideBusqueda &&
+        coincideOrigen &&
         coincideRiesgo &&
         coincideAsesor &&
         coincideMoraDesde &&
@@ -497,11 +688,20 @@ saldoVencido:
         this.filtrosAplicados.fechaHasta = '';
         break;
 
+      default:
+        if (clave.startsWith('origen:')) {
+          const origen = clave.replace('origen:', '');
+          this.filtrosAplicados.origenes =
+            this.filtrosAplicados.origenes.filter(o => o !== origen);
+        }
+        break;
+
     }
 
     this.filtros = {
       ...this.filtrosAplicados,
-      riesgos: [...this.filtrosAplicados.riesgos]
+      riesgos: [...this.filtrosAplicados.riesgos],
+      origenes: [...this.filtrosAplicados.origenes]
     };
 
     this.paginaActual = 1;
@@ -600,6 +800,11 @@ saldoVencido:
       });
 
     }
+
+    f.origenes.forEach(origen => {
+      const texto = this.opcionesOrigen.find(o => o.clave === origen)?.texto ?? origen;
+      visibles.push({ clave: `origen:${origen}`, texto: `Origen: ${texto}` });
+    });
 
     return visibles;
 
@@ -712,6 +917,7 @@ saldoVencido:
     } else {
 
       this.casoSeleccionado = caso;
+      this.cargarScoringRapido(caso);
 
     }
 
@@ -744,8 +950,55 @@ saldoVencido:
 
     this.errorAsignacion = '';
 
+    this.pasoAsignacion = 'formulario';
+
     this.mostrarModalAsignacion = true;
 
+    this.cargarAsesores();
+
+  }
+
+  // =========================================
+  // ASESORES REALES (GET /admin/advisors/workload)
+  // =========================================
+
+  asesoresDisponibles: AsesorCarga[] = [];
+  cargandoAsesores = false;
+  asesorElegidoId: number | null = null;
+  guardandoAsignacion = false;
+
+  private cargarAsesores(): void {
+    this.asesorElegidoId = null;
+    this.cargandoAsesores = true;
+
+    this.caseService.obtenerAsesores().subscribe({
+      next: lista => {
+        this.asesoresDisponibles = (lista ?? []).filter(a => a.advisorId != null);
+        this.cargandoAsesores = false;
+        this.changeDetectorRef.markForCheck();
+      },
+      error: error => {
+        this.asesoresDisponibles = [];
+        this.cargandoAsesores = false;
+        this.errorAsignacion = error?.status === 403
+          ? 'Solo un administrador o supervisor puede reasignar casos.'
+          : 'No fue posible consultar los asesores.';
+        this.changeDetectorRef.markForCheck();
+      }
+    });
+  }
+
+  // Automática: el asesor activo con cupo y menos casos
+  get asesorAutomatico(): AsesorCarga | null {
+    return [...this.asesoresDisponibles]
+      .filter(a => a.active && !a.atCapacity)
+      .sort((a, b) => a.activeCases - b.activeCases)[0] ?? null;
+  }
+
+  get asesorDestino(): AsesorCarga | null {
+    return this.asignacion.criterio === 'MANUAL'
+      ? this.asesoresDisponibles.find(a => a.advisorId === this.asesorElegidoId) ?? null
+      : this.asesorAutomatico;
   }
 
   cerrarModalAsignacion(): void {
@@ -790,22 +1043,140 @@ saldoVencido:
 
     }
 
-    console.log('Datos de asignación:', {
-      caso: this.casoSeleccionado,
-      colaDestino: this.asignacion.colaDestino,
-      criterio: this.asignacion.criterio,
-      motivo: this.asignacion.motivo,
-      comentario: this.asignacion.comentario
-    });
+    if (!this.asesorDestino) {
 
-    // La conexión con el backend y la revisión
-    // de la asignación se implementarán posteriormente.
+      this.errorAsignacion = this.asignacion.criterio === 'MANUAL'
+        ? 'Selecciona un asesor.'
+        : 'No hay asesores activos con cupo disponible.';
+
+      return;
+
+    }
+
+    this.errorAsignacion = '';
+    this.pasoAsignacion = 'revision';
+
+  }
+
+  // =========================================
+  // MENÚ DE LOS TRES PUNTOS (⋮)
+  // =========================================
+
+  menuAccionesId: string | null = null;
+
+  alternarMenuAcciones(caso: ManagedCase): void {
+    this.menuAccionesId = this.menuAccionesId === caso.id ? null : caso.id;
+  }
+
+  // Cierra el menú si se hace clic en cualquier otra parte
+  @HostListener('document:click')
+  cerrarMenuAcciones(): void {
+    this.menuAccionesId = null;
+  }
+
+  accionAsignar(caso: ManagedCase): void {
+    this.menuAccionesId = null;
+    this.casoSeleccionado = caso;
+    this.abrirModalAsignacion();
+  }
+
+  accionCopiarId(caso: ManagedCase): void {
+    this.menuAccionesId = null;
+    navigator.clipboard?.writeText(caso.id)
+      .then(() => this.mostrarAvisoAsignacion('ID del caso copiado.'))
+      .catch(() => this.mostrarAvisoAsignacion('No fue posible copiar el ID.'));
+  }
+
+  // "Ver historial" y "Enviar link de pago" se hacen desde el caso completo
+  accionAbrirCaso(caso: ManagedCase): void {
+    this.menuAccionesId = null;
+    this.casoSeleccionado = caso;
+    this.abrirCasoCompleto();
+  }
+
+  private mostrarAvisoAsignacion(texto: string): void {
+    this.mensajeAsignacion = texto;
+    if (this.temporizadorAsignacion) {
+      clearTimeout(this.temporizadorAsignacion);
+    }
+    this.temporizadorAsignacion = setTimeout(() => {
+      this.mensajeAsignacion = '';
+      this.changeDetectorRef.markForCheck();
+    }, 3000);
+    this.changeDetectorRef.markForCheck();
+  }
+
+  volverAFormularioAsignacion(): void {
+    this.pasoAsignacion = 'formulario';
+  }
+
+  // Reasigna en el backend y deja una nota con el motivo y el comentario
+  confirmarAsignacion(): void {
+
+    const caso = this.casoSeleccionado;
+    const asesor = this.asesorDestino;
+
+    if (!caso?.backendId || !asesor || this.guardandoAsignacion) {
+      return;
+    }
+
+    this.guardandoAsignacion = true;
+    this.errorAsignacion = '';
+
+    this.caseService.reasignarCaso(caso.backendId, asesor.advisorId).subscribe({
+      next: () => {
+        // Nota en el caso con lo que el backend no guarda (cola, motivo, comentario)
+        const nota = [
+          `Caso reasignado a ${asesor.fullName}.`,
+          `Cola destino: ${this.nombreCola(this.asignacion.colaDestino)}.`,
+          `Criterio: ${this.asignacion.criterio === 'AUTOMATICA' ? 'Automática' : 'Manual'}.`,
+          `Motivo: ${this.nombreMotivo(this.asignacion.motivo)}.`,
+          this.asignacion.comentario.trim() ? `Comentario: ${this.asignacion.comentario.trim()}` : ''
+        ].filter(Boolean).join(' ');
+
+        this.caseService.crearNota(caso.backendId!, nota).subscribe({ error: () => undefined });
+
+        this.guardandoAsignacion = false;
+        this.mostrarModalAsignacion = false;
+        this.pasoAsignacion = 'formulario';
+        this.mostrarAvisoAsignacion(`Caso reasignado a ${asesor.fullName}.`);
+        this.recargarCasos();
+      },
+      error: error => {
+        this.guardandoAsignacion = false;
+        this.errorAsignacion = error?.status === 403
+          ? 'No tienes permiso para reasignar casos.'
+          : error?.error?.message || 'No fue posible reasignar el caso.';
+        this.pasoAsignacion = 'formulario';
+        this.changeDetectorRef.markForCheck();
+      }
+    });
 
   }
 
   // =========================================
   // ABRIR CASO COMPLETO
   // =========================================
+
+  // Si llegamos con un caso pedido, se abre directamente su detalle
+  private abrirCasoPedido(): void {
+
+    if (!this.casoAAbrir) {
+      return;
+    }
+
+    const caso = this.casosOriginales.find(c => c.id === this.casoAAbrir);
+
+    if (caso) {
+      this.casoSeleccionado = caso;
+      this.casoDetalleChange.emit(caso);
+    } else {
+      // No está en la cola: al menos se deja buscado para que el usuario lo vea
+      this.busqueda = this.casoAAbrir;
+      this.aplicarBusquedaYFiltros();
+    }
+
+  }
 
   abrirCasoCompleto(): void {
 
@@ -844,48 +1215,19 @@ saldoVencido:
 
   }
 
+  // Color de la barrita del tiempo límite
   obtenerClaseTiempoLimite(tiempoLimite: string): string {
 
-    const normalizado = tiempoLimite.trim().toLowerCase();
+    const texto = (tiempoLimite || '').trim().toLowerCase();
+    const valor = Number.parseFloat(texto);
 
-    const valor = Number.parseFloat(normalizado);
-
-    if (!Number.isFinite(valor)) {
-
-      return 'deadline-neutral';
-
+    if (texto.startsWith('vencido')) return 'deadline-urgent';
+    if (!Number.isFinite(valor)) return 'deadline-neutral';
+    if (texto.includes(' h ')) return 'deadline-urgent';
+    if (texto.includes('día') || texto.includes('dia')) {
+      return valor <= 2 ? 'deadline-warning' : 'deadline-safe';
     }
-
-    if (normalizado.includes('min')) {
-
-      return valor <= 30
-        ? 'deadline-urgent'
-        : 'deadline-warning';
-
-    }
-
-    if (
-      normalizado.includes('hora') ||
-      normalizado.includes('h')
-    ) {
-
-      return valor <= 2
-        ? 'deadline-urgent'
-        : 'deadline-warning';
-
-    }
-
-    if (
-      normalizado.includes('día') ||
-      normalizado.includes('dia')
-    ) {
-
-      return 'deadline-safe';
-
-    }
-
     return 'deadline-neutral';
-
   }
 
   obtenerEstadoLabel(estado: string): string {

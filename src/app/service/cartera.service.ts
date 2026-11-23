@@ -358,6 +358,24 @@ export class CarteraService {
   ) {}
 
   // ==================================================
+  // ¿YA SE SUBIÓ UN ARCHIVO EN ESTA VISITA?
+  // Mientras sea false, Integración de cartera se ve vacía
+  // (sin KPI y con "No hay registros aún").
+  // Se guarda aquí para que no se pierda al cambiar de pestaña.
+  // ==================================================
+
+  archivoSubidoEnVisita = false;
+
+  // ==================================================
+  // CARGAS RECHAZADAS QUE EL BACKEND NO GUARDA
+  // Cuando el archivo no pasa la validación, el backend responde
+  // con los errores pero no crea el lote. Se guardan aquí (solo
+  // mientras la sesión esté abierta) para mostrarlas en la tabla.
+  // ==================================================
+
+  cargasRechazadasLocales: any[] = [];
+
+  // ==================================================
   // CARGAR ARCHIVO CSV
   // POST /integration/batches/csv/upload
   // ==================================================
@@ -376,6 +394,19 @@ export class CarteraService {
         observe: 'events',
         reportProgress: true
       }
+    );
+  }
+
+  // ==================================================
+  // SINCRONIZAR CON CORE
+  // POST /integration/core/sync
+  // Pone en marcha la sincronización con el sistema del banco.
+  // ==================================================
+
+  sincronizarCore(): Observable<{ message?: string }> {
+    return this.http.post<{ message?: string }>(
+      `${this.baseUrl}/integration/core/sync`,
+      {}
     );
   }
 
@@ -410,6 +441,42 @@ export class CarteraService {
 
     return this.http.get<BatchDetailResponse>(
       `${this.baseUrl}/integration/batches/${id}`
+    );
+  }
+
+  // ==================================================
+  // SUBIR CORRECCIONES DE UN LOTE (lote "hijo")
+  // POST /integration/batches/{parentId}/reupload
+  // ==================================================
+
+  reuploadCsv(
+    parentId: number,
+    file: File
+  ): Observable<HttpEvent<BatchUploadResponse>> {
+
+    const formData = new FormData();
+    formData.append('file', file);
+
+    return this.http.post<BatchUploadResponse>(
+      `${this.baseUrl}/integration/batches/${parentId}/reupload`,
+      formData,
+      {
+        observe: 'events',
+        reportProgress: true
+      }
+    );
+  }
+
+  // ==================================================
+  // CANCELAR UN LOTE EN PROCESO
+  // POST /integration/batches/{id}/cancel
+  // (el backend borra lo que ese lote alcanzó a crear)
+  // ==================================================
+
+  cancelBatch(id: number): Observable<unknown> {
+    return this.http.post(
+      `${this.baseUrl}/integration/batches/${id}/cancel`,
+      {}
     );
   }
 
@@ -574,6 +641,17 @@ export class CarteraService {
 
     return this.http.get<unknown>(
       `${this.baseUrl}/strategy/contact/attempts/client/${clientId}`
+    );
+  }
+
+  // ==================================================
+  // ESTADO DE UN PAGO EN LA PASARELA (Zolev)
+  // GET /v1/payments/status/{paymentId}
+  // ==================================================
+
+  getEstadoPago(paymentId: string): Observable<{ paymentId?: string; nombreEstado?: string; urlLink?: string }> {
+    return this.http.get<{ paymentId?: string; nombreEstado?: string; urlLink?: string }>(
+      `${this.baseUrl}/v1/payments/status/${encodeURIComponent(paymentId)}`
     );
   }
 

@@ -34,7 +34,7 @@
       <!-- TÍTULO, BUSCADOR Y FILTROS -->
       <div class="managed-cases-header">
 
-        <h2>Casos gestionados</h2>
+        <h2>Casos en gestión</h2>
 
         <div class="managed-cases-controls">
 
@@ -44,7 +44,9 @@
 
             <input
               type="text"
-              placeholder="Buscar caso...">
+              placeholder="Buscar por caso, asociado u obligación..."
+              [value]="textoBusqueda"
+              (input)="buscarEnTabla($any($event.target).value)">
           </div>
 
           <!-- FILTROS -->
@@ -136,7 +138,7 @@
                       <option value="">Todos los segmentos</option>
                       <option value="Preventiva">Preventiva</option>
                       <option value="Administrativa">Administrativa</option>
-                      <option value="Prejurídica">Prejurídica</option>
+                      <option value="Prejudicial">Prejurídica</option>
                       <option value="Jurídica">Jurídica</option>
 
                     </select>
@@ -374,8 +376,8 @@
 
             <tr *ngFor="let c of casosPaginados">
 
-              <td>{{ c.id }}</td>
-              <td>{{ c.asociado }}</td>
+              <td class="celda-corta celda-caso" [title]="c.id?.split('-OBL-')[0] || c.id">{{ c.id?.split('-OBL-')[0] || c.id }}</td>
+              <td class="celda-corta celda-asociado" [title]="c.asociado">{{ c.asociado }}</td>
               <td>{{ c.obligacion }}</td>
 
               <td class="risk-cell">
@@ -394,13 +396,19 @@
 
               <td>{{ c.diasMora }}</td>
               <td>{{ c.tiempoLimite }}</td>
-              <td>{{ c.asesor }}</td>
+              <td>
+                <span class="asesor-celda" [title]="c.asesor">
+                  <span class="asesor-avatar">{{ inicialesAsesor(c.asesor) }}</span>
+                  <span class="asesor-nombre">{{ c.asesor }}</span>
+                </span>
+              </td>
 
               <td>
                 <button
                   type="button"
-                  class="case-action">
-                  Ver detalle
+                  class="case-action"
+                  (click)="abrirCaso(c)">
+                  Revisar caso
                 </button>
               </td>
 
@@ -441,9 +449,11 @@
             class="pagination-button"
             *ngFor="let pagina of paginas"
             [class.active]="paginaActual === pagina"
+            [class.pagination-dots]="pagina === null"
+            [disabled]="pagina === null"
             [attr.aria-current]="paginaActual === pagina ? 'page' : null"
-            (click)="cambiarPagina(pagina)">
-            {{ pagina }}
+            (click)="pagina !== null && cambiarPagina(pagina)">
+            {{ pagina ?? '…' }}
           </button>
 
           <button
@@ -467,7 +477,7 @@
 
       <div class="quick-actions-grid">
 
-        <button type="button" class="quick-card">
+        <button type="button" class="quick-card" (click)="irACargarArchivo()">
           <div class="quick-icon">
             <img src="imagenes/Cargar-archivo.png" alt="Cargar archivo">
           </div>
@@ -490,7 +500,7 @@
           </div>
         </button>
 
-        <button type="button" class="quick-card">
+        <button type="button" class="quick-card" (click)="irAGenerarReporte()">
           <div class="quick-icon">
             <img src="imagenes/Generar-reporte.png" alt="Generar reporte">
           </div>
@@ -507,7 +517,7 @@
     <app-search-case
       [isOpen]="isSearchCaseOpen"
       [cases]="cases"
-      (goToCases)="goToManagedCases()"
+      (goToCases)="goToManagedCases($event)"
       (closed)="closeSearchCase()">
     </app-search-case>
 

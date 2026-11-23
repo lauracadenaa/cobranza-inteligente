@@ -479,14 +479,34 @@ export class SegmentoCarteraComponent implements OnInit {
   // FORMATEAR VALORES EN PESOS COLOMBIANOS
   // ==================================================
 
+  // Como en Figma: en millones ($98,0M). Si es menos de un
+  // millón, se muestra el valor completo sin decimales.
   private formatearMoneda(valor: number): string {
 
-    return new Intl.NumberFormat('es-CO', {
-      style: 'currency',
-      currency: 'COP',
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2
-    }).format(valor);
+    if (Math.abs(valor) >= 1000000) {
+      return '$' + (valor / 1000000).toLocaleString('es-CO', {
+        minimumFractionDigits: 1,
+        maximumFractionDigits: 1
+      }) + 'M';
+    }
+
+    return '$' + Math.round(valor).toLocaleString('es-CO');
+
+  }
+
+  // ==================================================
+  // PORCENTAJE DE ASOCIADOS DE CADA SEGMENTO
+  // (define el largo de cada barra de colores)
+  // ==================================================
+
+  porcentajeSegmento(segmento: Segmento): number {
+
+    const total = this.segmentos.reduce(
+      (suma, item) => suma + item.asociados,
+      0
+    );
+
+    return total > 0 ? segmento.asociados / total * 100 : 0;
 
   }
 
@@ -582,7 +602,8 @@ export class SegmentoCarteraComponent implements OnInit {
               saldoTotal: this.formatearMoneda(saldoTotal),
               saldoTotalValor: saldoTotal,
               saldoVencido: this.formatearMoneda(saldoVencido),
-              moraPromedio: Number(moraPromedio.toFixed(2))
+              // Como en Figma: días enteros (sin decimales)
+              moraPromedio: Math.round(moraPromedio)
             };
 
           });
@@ -657,7 +678,31 @@ export class SegmentoCarteraComponent implements OnInit {
 
       asociadosSegmentados: asociadosSegmentados.toLocaleString('es-CO'),
 
-      tasaRecuperacion: '—'
+      tasaRecuperacion: '—',
+
+      // Línea pequeña debajo de cada tarjeta (como en Figma)
+      detalles: [
+        {
+          porcentaje: this.segmentos.length > 0
+            ? Math.round(segmentosActivos / this.segmentos.length * 100) + '%'
+            : '',
+          periodo: 'cobertura'
+        },
+        {
+          porcentaje: segmentoMayorSaldo?.saldoTotalValor
+            ? this.formatearMoneda(segmentoMayorSaldo.saldoTotalValor)
+            : '',
+          periodo: 'de saldo total'
+        },
+        {
+          porcentaje: segmentoMayorMora?.moraPromedio
+            ? Math.round(segmentoMayorMora.moraPromedio) + ' días'
+            : '',
+          periodo: 'promedio'
+        },
+        { porcentaje: '', periodo: '' },
+        { porcentaje: '', periodo: '' }
+      ]
     };
 
   }

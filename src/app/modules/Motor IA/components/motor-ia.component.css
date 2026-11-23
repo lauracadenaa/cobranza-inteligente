@@ -1,0 +1,634 @@
+/* =========================================
+   DISTRIBUCIÓN GENERAL (igual que las demás pantallas)
+========================================= */
+
+:host {
+  display: block;
+  width: 100%;
+  min-height: 100vh;
+}
+
+.dashboard-layout {
+  display: flex;
+  align-items: flex-start;
+  width: 100%;
+  min-height: 100vh;
+  background-color: #D9E3EA;
+}
+
+.dashboard-content {
+  flex: 1 1 0;
+  min-width: 0;
+  padding: 30px 8px 30px 28px;
+  box-sizing: border-box;
+  overflow-x: hidden;
+}
+
+app-dashboard-header {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  margin-bottom: -24px;
+}
+
+.motor-body {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+  min-width: 0;
+  margin-top: 12px;
+}
+
+/* =========================================
+   TARJETAS
+========================================= */
+
+.motor-card {
+  padding: 18px 20px;
+  background: #FFFFFF;
+  border: 1px solid #E2E8F0;
+  border-radius: 12px;
+  box-sizing: border-box;
+  min-width: 0;
+}
+
+.card-encabezado {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.card-encabezado h3,
+.historial-titulo {
+  margin: 0;
+  color: #0A3B4E;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.card-encabezado p {
+  margin: 3px 0 0;
+  color: #64748B;
+  font-size: 11px;
+}
+
+/* =========================================
+   1. MODELO ACTIVO
+========================================= */
+
+.modelo-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 14px;
+}
+
+.modelo-icono {
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  border-radius: 8px;
+  background: #F3E8FF;
+  color: #7C3AED;
+  font-size: 18px;
+}
+
+.modelo-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.modelo-nombre {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.modelo-nombre h2 {
+  margin: 0;
+  color: #0A3B4E;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.etiqueta-activo {
+  padding: 2px 8px;
+  border-radius: 6px;
+  background: #DCFCE7;
+  color: #15803D;
+  font-size: 10px;
+  font-weight: 600;
+}
+
+.modelo-info p {
+  margin: 3px 0 0;
+  color: #64748B;
+  font-size: 11px;
+}
+
+.modelo-info p strong {
+  color: #2563EB;
+  font-weight: 600;
+}
+
+.separador {
+  margin: 0 5px;
+  color: #CBD5E1;
+}
+
+.btn-guardar {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 36px;
+  padding: 0 16px;
+  flex-shrink: 0;
+  border: none;
+  border-radius: 8px;
+  background: #1763F5;
+  color: #FFFFFF;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.btn-guardar:hover:not(:disabled) {
+  background: #0F52D6;
+}
+
+.btn-guardar:disabled {
+  background: #E2E8F0;
+  color: #94A3B8;
+  cursor: not-allowed;
+}
+
+/* Cargando / error */
+.estado-carga {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 28px;
+  color: #64748B;
+  font-size: 13px;
+}
+
+.estado-error {
+  color: #B42318;
+}
+
+.estado-error button {
+  padding: 6px 12px;
+  border: 1px solid #CBD5E1;
+  border-radius: 8px;
+  background: #FFFFFF;
+  color: #2563EB;
+  cursor: pointer;
+}
+
+/* =========================================
+   2. PESOS DE VARIABLES
+========================================= */
+
+.etiqueta-calibrado {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 9px;
+  border-radius: 6px;
+  background: #DCFCE7;
+  color: #15803D;
+  font-size: 11px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.etiqueta-calibrado.descalibrado {
+  background: #FEF3C7;
+  color: #B45309;
+}
+
+.variables-lista {
+  display: flex;
+  flex-direction: column;
+}
+
+.variable-fila {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(120px, 280px) 44px 14px 32px;
+  align-items: center;
+  gap: 10px;
+  min-height: 50px;
+}
+
+.variable-nombre {
+  color: #0A3B4E;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+/* Barra deslizante azul con relleno */
+.variable-slider {
+  --avance: 0%;
+  width: 100%;
+  height: 4px;
+  margin: 0;
+  appearance: none;
+  -webkit-appearance: none;
+  border-radius: 999px;
+  background: linear-gradient(to right, #1763F5 var(--avance), #E2E8F0 var(--avance));
+  cursor: pointer;
+}
+
+.variable-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 22px;
+  height: 12px;
+  border: 2px solid #1763F5;
+  border-radius: 999px;
+  background: #FFFFFF;
+}
+
+.variable-slider::-moz-range-thumb {
+  width: 18px;
+  height: 8px;
+  border: 2px solid #1763F5;
+  border-radius: 999px;
+  background: #FFFFFF;
+}
+
+.variable-valor {
+  width: 44px;
+  height: 32px;
+  box-sizing: border-box;
+  border: 1px solid #E2E8F0;
+  border-radius: 6px;
+  background: #F1F5F9;
+  color: #475569;
+  font-size: 12px;
+  text-align: center;
+  -moz-appearance: textfield;
+}
+
+.variable-valor::-webkit-inner-spin-button,
+.variable-valor::-webkit-outer-spin-button,
+.contador input::-webkit-inner-spin-button,
+.contador input::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.variable-porcentaje {
+  color: #475569;
+  font-size: 12px;
+}
+
+.btn-icono-eliminar {
+  width: 28px;
+  height: 28px;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: #2563EB;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.btn-icono-eliminar:hover {
+  background: #EFF6FF;
+}
+
+.btn-agregar {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 6px;
+  padding: 6px 8px;
+  border: none;
+  background: transparent;
+  color: #2563EB;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+/* =========================================
+   3. UMBRALES DE RIESGO
+========================================= */
+
+.umbral-fila {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 160px 160px;
+  align-items: center;
+  column-gap: 60px;
+  min-height: 52px;
+  border-bottom: 1px solid #EEF2F5;
+}
+
+.umbral-fila:last-of-type {
+  border-bottom: none;
+}
+
+.umbral-titulos {
+  min-height: 28px;
+  border-bottom: none;
+  color: #475569;
+  font-size: 11px;
+  font-weight: 500;
+  text-align: center;
+}
+
+.umbral-nombre {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: #0A3B4E;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.umbral-nombre i {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.contador {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.contador button {
+  width: 26px;
+  height: 26px;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: #2563EB;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.contador button:hover {
+  background: #EFF6FF;
+}
+
+.contador input {
+  width: 72px;
+  height: 32px;
+  box-sizing: border-box;
+  border: 1px solid #E2E8F0;
+  border-radius: 6px;
+  background: #F1F5F9;
+  color: #0A3B4E;
+  font-size: 12px;
+  text-align: center;
+  -moz-appearance: textfield;
+}
+
+.contador input.invalido {
+  border-color: #DC2626;
+  background: #FEF2F2;
+}
+
+.sin-datos {
+  margin: 12px 0 0;
+  color: #64748B;
+  font-size: 12px;
+  text-align: center;
+}
+
+/* =========================================
+   4. HISTÓRICO DE VERSIONES
+========================================= */
+
+.historial-card {
+  padding: 16px 0 12px;
+}
+
+.historial-titulo {
+  padding: 0 20px 12px;
+}
+
+.tabla-contenedor {
+  overflow-x: auto;
+}
+
+.historial-card table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+
+.historial-card th {
+  padding: 10px 20px;
+  background: #F8FAFC;
+  color: #64748B;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.4px;
+  text-align: left;
+  text-transform: uppercase;
+  border-top: 1px solid #EEF2F5;
+  border-bottom: 1px solid #EEF2F5;
+}
+
+.historial-card td {
+  padding: 11px 20px;
+  color: #334155;
+  border-bottom: 1px solid #EEF2F5;
+}
+
+.historial-card .col-acciones {
+  text-align: right;
+}
+
+.creador {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.creador-avatar {
+  width: 20px;
+  height: 20px;
+  display: grid;
+  place-items: center;
+  border: 1px solid #93C5FD;
+  border-radius: 50%;
+  background: #EFF6FF;
+  color: #2563EB;
+  font-size: 8px;
+  font-weight: 700;
+}
+
+.estado {
+  padding: 2px 8px;
+  border-radius: 4px;
+  background: #E2E8F0;
+  color: #475569;
+  font-size: 10px;
+  font-weight: 600;
+}
+
+.estado.estado-activo {
+  background: #DCFCE7;
+  color: #15803D;
+}
+
+.sin-accion {
+  color: #CBD5E1;
+}
+
+.historial-pie {
+  margin: 10px 20px 0;
+  color: #64748B;
+  font-size: 11px;
+}
+
+/* =========================================
+   MODAL DE CONFIRMACIÓN Y AVISO
+========================================= */
+
+.modal-fondo {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  background: rgba(15, 23, 42, 0.45);
+}
+
+.modal {
+  width: 420px;
+  max-width: 100%;
+  padding: 22px;
+  border-radius: 14px;
+  background: #FFFFFF;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+}
+
+.modal h3 {
+  margin: 0 0 8px;
+  color: #0A3B4E;
+  font-size: 16px;
+}
+
+.modal p {
+  margin: 0;
+  color: #475569;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.modal-acciones {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.btn-secundario,
+.btn-primario {
+  height: 36px;
+  padding: 0 16px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.btn-secundario {
+  border: 1px solid #CBD5E1;
+  background: #FFFFFF;
+  color: #334155;
+}
+
+.btn-primario {
+  border: none;
+  background: #1763F5;
+  color: #FFFFFF;
+}
+
+.btn-primario:disabled,
+.btn-secundario:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}
+
+.aviso {
+  position: fixed;
+  right: 24px;
+  bottom: 24px;
+  z-index: 1100;
+  max-width: 360px;
+  padding: 12px 16px;
+  border-radius: 10px;
+  background: #0A3B4E;
+  color: #FFFFFF;
+  font-size: 12px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
+}
+
+.aviso.aviso-exito {
+  background: #15803D;
+}
+
+.aviso.aviso-error {
+  background: #B42318;
+}
+
+/* =========================================
+   RESPONSIVE
+========================================= */
+
+@media (max-width: 900px) {
+  .umbral-fila {
+    grid-template-columns: minmax(0, 1fr) 140px 140px;
+    column-gap: 16px;
+  }
+}
+
+@media (max-width: 700px) {
+  .dashboard-content {
+    padding: 20px 12px;
+  }
+
+  .modelo-card {
+    flex-wrap: wrap;
+  }
+
+  .variable-fila {
+    grid-template-columns: minmax(0, 1fr) 44px 14px 32px;
+    row-gap: 4px;
+    padding: 8px 0;
+  }
+
+  .variable-slider {
+    grid-column: 1 / -1;
+    grid-row: 2;
+  }
+
+  .umbral-fila {
+    grid-template-columns: 1fr 1fr;
+    row-gap: 8px;
+    padding: 8px 0;
+  }
+
+  .umbral-nombre {
+    grid-column: 1 / -1;
+  }
+
+  .umbral-titulos {
+    display: none;
+  }
+}

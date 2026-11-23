@@ -1,0 +1,191 @@
+<!-- CAPACIDAD GENERAL -->
+<section class="card resumen">
+  <div class="resumen-valor">
+    <small>Capacidad general</small>
+    <strong>
+      @if (cargando) { Cargando... }
+      @else if (capacidadGeneral !== null) { {{ capacidadGeneral }} casos por agente }
+      @else { Sin tope configurado }
+    </strong>
+  </div>
+  <div class="resumen-texto">
+    <p>Las excepciones solo aplican al agente configurado.</p>
+    <small>La disponibilidad operativa no modifica el estado de su cuenta de usuario. La capacidad general se define en el servidor.</small>
+  </div>
+</section>
+
+<!-- TABLA DE AGENTES -->
+<section class="card agentes">
+
+  <div class="agentes-encabezado">
+    <div class="card-titulo">
+      <h2>Agentes <small>{{ agentesFiltrados.length }} agentes</small></h2>
+    </div>
+
+    <div class="controles">
+      <div class="buscador">
+        <i class="bi bi-search" aria-hidden="true"></i>
+        <input type="text" [(ngModel)]="busqueda" placeholder="Buscar agente..." aria-label="Buscar agente">
+      </div>
+
+      <div class="con-menu">
+        <button type="button" class="btn-filtros" [class.activo]="filtroEstado"
+                (click)="mostrarFiltros = !mostrarFiltros">
+          <i class="bi bi-sliders" aria-hidden="true"></i>
+          Filtros
+        </button>
+
+        @if (mostrarFiltros) {
+          <div class="menu">
+            <label>
+              Estado operativo
+              <select class="campo" [(ngModel)]="filtroEstado" (ngModelChange)="mostrarFiltros = false">
+                <option value="">Todos</option>
+                @for (e of estados; track e) {
+                  <option [value]="e">{{ e }}</option>
+                }
+              </select>
+            </label>
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+
+  <div class="tabla-scroll">
+    <table>
+      <thead>
+        <tr>
+          <th>Agente</th>
+          <th>Estado operativo</th>
+          <th>Casos activos</th>
+          <th>Capacidad máxima</th>
+          <th>Ocupación</th>
+          <th>Disponibilidad</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        @if (cargando) {
+          <tr><td colspan="7" class="vacio">Cargando agentes...</td></tr>
+        } @else if (errorCarga) {
+          <tr>
+            <td colspan="7" class="vacio">
+              <p class="error-carga">{{ errorCarga }}</p>
+              <button type="button" class="btn-secundario" (click)="cargar()">Reintentar</button>
+            </td>
+          </tr>
+        } @else {
+        @for (a of agentesFiltrados; track a.id) {
+          <tr>
+            <td class="nombre">{{ a.nombre }}</td>
+            <td>{{ a.estado }}</td>
+            <td>{{ a.casosActivos }} casos</td>
+            <td>
+              {{ a.capacidadMaxima !== null ? a.capacidadMaxima + ' máximo' : 'Sin tope' }}
+              @if (a.personalizada) {
+                <span class="personalizada" title="Capacidad personalizada">Personalizada</span>
+              }
+            </td>
+            <td [class.llena]="a.llena">{{ formatoPorcentaje(ocupacion(a)) }}</td>
+            <td>{{ disponibilidad(a) }}</td>
+            <td>
+              <button type="button" class="btn-enlace" (click)="abrirConfiguracion(a)">
+                Ver configuración
+              </button>
+            </td>
+          </tr>
+        } @empty {
+          <tr>
+            <td colspan="7" class="vacio">
+              {{ agentes.length ? 'No hay agentes que coincidan con la búsqueda.' : 'Todavía no hay agentes registrados.' }}
+            </td>
+          </tr>
+        }
+        }
+      </tbody>
+    </table>
+  </div>
+
+  <p class="pie">Mostrando {{ agentesFiltrados.length }} de {{ agentes.length }} agentes</p>
+
+</section>
+
+<!-- ESTADOS OPERATIVOS -->
+<section class="card">
+  <div class="card-titulo">
+    <h2>Estados operativos</h2>
+  </div>
+  <div class="estados">
+    @for (e of descripcionEstados; track e.nombre) {
+      <div class="estado">
+        <strong>{{ e.nombre }}</strong>
+        <span>{{ e.texto }}</span>
+      </div>
+    }
+  </div>
+</section>
+
+<div class="banner">
+  <i class="bi bi-info-circle" aria-hidden="true"></i>
+  <div>
+    <strong>Estados operativos</strong>
+    <p>
+      <b>Activo:</b> recibe casos · <b>No disponible:</b> conserva sus casos sin recibir nuevos ·
+      <b>Inactivo:</b> no recibe asignaciones
+    </p>
+  </div>
+</div>
+
+<!-- VENTANA: CONFIGURACIÓN DEL AGENTE -->
+@if (agenteEnEdicion; as agente) {
+  <div class="fondo" (click)="cerrarConfiguracion()">
+    <form class="modal" (click)="$event.stopPropagation()" (ngSubmit)="guardarConfiguracion()">
+
+      <h3>Configuración de {{ agente.nombre }}</h3>
+
+      <label>
+        Estado operativo
+        <select class="campo" name="estado" [(ngModel)]="formulario.estado" [disabled]="guardando">
+          @for (e of estados; track e) {
+            <option [value]="e">{{ e }}</option>
+          }
+        </select>
+      </label>
+
+      <label class="opcion">
+        <input type="checkbox" name="usarGeneral" [(ngModel)]="formulario.usarGeneral" [disabled]="guardando">
+        Usar la capacidad general{{ capacidadGeneral !== null ? ' (' + capacidadGeneral + ' casos)' : '' }}
+      </label>
+
+      @if (!formulario.usarGeneral) {
+        <label>
+          Capacidad máxima propia (casos)
+          <input class="campo" type="number" min="1" name="capacidad"
+                 [class.invalido]="!formularioValido"
+                 [(ngModel)]="formulario.capacidadMaxima" [disabled]="guardando">
+        </label>
+      }
+
+      <p class="nota-modal">
+        Al guardar, el sistema redistribuye los casos automáticamente según la nueva configuración.
+      </p>
+
+      @if (errorFormulario) {
+        <small class="error">{{ errorFormulario }}</small>
+      }
+
+      <div class="modal-botones">
+        <button type="button" class="btn-secundario" [disabled]="guardando" (click)="cerrarConfiguracion()">Cancelar</button>
+        <button type="submit" class="btn-primario" [disabled]="!formularioValido || guardando">
+          {{ guardando ? 'Guardando...' : 'Guardar' }}
+        </button>
+      </div>
+
+    </form>
+  </div>
+}
+
+@if (mensaje) {
+  <div class="aviso" role="status">{{ mensaje }}</div>
+}

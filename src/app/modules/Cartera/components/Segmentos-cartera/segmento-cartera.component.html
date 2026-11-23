@@ -15,14 +15,18 @@
 
       <div
         class="barra-segmento"
-        *ngFor="let segmento of segmentos">
+        *ngFor="let segmento of segmentos"
+        [style.flex-grow]="porcentajeSegmento(segmento) || 1">
 
         <div
           class="linea-segmento"
           [style.background]="segmento.color">
         </div>
 
-        <span>{{ segmento.nombre }}</span>
+        <span>
+          {{ segmento.nombre }}
+          ({{ porcentajeSegmento(segmento) | number:'1.1-1' }}%)
+        </span>
 
       </div>
 

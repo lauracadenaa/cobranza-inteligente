@@ -1,0 +1,112 @@
+<!-- ESTADOS DEL TIEMPO DE ATENCIÓN -->
+<section class="card">
+  <div class="card-titulo">
+    <h2>Estados del tiempo de atención</h2>
+  </div>
+
+  <div class="estados">
+    @for (e of estados; track e.titulo) {
+      <div class="estado tono-{{ e.tono }}">
+        <div class="estado-titulo">
+          <i class="bi {{ e.icono }}" aria-hidden="true"></i>
+          <strong>{{ e.titulo }}</strong>
+        </div>
+        <p>{{ e.texto }}</p>
+      </div>
+    }
+  </div>
+</section>
+
+<!-- TABLA DE TIEMPOS -->
+<section class="card">
+
+  <div class="card-titulo">
+    <h2>Tiempos de atención</h2>
+    <p>Define los tiempos máximos y el umbral de advertencia para cada prioridad.</p>
+  </div>
+
+  <div class="tabla-scroll tabla-borde">
+    <table>
+      <thead>
+        <tr>
+          <th>Prioridad</th>
+          <th>Sin asignar</th>
+          <th>Primera gestión</th>
+          <th>Advertencia</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (fila of tiempos; track fila.prioridad) {
+          <tr>
+            <td>
+              <span class="prioridad">
+                <i [style.background]="fila.color"></i>
+                {{ fila.prioridad }}
+              </span>
+            </td>
+
+            <td>
+              <div class="tiempo">
+                <input type="number" min="0" class="campo numero"
+                       [class.invalido]="!valorValido(fila.sinAsignar)"
+                       [(ngModel)]="fila.sinAsignar.valor"
+                       [attr.aria-label]="'Sin asignar, prioridad ' + fila.prioridad">
+                <select class="campo" [(ngModel)]="fila.sinAsignar.unidad"
+                        [attr.aria-label]="'Unidad sin asignar, prioridad ' + fila.prioridad">
+                  @for (u of unidades; track u.valor) {
+                    <option [value]="u.valor">{{ u.texto }}</option>
+                  }
+                </select>
+              </div>
+            </td>
+
+            <td>
+              <div class="tiempo">
+                <input type="number" min="0" class="campo numero"
+                       [class.invalido]="!valorValido(fila.primeraGestion) || !ordenValido(fila)"
+                       [(ngModel)]="fila.primeraGestion.valor"
+                       [attr.aria-label]="'Primera gestión, prioridad ' + fila.prioridad">
+                <select class="campo" [class.invalido]="!ordenValido(fila)"
+                        [(ngModel)]="fila.primeraGestion.unidad"
+                        [attr.aria-label]="'Unidad primera gestión, prioridad ' + fila.prioridad">
+                  @for (u of unidades; track u.valor) {
+                    <option [value]="u.valor">{{ u.texto }}</option>
+                  }
+                </select>
+              </div>
+            </td>
+
+            <td>
+              <div class="tiempo">
+                <input type="number" min="1" max="99" class="campo numero ancho"
+                       [class.invalido]="!advertenciaValida(fila)"
+                       [(ngModel)]="fila.advertencia"
+                       [attr.aria-label]="'Advertencia, prioridad ' + fila.prioridad">
+                <span>%</span>
+              </div>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+
+  <div class="reglas" [class.con-error]="!todoValido">
+    <p>Valores iguales o mayores que 0. La primera gestión debe ser mayor o igual al tiempo sin asignar.</p>
+    <p>Advertencia: de 1 a 99 % del tiempo transcurrido.</p>
+  </div>
+
+  <div class="acciones">
+    <button type="button" class="btn-secundario" [disabled]="!hayCambios" (click)="descartar()">
+      Descartar cambios
+    </button>
+    <button type="button" class="btn-primario" [disabled]="!hayCambios || !todoValido" (click)="guardar()">
+      Guardar configuración
+    </button>
+  </div>
+
+</section>
+
+@if (mensaje) {
+  <div class="aviso" role="status">{{ mensaje }}</div>
+}

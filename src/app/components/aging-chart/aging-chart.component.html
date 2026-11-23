@@ -1,4 +1,3 @@
-
 <!-- ================================================== -->
 <!-- CARTERA -->
 <!-- ================================================== -->
@@ -17,7 +16,7 @@
         Cartera por antigüedad de mora
       </h2>
 
-      <!-- FILTRO DE ASESOR -->
+      <!-- SELECTOR: QUÉ SE MIDE EN EL GRÁFICO -->
       <div class="asesor-filtro">
 
         <button
@@ -25,7 +24,8 @@
           class="asesor-filtro-button"
           (click)="toggleAsesorMenu()"
         >
-          Asesor: Todos
+          <i class="bi bi-bar-chart-line"></i>
+          {{ nombreMetrica }}
 
           <span class="asesor-flecha">
             ⌄
@@ -36,12 +36,9 @@
           class="asesor-menu"
           *ngIf="asesorMenuAbierto"
         >
-          <button type="button">Hoy</button>
-          <button type="button">Últimos 7 días</button>
-          <button type="button">Últimos 30 días</button>
-          <button type="button">Este mes</button>
-          <button type="button">Mes anterior</button>
-          <button type="button">Personalizado</button>
+          <button type="button" (click)="cambiarMetrica('saldo')">Saldo vencido</button>
+          <button type="button" (click)="cambiarMetrica('obligaciones')">Obligaciones</button>
+          <button type="button" (click)="cambiarMetrica('asociados')">Asociados</button>
         </div>
 
       </div>
@@ -80,25 +77,24 @@
   </div>
 
   <!-- ================================================== -->
-  <!-- DIAGRAMA POR ANTIGÜEDAD -->
+  <!-- DIAGRAMA (sirve para las tres vistas) -->
   <!-- ================================================== -->
 
-  <div
-    class="aging-diagram aging-diagram-antiguedad"
-    *ngIf="vistaActual === 'antiguedad'"
-  >
+  <div class="aging-diagram">
 
     <!-- EJE VERTICAL -->
     <div class="aging-y-axis">
 
-      <span class="aging-y-axis-title">Monto (COP)</span>
+      <span class="aging-y-axis-title">
+        {{ metricaActual === 'saldo' ? 'Monto (COP)' : nombreMetrica }}
+      </span>
 
       <div class="aging-y-values">
-        <span>120.0M</span>
-        <span>90.0M</span>
-        <span>60.0M</span>
-        <span>30.0M</span>
-        <span>0</span>
+        <span>{{ getAxisLabel(4) }}</span>
+        <span>{{ getAxisLabel(3) }}</span>
+        <span>{{ getAxisLabel(2) }}</span>
+        <span>{{ getAxisLabel(1) }}</span>
+        <span>{{ getAxisLabel(0) }}</span>
       </div>
 
     </div>
@@ -108,123 +104,36 @@
 
       <!-- LÍNEAS HORIZONTALES -->
       <div class="aging-grid">
-
         <div class="grid-line"></div>
         <div class="grid-line"></div>
         <div class="grid-line"></div>
         <div class="grid-line"></div>
         <div class="grid-line"></div>
-
       </div>
 
-      <!-- BARRAS POR ANTIGÜEDAD -->
-      <div class="aging-bars">
-
-        <ng-container
-          *ngFor="let dato of agingData; let i = index"
-        >
-
-          <div class="aging-bar-item">
-
-            <div
-              class="aging-bar"
-              [style.height.%]="getBarHeight(dato.valor)"
-            ></div>
-
-            <!-- TOOLTIP -->
-            <div
-              class="aging-tooltip"
-              [class.tooltip-left]="i >= agingData.length - 2"
-            >
-              <strong>{{ dato.rangoMora }}</strong>
-              <span>Monto: {{ getFormattedValue(dato.valor) }}</span>
-              <span>Obligaciones: {{ dato.obligaciones }}</span>
-            </div>
-
-          </div>
-
-        </ng-container>
-
-      </div>
-
-      <!-- INFORMACIÓN INFERIOR -->
-      <div class="aging-labels">
-
-        <span
-          class="aging-label"
-          *ngFor="let dato of agingData"
-        >
-          {{ dato.rangoMora }}
-        </span>
-
-      </div>
-
-    </div>
-
-  </div>
-
-  <!-- ================================================== -->
-  <!-- DIAGRAMA POR SEGMENTO -->
-  <!-- ================================================== -->
-
-  <div
-    class="aging-diagram aging-diagram-segmento"
-    *ngIf="vistaActual === 'segmento'"
-  >
-
-    <!-- EJE VERTICAL -->
-    <div class="aging-y-axis">
-
-      <span class="aging-y-axis-title">Monto (COP)</span>
-
-      <div class="aging-y-values">
-        <span>120.0M</span>
-        <span>90.0M</span>
-        <span>60.0M</span>
-        <span>30.0M</span>
-        <span>0</span>
-      </div>
-
-    </div>
-
-    <!-- ÁREA DEL GRÁFICO -->
-    <div class="aging-graph">
-
-      <!-- LÍNEAS HORIZONTALES -->
-      <div class="aging-grid">
-
-        <div class="grid-line"></div>
-        <div class="grid-line"></div>
-        <div class="grid-line"></div>
-        <div class="grid-line"></div>
-        <div class="grid-line"></div>
-
-      </div>
-
-      <!-- BARRAS POR SEGMENTO -->
+      <!-- BARRAS -->
       <div class="aging-bars">
 
         <div
           class="aging-bar-item"
-          *ngFor="let dato of segmentDataFiltrada; let i = index"
+          *ngFor="let dato of datosActuales; let i = index"
         >
 
           <div
             class="aging-bar"
-            [style.height.%]="getBarHeight(dato.valor)"
-            [style.background-color]="
-              dato.rangoMora === 'Bajo' ? '#22C55E' :
-              dato.rangoMora === 'Medio' ? '#EAB308' :
-              dato.rangoMora === 'Alto' ? '#F97316' :
-              dato.rangoMora === 'Crítico' ? '#EF4444' :
-              '#1A4DD6'
-            "
-          ></div>
+            [style.height.%]="getBarHeight(dato)"
+            [style.background-color]="getColorBarra(dato)"
+          >
+            <!-- VALOR ENCIMA DE LA BARRA -->
+            <span class="aging-bar-valor">
+              {{ getValorEtiqueta(dato) }}
+            </span>
+          </div>
 
           <!-- TOOLTIP -->
           <div
             class="aging-tooltip"
-            [class.tooltip-left]="i >= segmentDataFiltrada.length - 2"
+            [class.tooltip-left]="i >= datosActuales.length - 2"
           >
             <strong>{{ dato.rangoMora }}</strong>
             <span>Monto: {{ getFormattedValue(dato.valor) }}</span>
@@ -235,93 +144,12 @@
 
       </div>
 
-      <!-- INFORMACIÓN INFERIOR -->
+      <!-- NOMBRES DEBAJO DE LAS BARRAS -->
       <div class="aging-labels">
 
         <span
           class="aging-label"
-          *ngFor="let dato of segmentDataFiltrada"
-        >
-          {{ dato.rangoMora }}
-        </span>
-
-      </div>
-
-    </div>
-
-  </div>
-
-  <!-- ================================================== -->
-  <!-- DIAGRAMA POR RIESGO -->
-  <!-- ================================================== -->
-
-  <div
-    class="aging-diagram"
-    *ngIf="vistaActual === 'riesgo'"
-  >
-
-    <!-- EJE VERTICAL -->
-    <div class="aging-y-axis">
-
-      <span class="aging-y-axis-title">Monto (COP)</span>
-
-      <div class="aging-y-values">
-        <span>120.0M</span>
-        <span>90.0M</span>
-        <span>60.0M</span>
-        <span>30.0M</span>
-        <span>0</span>
-      </div>
-
-    </div>
-
-    <!-- ÁREA DEL GRÁFICO -->
-    <div class="aging-graph">
-
-      <!-- LÍNEAS HORIZONTALES -->
-      <div class="aging-grid">
-
-        <div class="grid-line"></div>
-        <div class="grid-line"></div>
-        <div class="grid-line"></div>
-        <div class="grid-line"></div>
-        <div class="grid-line"></div>
-
-      </div>
-
-      <!-- BARRAS POR RIESGO -->
-      <div class="aging-bars">
-
-        <div
-          class="aging-bar-item"
-          *ngFor="let dato of riskData; let i = index"
-        >
-
-          <div
-            class="aging-bar"
-            [style.height.%]="getBarHeight(dato.valor)"
-          ></div>
-
-          <!-- TOOLTIP -->
-          <div
-            class="aging-tooltip"
-            [class.tooltip-left]="i >= riskData.length - 2"
-          >
-            <strong>{{ dato.rangoMora }}</strong>
-            <span>Monto: {{ getFormattedValue(dato.valor) }}</span>
-            <span>Obligaciones: {{ dato.obligaciones }}</span>
-          </div>
-
-        </div>
-
-      </div>
-
-      <!-- INFORMACIÓN INFERIOR -->
-      <div class="aging-labels">
-
-        <span
-          class="aging-label"
-          *ngFor="let dato of riskData"
+          *ngFor="let dato of datosActuales"
         >
           {{ dato.rangoMora }}
         </span>

@@ -1,0 +1,99 @@
+<!-- TARJETAS DE REPORTES -->
+<div class="reportes-grid">
+
+  <article class="reporte-card" *ngFor="let reporte of reportes">
+
+    <div class="reporte-icono" [ngClass]="'tono-' + reporte.tono">
+      <i class="bi" [ngClass]="reporte.icono" aria-hidden="true"></i>
+    </div>
+
+    <h3>{{ reporte.titulo }}</h3>
+    <p>{{ reporte.descripcion }}</p>
+
+    <button type="button" class="btn-generar" (click)="abrir(reporte)">
+      <i class="bi bi-sliders" aria-hidden="true"></i>
+      Configurar reporte
+    </button>
+
+  </article>
+
+</div>
+
+<!-- VENTANA: CONFIGURAR Y GENERAR -->
+<div class="modal-fondo" *ngIf="reporteSeleccionado as reporte" (click)="cerrar()">
+
+  <div class="modal" role="dialog" aria-modal="true" (click)="$event.stopPropagation()">
+
+    <div class="modal-encabezado">
+      <div class="reporte-icono" [ngClass]="'tono-' + reporte.tono">
+        <i class="bi" [ngClass]="reporte.icono" aria-hidden="true"></i>
+      </div>
+      <div>
+        <h3>{{ reporte.titulo }}</h3>
+        <p>Configura los parámetros del reporte</p>
+      </div>
+      <button type="button" class="btn-cerrar" aria-label="Cerrar" (click)="cerrar()">
+        <i class="bi bi-x-lg" aria-hidden="true"></i>
+      </button>
+    </div>
+
+    <!-- 1. Formulario -->
+    <ng-container *ngIf="estado === 'formulario' || estado === 'error'">
+
+      <div class="campos-fecha">
+        <label>
+          Desde
+          <input type="date" [(ngModel)]="desde" [max]="hasta">
+        </label>
+        <label>
+          Hasta
+          <input type="date" [(ngModel)]="hasta" [min]="desde">
+        </label>
+      </div>
+
+      <span class="campo-titulo">Formato</span>
+      <div class="formatos">
+        <button type="button" [class.activo]="formato === 'EXCEL'" (click)="formato = 'EXCEL'">
+          <i class="bi bi-file-earmark-excel" aria-hidden="true"></i> Excel
+        </button>
+        <button type="button" [class.activo]="formato === 'PDF'" (click)="formato = 'PDF'">
+          <i class="bi bi-file-earmark-pdf" aria-hidden="true"></i> PDF
+        </button>
+      </div>
+
+      <p class="mensaje-error" *ngIf="estado === 'error'">
+        <i class="bi bi-exclamation-circle" aria-hidden="true"></i>
+        {{ mensajeError }}
+      </p>
+
+      <div class="modal-acciones">
+        <button type="button" class="btn-secundario" (click)="cerrar()">Cancelar</button>
+        <button type="button" class="btn-primario" [disabled]="!fechasValidas" (click)="generar()">
+          <i class="bi bi-download" aria-hidden="true"></i>
+          Generar y descargar
+        </button>
+      </div>
+
+    </ng-container>
+
+    <!-- 2. Generando -->
+    <div class="estado-generando" *ngIf="estado === 'generando'">
+      <span class="cargador"></span>
+      <strong>Generando reporte...</strong>
+      <span>Esto puede tardar unos segundos. No cierres esta ventana.</span>
+    </div>
+
+    <!-- 3. Listo -->
+    <div class="estado-listo" *ngIf="estado === 'listo'">
+      <i class="bi bi-check-circle-fill" aria-hidden="true"></i>
+      <strong>¡Reporte listo!</strong>
+      <span>La descarga empezó automáticamente.</span>
+      <div class="modal-acciones">
+        <button type="button" class="btn-secundario" (click)="descargar()">Descargar de nuevo</button>
+        <button type="button" class="btn-primario" (click)="cerrar()">Cerrar</button>
+      </div>
+    </div>
+
+  </div>
+
+</div>

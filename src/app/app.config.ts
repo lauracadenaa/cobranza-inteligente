@@ -3,7 +3,7 @@ import {
   provideBrowserGlobalErrorListeners
 } from '@angular/core';
 
-import { provideRouter } from '@angular/router';
+import { provideRouter, withInMemoryScrolling } from '@angular/router';
 
 import {
   provideHttpClient,
@@ -19,7 +19,11 @@ export const appConfig: ApplicationConfig = {
   providers: [
     provideBrowserGlobalErrorListeners(),
 
-    provideRouter(routes),
+    // Al cambiar de pantalla, siempre empezar desde arriba
+    provideRouter(
+      routes,
+      withInMemoryScrolling({ scrollPositionRestoration: 'top' })
+    ),
 
     // Activar el interceptor de autenticación
     provideHttpClient(

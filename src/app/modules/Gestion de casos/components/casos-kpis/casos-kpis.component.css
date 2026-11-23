@@ -58,6 +58,41 @@
   justify-content: center;
 }
 
+.kpi-icon i {
+  font-size: 18px;
+}
+
+.kpi-detalle {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  padding-left: 10px;
+  margin-top: 28px;
+  overflow: hidden;
+  white-space: nowrap;
+  font-family: 'Roboto', sans-serif;
+  font-size: 11px;
+}
+
+.kpi-etiqueta {
+  padding: 2px 7px;
+  border-radius: 6px;
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.kpi-etiqueta.tono-azul { background: #EAF1FF; color: #2563EB; }
+.kpi-etiqueta.tono-rojo { background: #FDECEC; color: #DC2626; }
+.kpi-etiqueta.tono-morado { background: #F1EAFE; color: #7C3AED; }
+.kpi-etiqueta.tono-naranja { background: #FFF1E0; color: #C2410C; }
+.kpi-etiqueta.tono-verde { background: #DCFCE7; color: #15803D; }
+
+.kpi-descripcion {
+  color: #64748B;
+}
+
 .kpi-icon img {
   display: block;
   width: 23px;

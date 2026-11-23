@@ -24,13 +24,15 @@
       <app-caso-resumen
         *ngIf="casoEnDetalle"
         [caso]="casoEnDetalle"
-        (cerrar)="cerrarDetalle()">
+        (cerrar)="cerrarDetalle()"
+        (casoActualizado)="$event && (casoEnDetalle = $event)">
       </app-caso-resumen>
 
       <!-- COLA DE CASOS -->
       <app-cola-casos
         *ngIf="!casoEnDetalle"
         [detalleAbierto]="false"
+        [casoAAbrir]="casoAAbrir"
         (casoDetalleChange)="actualizarCasoEnDetalle($event)">
       </app-cola-casos>
 

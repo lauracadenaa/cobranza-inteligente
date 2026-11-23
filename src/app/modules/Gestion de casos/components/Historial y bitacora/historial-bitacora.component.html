@@ -13,7 +13,7 @@
       </div>
 
       <span class="total-eventos">
-        {{ totalEventos }} eventos
+        {{ totalEventos }} {{ totalEventos === 1 ? 'evento' : 'eventos' }}
       </span>
     </div>
 
@@ -28,7 +28,7 @@
         <div class="timeline-indicator">
           <span
             class="timeline-dot"
-            [class.timeline-dot-active]="evento.id === eventoSeleccionadoId">
+            [class.timeline-dot-active]="evento === eventoSeleccionado">
           </span>
 
           <span
@@ -37,19 +37,18 @@
           </span>
         </div>
 
+        <!-- Solo para ver: no se puede seleccionar -->
         <div
           class="evento-card"
-          [class.evento-seleccionado]="evento.id === eventoSeleccionadoId"
-          (click)="seleccionarEvento(evento)"
-          role="button"
-          tabindex="0"
-          (keydown.enter)="seleccionarEvento(evento)"
-          (keydown.space)="seleccionarEvento(evento); $event.preventDefault()">
+          [class.evento-seleccionado]="evento === eventoSeleccionado">
 
           <div class="evento-card-header">
             <div class="evento-title-group">
               <span class="evento-type">
                 {{ evento.tipo }}
+              </span>
+              <span class="evento-origen origen-{{ evento.origen === 'Motor IA' ? 'ia' : evento.origen.toLowerCase() }}">
+                {{ evento.origen }}
               </span>
               <h4>{{ evento.titulo }}</h4>
             </div>
@@ -83,8 +82,8 @@
       <div
         class="historial-empty"
         *ngIf="eventosOrdenados.length === 0">
-        <p>No hay registros aún.</p>
-        <span>Cuando existan movimientos, aparecerán aquí.</span>
+        <p>{{ cargando ? 'Consultando la bitácora...' : 'No hay registros aún.' }}</p>
+        <span *ngIf="!cargando">Cuando existan movimientos, aparecerán aquí.</span>
       </div>
 
     </div>
@@ -103,6 +102,7 @@
 
       <div class="sidebar-card-header">
         <h3>Detalle del evento</h3>
+        <span class="detalle-subtitulo">Último evento</span>
       </div>
 
       <div class="sidebar-divider"></div>
@@ -143,7 +143,7 @@
             <p>{{ evento.descripcion }}</p>
           </div>
 
-          <div class="detalle-observacion">
+          <div class="detalle-observacion" *ngIf="evento.observacion">
             <span>Observaciones</span>
             <p>{{ evento.observacion }}</p>
           </div>
@@ -154,7 +154,7 @@
 
       <ng-template #sinEvento>
         <div class="detalle-empty">
-          <p>Selecciona un evento para consultar su detalle.</p>
+          <p>Aún no hay eventos en este caso.</p>
         </div>
       </ng-template>
 
@@ -168,21 +168,11 @@
         <h3>Resumen de la bitácora</h3>
       </div>
 
-      <div class="resumen-bitacora-content">
-        <div class="resumen-item">
-          <span>Total de eventos</span>
-          <strong>{{ totalEventos }}</strong>
+      <div class="resumen-cuadros">
+        <div class="resumen-cuadro tono-{{ dato.tono }}" *ngFor="let dato of resumenPorOrigen">
+          <strong>{{ dato.valor }}</strong>
+          <span>{{ dato.texto }}</span>
         </div>
-
-        <div class="resumen-item">
-          <span>Contactos efectivos</span>
-          <strong>{{ contactosEfectivos }}</strong>
-        </div>
-      </div>
-
-      <div class="ultima-actividad">
-        <span>Última actividad:</span>
-        <strong>{{ ultimaActividad }}</strong>
       </div>
 
     </section>

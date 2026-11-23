@@ -71,6 +71,17 @@ saldoVencido?: number;
   fechaCreacion?: string;
   origen?: string;
 
+  // Última gestión (fecha de la última actualización y cantidad de intentos)
+  ultimaGestion?: string;
+  ultimaGestionDetalle?: string;
+  fechaActualizacion?: string;
+
+  // Ruta asignada por el backend
+  colaActual?: string;
+  skillRuta?: string;
+  productoRuta?: string;
+  regionRuta?: string;
+
   // CONTEXTO DE INTELIGENCIA ARTIFICIAL
   scoreIA?: number;
   mejorSiguienteAccion?: string;
@@ -109,4 +120,5 @@ export interface AgingData {
   rangoMora: string;
   valor: number;
   obligaciones: number;
+  asociados: number;
 }

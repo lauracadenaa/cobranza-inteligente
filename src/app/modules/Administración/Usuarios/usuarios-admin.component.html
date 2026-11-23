@@ -1,0 +1,221 @@
+<section class="card">
+
+  <!-- TÍTULO -->
+  <header class="card-header">
+    <div>
+      <h2>Gestión de Usuarios</h2>
+      <p>Crea usuarios y administra sus roles, accesos y estado en el sistema</p>
+    </div>
+
+    <button type="button" class="btn-primario" (click)="abrirCrear()" [disabled]="cargando || !!errorCarga">
+      <i class="bi bi-person-plus"></i>
+      Crear usuario
+    </button>
+  </header>
+
+  <!-- TABLA -->
+  <div class="tabla-scroll">
+    <table>
+      <thead>
+        <tr>
+          <th>Nombre y correo</th>
+          <th>Nombre de usuario</th>
+          <th>Rol</th>
+          <th>Estado</th>
+          <th class="col-acciones">Acciones</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        @if (cargando) {
+          <tr>
+            <td colspan="5" class="vacio">Cargando usuarios...</td>
+          </tr>
+        } @else if (errorCarga) {
+          <tr>
+            <td colspan="5" class="vacio">
+              <p class="error-carga">{{ errorCarga }}</p>
+              <button type="button" class="btn-secundario" (click)="cargar()">Reintentar</button>
+            </td>
+          </tr>
+        } @else {
+        @for (u of usuarios; track u.id) {
+          <tr [class.inactivo]="u.estado !== 'ACTIVE'">
+
+            <td>
+              <div class="persona">
+                <span class="avatar">{{ inicial(u.nombre) }}</span>
+                <div>
+                  <strong>{{ u.nombre }}</strong>
+                  <small>{{ u.correo }}</small>
+                </div>
+              </div>
+            </td>
+
+            <td class="usuario">{{ u.usuario }}</td>
+
+            <td class="rol">{{ nombreRol(u.rol) }}</td>
+
+            <td>
+              <div class="estado">
+                <button
+                  type="button"
+                  class="switch"
+                  role="switch"
+                  [attr.aria-checked]="u.estado === 'ACTIVE'"
+                  [attr.aria-label]="'Activar o suspender a ' + u.nombre"
+                  [class.on]="u.estado === 'ACTIVE'"
+                  [disabled]="procesandoId === u.id"
+                  (click)="alternarEstado(u)">
+                  <span></span>
+                </button>
+                <span class="estado-texto">{{ textoEstado(u.estado) }}</span>
+              </div>
+            </td>
+
+            <td class="col-acciones">
+              <div class="menu-acciones">
+                <button type="button" class="btn-menu" title="Acciones"
+                  [attr.aria-expanded]="menuAbiertoId === u.id"
+                  [attr.aria-label]="'Acciones de ' + u.nombre"
+                  [disabled]="procesandoId === u.id"
+                  (click)="alternarMenu(u, $event)">
+                  <i class="bi bi-three-dots-vertical" aria-hidden="true"></i>
+                </button>
+
+                @if (menuAbiertoId === u.id) {
+                  <div class="menu-desplegable" role="menu" (click)="$event.stopPropagation()">
+                    <button type="button" role="menuitem" (click)="cerrarMenu(); abrirEditar(u)">
+                      <i class="bi bi-person-gear" aria-hidden="true"></i>
+                      Editar usuario
+                    </button>
+                    <button type="button" role="menuitem" (click)="cerrarMenu(); resetearPassword(u)">
+                      <i class="bi bi-arrow-counterclockwise" aria-hidden="true"></i>
+                      Restablecer acceso
+                    </button>
+                    @if (u.estado !== 'INACTIVE') {
+                      <button type="button" role="menuitem" class="peligro" (click)="cerrarMenu(); pedirEliminar(u)">
+                        <i class="bi bi-person-x" aria-hidden="true"></i>
+                        Desactivar usuario
+                      </button>
+                    }
+                  </div>
+                }
+              </div>
+            </td>
+
+          </tr>
+        } @empty {
+          <tr>
+            <td colspan="5" class="vacio">No hay usuarios registrados.</td>
+          </tr>
+        }
+        }
+      </tbody>
+    </table>
+  </div>
+
+</section>
+
+<!-- VENTANA: CREAR / EDITAR -->
+@if (modalFormularioAbierto) {
+  <div class="fondo" (click)="cerrarFormulario()">
+    <form class="modal" (click)="$event.stopPropagation()" (ngSubmit)="guardarUsuario()">
+
+      <h3>{{ usuarioEnEdicion ? 'Editar usuario' : 'Crear usuario' }}</h3>
+
+      <label>
+        Nombre completo
+        <input name="nombre" [(ngModel)]="formulario.nombre" autocomplete="off"
+          [disabled]="!!usuarioEnEdicion" />
+        @if (usuarioEnEdicion) {
+          <small class="nota">El nombre no se puede cambiar. Si hace falta, solicítalo a soporte.</small>
+        }
+      </label>
+
+      <label>
+        Correo
+        <input name="correo" type="email" [(ngModel)]="formulario.correo" autocomplete="off" />
+      </label>
+
+      <label>
+        Nombre de usuario
+        <input name="usuario" [(ngModel)]="formulario.usuario" autocomplete="off"
+          [disabled]="!!usuarioEnEdicion" />
+        @if (!usuarioEnEdicion) {
+          <small class="nota">Entre 6 y 20 caracteres. La contraseña temporal la genera el sistema.</small>
+        }
+      </label>
+
+      <label>
+        Rol
+        <select name="rol" [(ngModel)]="formulario.rolId">
+          <option [ngValue]="null" disabled>Selecciona un rol</option>
+          @for (r of roles; track r.id) {
+            <option [ngValue]="r.id">{{ nombreRol(r.name) }}</option>
+          }
+        </select>
+      </label>
+
+      @if (errorFormulario) {
+        <p class="error">{{ errorFormulario }}</p>
+      }
+
+      <div class="modal-botones">
+        <button type="button" class="btn-secundario" [disabled]="guardando" (click)="cerrarFormulario()">Cancelar</button>
+        <button type="submit" class="btn-primario" [disabled]="guardando">
+          {{ guardando ? 'Guardando...' : 'Guardar' }}
+        </button>
+      </div>
+
+    </form>
+  </div>
+}
+
+<!-- VENTANA: CONFIRMAR ELIMINACIÓN -->
+@if (usuarioAEliminar) {
+  <div class="fondo" (click)="cancelarEliminar()">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <h3>¿Desactivar usuario?</h3>
+      <p>
+        <strong>{{ usuarioAEliminar.nombre }}</strong> quedará inactivo y no podrá iniciar sesión.
+        Seguirá en la lista y podrás volver a activarlo con el interruptor.
+      </p>
+      <div class="modal-botones">
+        <button type="button" class="btn-secundario" [disabled]="guardando" (click)="cancelarEliminar()">Cancelar</button>
+        <button type="button" class="btn-peligro" [disabled]="guardando" (click)="confirmarEliminar()">
+          {{ guardando ? 'Desactivando...' : 'Desactivar' }}
+        </button>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- VENTANA: CONTRASEÑA TEMPORAL -->
+@if (claveTemporal) {
+  <div class="fondo">
+    <div class="modal" role="dialog" aria-modal="true">
+      <h3>{{ claveTemporal.titulo }}</h3>
+      <p>
+        Contraseña temporal para <strong>{{ claveTemporal.usuario }}</strong>.
+        El usuario deberá cambiarla al iniciar sesión por primera vez.
+      </p>
+      <div class="clave">
+        <code>{{ claveTemporal.clave }}</code>
+        <button type="button" class="btn-secundario" (click)="copiarClave()">
+          <i class="bi" [class.bi-clipboard]="!claveCopiada" [class.bi-check2]="claveCopiada"></i>
+          {{ claveCopiada ? 'Copiada' : 'Copiar' }}
+        </button>
+      </div>
+      <small class="nota">Guárdala ahora: por seguridad no se volverá a mostrar.</small>
+      <div class="modal-botones">
+        <button type="button" class="btn-primario" (click)="cerrarClave()">Entendido</button>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- MENSAJE CORTO -->
+@if (mensaje) {
+  <div class="aviso" role="status">{{ mensaje }}</div>
+}

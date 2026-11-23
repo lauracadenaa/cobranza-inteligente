@@ -1,0 +1,244 @@
+:host {
+  position: relative;
+  display: inline-flex;
+  font-family: 'Roboto', sans-serif;
+}
+
+/* ===== Botón azul ===== */
+.periodo-boton {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  height: 30px;
+  padding: 0 14px;
+  border: none;
+  border-radius: 8px;
+  background: #1763F5;
+  color: #FFFFFF;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 500;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.periodo-boton:hover {
+  background: #1452CC;
+}
+
+.periodo-boton .bi-chevron-down {
+  font-size: 12px;
+}
+
+/* ===== X cuando está abierto ===== */
+.periodo-cerrar {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border: none;
+  border-radius: 8px;
+  background: #DCE8FB;
+  color: #0A3B4E;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+/* ===== Menú ===== */
+.periodo-menu {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  z-index: 50;
+  display: flex;
+  border: 1px solid #E2E8F0;
+  border-radius: 10px;
+  background: #FFFFFF;
+  box-shadow: 0 12px 28px rgba(15, 23, 42, 0.14);
+  overflow: hidden;
+}
+
+.periodo-opciones {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  width: 240px;
+  padding: 14px 16px;
+  box-sizing: border-box;
+}
+
+.periodo-menu.con-calendario .periodo-opciones {
+  width: 200px;
+  border-right: 1px solid #E2E8F0;
+}
+
+.periodo-opcion {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 0;
+  color: #1E293B;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.periodo-opcion input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.periodo-radio {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  border: 1.5px solid #334155;
+  border-radius: 50%;
+  box-sizing: border-box;
+}
+
+.periodo-opcion input:checked + .periodo-radio {
+  border-color: #1763F5;
+  background: radial-gradient(circle, #1763F5 0 4.5px, #FFFFFF 5px);
+}
+
+.periodo-opcion input:focus-visible + .periodo-radio {
+  outline: 2px solid #1763F5;
+  outline-offset: 2px;
+}
+
+/* ===== Calendario ===== */
+.periodo-calendario {
+  display: flex;
+  flex-direction: column;
+  width: 410px;
+}
+
+.periodo-fechas {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  padding: 14px 16px;
+  border-bottom: 1px solid #E2E8F0;
+}
+
+.periodo-fechas label {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  color: #0A3B4E;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.periodo-fecha {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 38px;
+  padding: 0 12px;
+  border-radius: 6px;
+  background: #F1F5F9;
+  color: #0A3B4E;
+  font-size: 13px;
+  font-weight: 400;
+}
+
+.periodo-fecha.vacia {
+  color: #94A3B8;
+}
+
+.periodo-fecha i {
+  color: #94A3B8;
+  font-size: 16px;
+}
+
+.periodo-meses {
+  max-height: 290px;
+  padding: 4px 16px 8px;
+  overflow-y: auto;
+}
+
+.periodo-mes h4 {
+  margin: 14px 0 10px;
+  color: #0A3B4E;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.periodo-semana,
+.periodo-dias {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  text-align: center;
+}
+
+.periodo-semana span {
+  padding-bottom: 8px;
+  color: #475569;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.periodo-dia {
+  justify-self: center;
+  width: 32px;
+  height: 32px;
+  margin: 2px 0;
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+  color: #0A3B4E;
+  font-family: inherit;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.periodo-dia:hover:not(:disabled) {
+  background: #E2E8F0;
+}
+
+.periodo-dia.hoy {
+  font-weight: 700;
+}
+
+.periodo-dia.en-rango {
+  border-radius: 6px;
+  background: #EAF1FF;
+}
+
+.periodo-dia.extremo {
+  background: #1763F5;
+  color: #FFFFFF;
+}
+
+.periodo-dia:disabled {
+  color: #CBD5E1;
+  cursor: default;
+}
+
+.periodo-ayuda {
+  margin: 0;
+  padding: 8px 16px 12px;
+  border-top: 1px solid #E2E8F0;
+  color: #64748B;
+  font-size: 12px;
+}
+
+/* ===== Pantallas pequeñas ===== */
+@media (max-width: 720px) {
+  .periodo-menu.con-calendario {
+    flex-direction: column;
+  }
+
+  .periodo-menu.con-calendario .periodo-opciones {
+    width: 100%;
+    border-right: none;
+    border-bottom: 1px solid #E2E8F0;
+  }
+
+  .periodo-calendario {
+    width: min(410px, calc(100vw - 48px));
+  }
+}

@@ -1,5 +1,6 @@
 
-import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit, DestroyRef, inject } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 
@@ -97,6 +98,9 @@ export class CaseStatusChartComponent implements OnInit {
   readonly radio = 94;
   readonly circunferencia = 2 * Math.PI * 94;
 
+  // Grosor del anillo
+  readonly grosor = 18;
+
   constructor(
     private dashboardService: DashboardService,
     private changeDetectorRef: ChangeDetectorRef,
@@ -107,8 +111,14 @@ export class CaseStatusChartComponent implements OnInit {
   // INICIALIZACIÓN
   // ==================================================
 
+  private readonly destroyRef = inject(DestroyRef);
+
   ngOnInit(): void {
     this.cargarCasosPorEstado();
+
+    this.dashboardService.recargar$
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => this.cargarCasosPorEstado());
   }
 
   // ==================================================
@@ -340,6 +350,60 @@ export class CaseStatusChartComponent implements OnInit {
   }
 
   // ==================================================
+  // PEDAZOS DE LA DONA
+  // Solo se dibujan los estados con casos, y entre
+  // un pedazo y otro queda una pequeña separación
+  // (como en Figma).
+  // ==================================================
+
+  get segmentosDona(): {
+    item: CaseStatusItem;
+    dashArray: string;
+    dashOffset: number;
+    puntaRedonda: boolean;
+  }[] {
+
+    const total = this.totalCasos;
+    const conCasos = this.caseStatusData.filter(item => item.cantidad > 0);
+
+    if (total <= 0 || conCasos.length === 0) {
+      return [];
+    }
+
+    // Un solo estado: anillo completo, sin separaciones
+    if (conCasos.length === 1) {
+      return [{
+        item: conCasos[0],
+        dashArray: `${this.circunferencia} 0`,
+        dashOffset: 0,
+        puntaRedonda: false
+      }];
+    }
+
+    // La punta redonda "crece" medio grosor a cada lado,
+    // así que el hueco debe ser mayor que el grosor.
+    const hueco = this.grosor + 6;
+
+    let recorrido = 0;
+
+    return conCasos.map(item => {
+
+      const largoTotal = this.circunferencia * item.cantidad / total;
+      const largoVisible = Math.max(largoTotal - hueco, 0.01);
+
+      const segmento = {
+        item,
+        dashArray: `${largoVisible} ${this.circunferencia}`,
+        dashOffset: -(recorrido + hueco / 2),
+        puntaRedonda: true
+      };
+
+      recorrido += largoTotal;
+      return segmento;
+    });
+  }
+
+  // ==================================================
   // LONGITUD DE CADA SEGMENTO
   // ==================================================
 
@@ -386,6 +450,13 @@ export class CaseStatusChartComponent implements OnInit {
 
     this.mostrarTooltip = true;
 
+  }
+
+  // Mantiene el mismo pedazo de la dona entre redibujos.
+  // Sin esto Angular lo borraba y lo volvía a crear al pasar el mouse,
+  // y por eso el cuadrito se quedaba pegado.
+  seguirSegmento(_indice: number, segmento: { item: CaseStatusItem }): string {
+    return segmento.item.estado;
   }
 
   ocultarInfo(): void {

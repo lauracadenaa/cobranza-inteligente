@@ -1,0 +1,174 @@
+<section class="auditoria-card">
+
+  <!-- ENCABEZADO DE LA TABLA -->
+  <div class="auditoria-encabezado">
+
+    <h2>
+      Registro de actividad
+      <span>{{ total | number }} {{ total === 1 ? 'evento' : 'eventos' }}</span>
+    </h2>
+
+    <div class="auditoria-controles">
+
+      <!-- Buscador -->
+      <div class="buscador">
+        <i class="bi bi-search" aria-hidden="true"></i>
+        <input
+          type="text"
+          [(ngModel)]="busqueda"
+          (ngModelChange)="alEscribir()"
+          placeholder="Buscar por ID, usuario, acción o descripción..."
+          aria-label="Buscar en la bitácora">
+        <button type="button" *ngIf="busqueda" aria-label="Limpiar búsqueda" (click)="limpiarBusqueda()">
+          <i class="bi bi-x" aria-hidden="true"></i>
+        </button>
+      </div>
+
+      <!-- FILTROS (igual que Inicio > Casos en gestión) -->
+      <div class="filtros-container">
+
+        <button
+          type="button"
+          class="managed-filter"
+          [class.filtros-activos]="mostrarFiltros"
+          [attr.aria-expanded]="mostrarFiltros"
+          (click)="alternarFiltros($event)">
+          <img src="imagenes/Filtro.png" alt="">
+          <span>Filtros</span>
+          <span class="filter-count" *ngIf="filtrosActivos > 0">{{ filtrosActivos }}</span>
+        </button>
+
+        <div class="filtros-modal" *ngIf="mostrarFiltros" (click)="$event.stopPropagation()">
+
+          <div class="filtros-header">
+            <h3>Filtros</h3>
+            <button type="button" class="cerrar-filtros" aria-label="Cerrar filtros" (click)="cerrarFiltros()">
+              <i class="bi bi-x"></i>
+            </button>
+          </div>
+
+          <div class="filtros-body">
+
+            <!-- ACCIÓN -->
+            <div class="filtro-grupo">
+              <label for="filtro-accion">Acción</label>
+              <div class="filtro-select">
+                <select
+                  id="filtro-accion"
+                  [class.con-valor]="borradorAccion !== ''"
+                  [(ngModel)]="borradorAccion">
+                  <option value="">Todas las acciones</option>
+                  <option *ngFor="let opcion of opcionesAccion" [value]="opcion.valor">{{ opcion.texto }}</option>
+                </select>
+                <img src="/imagenes/flecha.admin.png" alt="">
+              </div>
+            </div>
+
+            <!-- USUARIO -->
+            <div class="filtro-grupo">
+              <label for="filtro-usuario">ID de usuario</label>
+              <input
+                id="filtro-usuario"
+                type="text"
+                inputmode="numeric"
+                placeholder="Ej. 6"
+                [class.con-valor]="borradorUsuario.trim() !== ''"
+                [(ngModel)]="borradorUsuario"
+                (keydown.enter)="aplicarFiltros()">
+            </div>
+
+          </div>
+
+          <div class="filtros-footer">
+            <button type="button" class="btn-limpiar-filtros" (click)="limpiarFiltros()">Limpiar</button>
+            <button type="button" class="btn-aplicar-filtros" (click)="aplicarFiltros()">Aplicar filtros</button>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- PERIODO (mismo botón de Análisis de cartera) -->
+      <app-selector-periodo
+        [tipoInicial]="periodoSeleccionado?.tipo ?? '12m'"
+        (cambio)="cambiarPeriodo($event)">
+      </app-selector-periodo>
+
+    </div>
+
+  </div>
+
+  <!-- FILTROS ACTIVOS -->
+  <div class="managed-active-filters" *ngIf="filtrosVisibles.length > 0">
+    <div class="active-filter-tag" *ngFor="let filtro of filtrosVisibles">
+      <span>{{ filtro.texto }}</span>
+      <button type="button" class="remove-active-filter" aria-label="Quitar filtro" (click)="quitarFiltro(filtro.clave)">
+        <i class="bi bi-x"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- TABLA -->
+  <div class="tabla-contenedor">
+    <table>
+      <thead>
+        <tr>
+          <th class="col-id">ID</th>
+          <th class="col-fecha">Fecha/hora</th>
+          <th class="col-usuario">Usuario</th>
+          <th class="col-accion">Acción</th>
+          <th>Descripción</th>
+        </tr>
+      </thead>
+
+      <tbody [class.cargando]="cargando && registros.length > 0">
+        <tr *ngFor="let registro of registros">
+          <td>{{ registro.id }}</td>
+          <td>{{ registro.timestamp | date:'yyyy-MM-dd HH:mm:ss' }}</td>
+          <td>{{ registro.userId ?? '—' }}</td>
+          <td class="accion" [title]="registro.action">{{ textoAccion(registro.action) }}</td>
+          <td class="descripcion" [title]="registro.description || ''">{{ registro.description || '—' }}</td>
+        </tr>
+
+        <tr *ngIf="cargando && registros.length === 0">
+          <td colspan="5" class="estado-tabla">Cargando bitácora...</td>
+        </tr>
+
+        <tr *ngIf="!cargando && error">
+          <td colspan="5" class="estado-tabla estado-error">
+            {{ error }}
+            <button type="button" (click)="cargar()">Reintentar</button>
+          </td>
+        </tr>
+
+        <tr *ngIf="!cargando && !error && registros.length === 0">
+          <td colspan="5" class="estado-tabla">
+            No hay eventos que coincidan con la búsqueda o el periodo.
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- PIE CON PAGINACIÓN -->
+  <div class="auditoria-pie" *ngIf="total > 0">
+    <span>Mostrando {{ desdeRegistro }} a {{ hastaRegistro }} de {{ total | number }} eventos</span>
+
+    <div class="paginacion" *ngIf="paginas > 1">
+      <button type="button" aria-label="Página anterior" [disabled]="pagina === 0" (click)="irAPagina(pagina - 1)">
+        <i class="bi bi-chevron-left" aria-hidden="true"></i>
+      </button>
+
+      <ng-container *ngFor="let boton of botonesPagina">
+        <span *ngIf="boton === null" class="puntos">…</span>
+        <button type="button" *ngIf="boton !== null" [class.activa]="boton === pagina" (click)="irAPagina(boton)">
+          {{ boton + 1 }}
+        </button>
+      </ng-container>
+
+      <button type="button" aria-label="Página siguiente" [disabled]="pagina >= paginas - 1" (click)="irAPagina(pagina + 1)">
+        <i class="bi bi-chevron-right" aria-hidden="true"></i>
+      </button>
+    </div>
+  </div>
+
+</section>

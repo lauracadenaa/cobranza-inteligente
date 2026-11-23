@@ -1,0 +1,626 @@
+<!-- ESTRUCTURA PRINCIPAL -->
+<div class="dashboard-layout">
+
+  <!-- MENÚ LATERAL -->
+  <app-sidebar></app-sidebar>
+
+  <!-- CONTENIDO -->
+  <main class="dashboard-content">
+
+    <div class="estrategias-layout">
+
+      <!-- ENCABEZADO -->
+      <div class="header-container">
+        <app-dashboard-header
+          [tituloPersonalizado]="'Estrategias'"
+          [descripcionPersonalizada]="descripcion">
+        </app-dashboard-header>
+      </div>
+
+      <!-- PESTAÑAS -->
+      <nav class="tabs">
+        <button type="button" [class.activo]="seccionActiva === 'estrategias'" (click)="cambiarSeccion('estrategias')">Estrategias</button>
+        <button type="button" [class.activo]="seccionActiva === 'segmentacion'" (click)="cambiarSeccion('segmentacion')">Segmentación</button>
+        <button type="button" [class.activo]="seccionActiva === 'contacto'" (click)="cambiarSeccion('contacto')">Contacto y orquestación</button>
+        <button type="button" [class.activo]="seccionActiva === 'plantillas'" (click)="cambiarSeccion('plantillas')">Plantillas</button>
+      </nav>
+
+      @switch (seccionActiva) {
+
+        <!-- ================================================== -->
+        <!-- PESTAÑA: ESTRATEGIAS                                 -->
+        <!-- ================================================== -->
+        @case ('estrategias') {
+
+          <!-- Tabla + panel de detalle a la derecha -->
+          <div class="estrategias-detalle" [class.con-panel]="estrategiaSeleccionada">
+
+          <section class="card tarjeta-tabla">
+            <div class="card-cabecera">
+              <div class="card-titulo">
+                <h2>Estrategias de cobranza</h2>
+                <p>Administra las estrategias aplicadas a cada segmento de cartera</p>
+              </div>
+              <button type="button" class="btn-primario" (click)="proximamente('Crear estrategia')">Crear estrategia</button>
+            </div>
+
+            <div class="caja-tabla">
+
+              <div class="filtros">
+                <label class="buscador">
+                  <i class="bi bi-search" aria-hidden="true"></i>
+                  <input type="text" placeholder="Nombre" [(ngModel)]="busqueda" aria-label="Buscar estrategia por nombre">
+                </label>
+
+                <select class="campo" [(ngModel)]="filtroSegmento" aria-label="Segmento">
+                  <option value="">Segmento</option>
+                  <option value="Preventiva">Preventiva</option>
+                  <option value="Administrativa">Administrativa</option>
+                  <option value="Prejurídica">Prejurídica</option>
+                </select>
+
+                <select class="campo" [(ngModel)]="filtroEstado" aria-label="Estado">
+                  <option value="">Estado</option>
+                  <option value="Activa">Activa</option>
+                  <option value="Borrador">Borrador</option>
+                </select>
+
+                <select class="campo" [(ngModel)]="filtroVigencia" aria-label="Vigencia">
+                  <option value="">Vigencia</option>
+                  <option value="Vigente">Vigente</option>
+                  <option value="Sin iniciar">Sin iniciar</option>
+                </select>
+              </div>
+
+              <div class="tabla-scroll">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Estrategia</th>
+                      <th>Segmento</th>
+                      <th>Canales</th>
+                      <th>Política de contacto</th>
+                      <th>Vigencia</th>
+                      <th>Estado</th>
+                      <th>Acciones</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    @for (e of estrategiasFiltradas; track e.nombre) {
+                      <tr class="fila-alta" [class.fila-seleccionada]="e === estrategiaSeleccionada">
+                        <td class="ajustar">{{ e.nombre }}</td>
+                        <td>{{ e.segmento }}</td>
+                        <td>@for (c of e.canales; track c) { <span class="linea">{{ c }}</span> }</td>
+                        <td>{{ e.politica }}</td>
+                        <td>@for (v of e.vigencia; track v) { <span class="linea">{{ v }}</span> }</td>
+                        <td>
+                          <span class="badge" [class.badge-verde]="e.estado === 'Activa'" [class.badge-gris]="e.estado !== 'Activa'">{{ e.estado }}</span>
+                        </td>
+                        <td class="ajustar">
+                          <button type="button" class="link" (click)="abrirEstrategia(e)">{{ e.accion }}</button>
+                        </td>
+                      </tr>
+                    } @empty {
+                      <tr><td colspan="7" class="vacio">No hay estrategias con esos filtros.</td></tr>
+                    }
+                  </tbody>
+                </table>
+              </div>
+
+              <p class="pie">Mostrando {{ estrategiasFiltradas.length }} de {{ estrategias.length }} estrategias</p>
+            </div>
+
+            <!-- Nota de cómo se relacionan las piezas -->
+            <div class="nota-relacion">
+              <span class="nota-icono"><i class="bi bi-info-lg" aria-hidden="true"></i></span>
+              <div>
+                <strong>Segmento → Política de contacto → Plantilla</strong>
+                <p>Cada estrategia relaciona la población objetivo con la forma y el contenido del contacto</p>
+              </div>
+            </div>
+          </section>
+
+          <!-- PANEL: DETALLE DE LA ESTRATEGIA -->
+          @if (estrategiaSeleccionada; as e) {
+            <aside class="panel-estrategia">
+
+              <div class="panel-cabecera">
+                <h3>Detalle de la estrategia</h3>
+                <button type="button" class="panel-cerrar" title="Cerrar" (click)="cerrarEstrategia()">
+                  <i class="bi bi-x-lg" aria-hidden="true"></i>
+                </button>
+              </div>
+
+              <div class="panel-nombre">
+                <strong>{{ e.nombre }}</strong>
+                <span class="badge" [class.badge-verde]="e.estado === 'Activa'" [class.badge-gris]="e.estado !== 'Activa'">{{ e.estado }}</span>
+              </div>
+
+              <div class="panel-seccion">
+                <h4>Información general</h4>
+                <dl>
+                  <dt>Nombre</dt><dd>{{ e.nombre }}</dd>
+                  <dt>Descripción</dt><dd>{{ e.descripcion }}</dd>
+                  <dt>Segmento</dt><dd>{{ e.segmento }}</dd>
+                  <dt>Estado</dt><dd>{{ e.estadoDetalle }}</dd>
+                  <dt>Vigencia</dt><dd>{{ e.vigenciaCompleta }}</dd>
+                </dl>
+              </div>
+
+              <div class="panel-seccion">
+                <h4>Configuración de contacto</h4>
+                <dl>
+                  <dt>Política de intensidad</dt><dd>{{ e.politica }}</dd>
+                  <dt>Secuencia de canales</dt><dd>{{ e.secuencia }}</dd>
+                  <dt>Plantillas</dt><dd>{{ e.plantillas }}</dd>
+                </dl>
+              </div>
+
+              <div class="panel-botones">
+                @if (e.estado === 'Borrador') {
+                  <button type="button" class="btn-secundario" (click)="proximamente('Editar borrador')">Editar borrador</button>
+                } @else {
+                  <button type="button" class="btn-secundario" (click)="proximamente('Crear nueva versión')">Crear nueva versión</button>
+                }
+                <button type="button" class="btn-secundario" (click)="verAuditoria()">Ver auditoría</button>
+              </div>
+
+            </aside>
+          }
+
+          </div>
+
+          <!-- En Figma esta tarjeta solo aparece con el detalle de una estrategia abierto -->
+          @if (estrategiaSeleccionada) {
+            <section class="card">
+              <div class="card-titulo">
+                <h2>Versiones controladas</h2>
+              </div>
+              <p class="texto-nota">
+                Las estrategias publicadas son de solo lectura. Para cambiar su configuración, crea una nueva versión.
+                Los borradores sí pueden editarse.
+              </p>
+            </section>
+          }
+        }
+
+        <!-- ================================================== -->
+        <!-- PESTAÑA: SEGMENTACIÓN                                -->
+        <!-- ================================================== -->
+        @case ('segmentacion') {
+
+          <section class="card">
+            <div class="card-cabecera">
+              <div class="card-titulo">
+                <h2>Segmentación de cartera</h2>
+                <p>Define los grupos de asociados u obligaciones a los que se aplican las estrategias</p>
+              </div>
+              <button type="button" class="btn-primario" (click)="proximamente('Crear segmento')">Crear segmento</button>
+            </div>
+
+            <div class="caja-tabla">
+              <div class="tabla-scroll">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Segmento</th>
+                      <th>Objeto</th>
+                      <th>Criterios</th>
+                      <th>Registros relacionados</th>
+                      <th>Estrategias asociadas</th>
+                      <th>Actualización</th>
+                      <th>Estado</th>
+                      <th>Acciones</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    @if (cargandoSegmentos) {
+                      <tr class="sin-linea"><td colspan="8" class="vacio">Cargando segmentos...</td></tr>
+                    } @else if (errorSegmentos) {
+                      <tr class="sin-linea">
+                        <td colspan="8" class="vacio">
+                          <p class="error-carga">{{ errorSegmentos }}</p>
+                          <button type="button" class="btn-secundario" (click)="cargarSegmentos()">Reintentar</button>
+                        </td>
+                      </tr>
+                    }
+                    @for (s of segmentos; track s.codigo) {
+                      <tr class="fila-alta sin-linea">
+                        <td>
+                          <span class="segmento-nombre">
+                            <span class="segmento-icono"><i class="bi {{ iconoSegmento(s.codigo) }}" aria-hidden="true"></i></span>
+                            {{ s.nombre }}
+                          </span>
+                        </td>
+                        <td>{{ s.objeto }}</td>
+                        <td>@for (c of s.criterios; track c) { <span class="linea">{{ c }}</span> }</td>
+                        <td>@for (r of s.registros; track r) { <span class="linea">{{ r }}</span> }</td>
+                        <td>{{ s.estrategias }}</td>
+                        <td>{{ s.actualizacion }}</td>
+                        <td>{{ s.estado }}</td>
+                        <td><button type="button" class="link" (click)="proximamente('Ver detalle')">Ver detalle</button></td>
+                      </tr>
+                    } @empty {
+                      @if (!cargandoSegmentos && !errorSegmentos) {
+                        <tr class="sin-linea"><td colspan="8" class="vacio">No hay reglas de segmentación activas.</td></tr>
+                      }
+                    }
+                  </tbody>
+                </table>
+              </div>
+
+              <p class="pie">Mostrando {{ segmentos.length }} de {{ segmentos.length }} segmentos</p>
+            </div>
+          </section>
+
+          <section class="card">
+            <div class="card-titulo">
+              <h2>Criterios operativos, sin modificar el scoring</h2>
+            </div>
+            <p class="texto-nota">
+              Los segmentos agrupan asociados u obligaciones. El cálculo del riesgo y del scoring se administra en Motor IA y Scoring.
+            </p>
+          </section>
+        }
+
+        <!-- ================================================== -->
+        <!-- PESTAÑA: CONTACTO Y ORQUESTACIÓN                     -->
+        <!-- ================================================== -->
+        @case ('contacto') {
+
+          <!-- Aviso azul de cumplimiento -->
+          <div class="banner-cumplimiento">
+            <span class="banner-icono"><i class="bi bi-shield-check" aria-hidden="true"></i></span>
+            <div class="banner-texto">
+              <strong>Políticas obligatorias de cumplimiento</strong>
+              <p>
+                Toda frecuencia, secuencia y acción de contacto se valida automáticamente antes de ejecutarse.
+                Estas condiciones no pueden ser modificadas desde la plataforma
+              </p>
+            </div>
+            <button type="button" class="link" (click)="proximamente('Consultar reglas')">Consultar reglas</button>
+          </div>
+
+          <div class="seccion-cabecera">
+            <div>
+              <h2>Contacto y orquestación</h2>
+              <p>Configura la intensidad, los canales y las condiciones utilizadas en las estrategias de contacto.</p>
+            </div>
+          </div>
+
+          <!-- Políticas de intensidad -->
+          <section class="card">
+            <div class="card-cabecera">
+              <div class="card-titulo"><h2>Políticas de intensidad</h2></div>
+              <button type="button" class="btn-secundario" (click)="proximamente('Crear política')">Crear política</button>
+            </div>
+
+            <div class="tabla-scroll">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Política</th>
+                    <th>SMS</th>
+                    <th>Email</th>
+                    <th>WhatsApp</th>
+                    <th>Voz</th>
+                    <th>Horario de referencia</th>
+                    <th>Estado</th>
+                    <th>Acciones</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (p of politicas; track p.nombre) {
+                    <tr class="sin-linea">
+                      <td>{{ p.nombre }}</td>
+                      <td>{{ p.sms }}</td>
+                      <td>{{ p.email }}</td>
+                      <td>{{ p.whatsapp }}</td>
+                      <td>{{ p.voz }}</td>
+                      <td>{{ p.horario }}</td>
+                      <td>{{ p.estado }}</td>
+                      <td><button type="button" class="link" (click)="proximamente('Editar política')">Editar</button></td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+
+            <p class="pie">Frecuencias operativas de referencia, siempre sujetas a la configuración normativa vigente.</p>
+          </section>
+
+          <!-- Secuencias de canales -->
+          <section class="card">
+            <div class="card-cabecera">
+              <div class="card-titulo"><h2>Secuencias de canales</h2></div>
+              <button type="button" class="btn-secundario" (click)="proximamente('Crear secuencia')">Crear secuencia</button>
+            </div>
+
+            <div class="tabla-scroll">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Secuencia</th>
+                    <th>Estrategia</th>
+                    <th>Orden de canales</th>
+                    <th>Condición de avance</th>
+                    <th>Tiempo de espera</th>
+                    <th>Estado</th>
+                    <th>Acciones</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (s of secuencias; track s.nombre) {
+                    <tr class="sin-linea">
+                      <td>{{ s.nombre }}</td>
+                      <td class="ajustar">{{ s.estrategia }}</td>
+                      <td>{{ s.orden }}</td>
+                      <td class="ajustar">{{ s.condicion }}</td>
+                      <td>{{ s.espera }}</td>
+                      <td>{{ s.estado }}</td>
+                      <td><button type="button" class="link" (click)="proximamente('Editar secuencia')">Editar</button></td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          </section>
+
+          <!-- Condiciones de gestión humana -->
+          <section class="card">
+            <div class="card-cabecera">
+              <div class="card-titulo"><h2>Condiciones de gestión humana</h2></div>
+              <button type="button" class="btn-secundario" (click)="proximamente('Configurar condiciones')">Configurar condiciones</button>
+            </div>
+
+            <div class="tabla-scroll">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Condición</th>
+                    <th>Operador</th>
+                    <th>Valor</th>
+                    <th>Cola destino</th>
+                    <th>Prioridad</th>
+                    <th>Estado</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (c of condiciones; track c.condicion) {
+                    <tr class="sin-linea">
+                      <td>{{ c.condicion }}</td>
+                      <td>{{ c.operador }}</td>
+                      <td>{{ c.valor }}</td>
+                      <td>{{ c.cola }}</td>
+                      <td>{{ c.prioridad }}</td>
+                      <td>{{ c.estado }}</td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+
+            <p class="pie">Estas condiciones derivan la gestión a una cola; no asignan asesores ni distribuyen la carga.</p>
+          </section>
+        }
+
+        <!-- ================================================== -->
+        <!-- PESTAÑA: PLANTILLAS                                  -->
+        <!-- ================================================== -->
+        @default {
+
+          <div class="seccion-cabecera">
+            <div>
+              <h2>Plantillas</h2>
+              <p>Administra los mensajes utilizados por las estrategias de contacto.</p>
+            </div>
+            <button type="button" class="btn-primario" (click)="abrirCrearPlantilla()">Crear plantilla</button>
+          </div>
+
+          <section class="card">
+
+            <div class="filtros filtros-4">
+              <select class="campo centrado" [(ngModel)]="filtroCanal" aria-label="Canal">
+                <option value="">Canal</option>
+                @for (c of canalesPlantilla; track c) { <option [value]="c">{{ c }}</option> }
+              </select>
+
+              <select class="campo centrado" [(ngModel)]="filtroEstadoPlantilla" aria-label="Estado">
+                <option value="">Estado</option>
+                @for (e of estadosPlantilla; track e) { <option [value]="e">{{ e }}</option> }
+              </select>
+
+              <select class="campo centrado" [(ngModel)]="filtroSegmentoPlantilla" aria-label="Segmento">
+                <option value="">Segmento</option>
+                @for (e of segmentosPlantilla; track e) { <option [value]="e">{{ e }}</option> }
+              </select>
+
+              <select class="campo centrado" [(ngModel)]="filtroFecha" aria-label="Fecha de actualización">
+                <option value="">Fecha de actualización</option>
+                @for (f of fechasPlantilla; track f) { <option [value]="f">{{ f }}</option> }
+              </select>
+            </div>
+
+            <div class="tabla-scroll">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Plantilla</th>
+                    <th>Canal</th>
+                    <th>Segmento</th>
+                    <th>Estado</th>
+                    <th>Última actualización</th>
+                    <th>Acciones</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @if (cargandoPlantillas) {
+                    <tr class="sin-linea"><td colspan="6" class="vacio">Cargando plantillas...</td></tr>
+                  } @else if (errorPlantillas) {
+                    <tr class="sin-linea">
+                      <td colspan="6" class="vacio">
+                        <p class="error-carga">{{ errorPlantillas }}</p>
+                        <button type="button" class="btn-secundario" (click)="cargarPlantillas()">Reintentar</button>
+                      </td>
+                    </tr>
+                  } @else {
+                    @for (p of plantillasFiltradas; track p.id) {
+                      <tr class="sin-linea">
+                        <td class="ajustar">{{ p.nombre }}</td>
+                        <td>{{ p.canal }}</td>
+                        <td>{{ p.segmento }}</td>
+                        <td>
+                          <span class="badge" [class.badge-verde]="p.estado === 'Activa'" [class.badge-gris]="p.estado !== 'Activa'">{{ p.estado }}</span>
+                        </td>
+                        <td>{{ p.fecha }}</td>
+                        <td><button type="button" class="link" (click)="abrirPlantilla(p)">Ver detalle</button></td>
+                      </tr>
+                    } @empty {
+                      <tr class="sin-linea">
+                        <td colspan="6" class="vacio">
+                          {{ plantillas.length ? 'No hay plantillas con esos filtros.' : 'Todavía no hay plantillas creadas.' }}
+                        </td>
+                      </tr>
+                    }
+                  }
+                </tbody>
+              </table>
+            </div>
+
+            <p class="pie">
+              Mostrando {{ plantillasFiltradas.length }} de {{ plantillas.length }} plantillas
+            </p>
+          </section>
+        }
+      }
+
+    </div>
+
+  </main>
+
+</div>
+
+<!-- VENTANA: VER / EDITAR PLANTILLA -->
+@if (plantillaEnEdicion) {
+  <div class="fondo" (click)="cerrarPlantilla()">
+    <form class="modal modal-grande" (click)="$event.stopPropagation()" (ngSubmit)="guardarPlantilla()">
+
+      <div class="modal-cabecera">
+        <div>
+          <h3>{{ plantillaEnEdicion.nombre }}</h3>
+          <p>{{ plantillaEnEdicion.canal }} · Segmento {{ plantillaEnEdicion.segmento }} · Actualizada {{ plantillaEnEdicion.fecha }}</p>
+        </div>
+        <label class="interruptor">
+          <input type="checkbox" name="activa" [(ngModel)]="activaPlantilla" [disabled]="guardandoPlantilla">
+          {{ activaPlantilla ? 'Activa' : 'Inactiva' }}
+        </label>
+      </div>
+
+      <p class="nota">
+        Solo se pueden cambiar los textos del mensaje. El diseño base (HTML) de la plantilla no se modifica desde aquí.
+      </p>
+
+      <div class="campos-plantilla">
+        @for (c of camposEditables; track c.clave) {
+          <label [class.ancho-completo]="c.largo">
+            {{ c.texto }}
+            @if (c.largo) {
+              <textarea class="campo area" rows="3" [name]="c.clave"
+                [(ngModel)]="formularioPlantilla[c.clave]" [disabled]="guardandoPlantilla"></textarea>
+            } @else {
+              <input class="campo" [name]="c.clave"
+                [(ngModel)]="formularioPlantilla[c.clave]" [disabled]="guardandoPlantilla">
+            }
+          </label>
+        }
+      </div>
+
+      @if (errorFormularioPlantilla) {
+        <p class="error-carga">{{ errorFormularioPlantilla }}</p>
+      }
+
+      <div class="modal-botones">
+        <button type="button" class="btn-secundario" [disabled]="guardandoPlantilla" (click)="cerrarPlantilla()">Cancelar</button>
+        <button type="submit" class="btn-primario" [disabled]="guardandoPlantilla">
+          {{ guardandoPlantilla ? 'Guardando...' : 'Guardar cambios' }}
+        </button>
+      </div>
+    </form>
+  </div>
+}
+
+<!-- VENTANA: CREAR PLANTILLA -->
+@if (creandoPlantilla) {
+  <div class="fondo" (click)="cerrarCrearPlantilla()">
+    <form class="modal modal-grande" (click)="$event.stopPropagation()" (ngSubmit)="guardarNuevaPlantilla()">
+
+      <div class="modal-cabecera">
+        <div>
+          <h3>Crear plantilla</h3>
+          <p>Define el mensaje que usarán las estrategias de contacto.</p>
+        </div>
+      </div>
+
+      <div class="campos-plantilla">
+        <label class="ancho-completo">
+          Nombre
+          <input class="campo" name="nombre" maxlength="100" [(ngModel)]="nuevaPlantilla.nombre" [disabled]="guardandoNueva">
+        </label>
+
+        <label>
+          Canal
+          <select class="campo" name="canal" [(ngModel)]="nuevaPlantilla.canal" [disabled]="guardandoNueva">
+            @for (c of canalesNuevaPlantilla; track c.valor) { <option [value]="c.valor">{{ c.texto }}</option> }
+          </select>
+        </label>
+
+        <label>
+          Segmento
+          <select class="campo" name="segmento" [(ngModel)]="nuevaPlantilla.segmento" [disabled]="guardandoNueva">
+            <option value="">Todos los segmentos</option>
+            @for (s of segmentosNuevaPlantilla; track s.valor) { <option [value]="s.valor">{{ s.texto }}</option> }
+          </select>
+        </label>
+
+        @if (nuevaPlantilla.canal === 'EMAIL') {
+          <label class="ancho-completo">
+            Asunto
+            <input class="campo" name="asunto" maxlength="300" [(ngModel)]="nuevaPlantilla.asunto" [disabled]="guardandoNueva">
+          </label>
+        }
+
+        <label class="ancho-completo">
+          {{ nuevaPlantilla.canal === 'EMAIL' ? 'Contenido (HTML del correo)' : 'Texto del mensaje' }}
+          <textarea class="campo area" rows="6" name="contenido" [(ngModel)]="nuevaPlantilla.contenido" [disabled]="guardandoNueva"
+            [placeholder]="ejemploContenido"></textarea>
+        </label>
+
+        <label class="check ancho-completo">
+          <input type="checkbox" name="activa" [(ngModel)]="nuevaPlantilla.activa" [disabled]="guardandoNueva">
+          Dejarla activa
+        </label>
+      </div>
+
+      <p class="nota">
+        Puedes usar variables como {{ '{{' }}nombre_cliente{{ '}}' }}, {{ '{{' }}numero_obligacion{{ '}}' }},
+        {{ '{{' }}valor_obligacion{{ '}}' }} y {{ '{{' }}dias_mora{{ '}}' }}.
+      </p>
+
+      @if (errorNuevaPlantilla) {
+        <p class="error-carga">{{ errorNuevaPlantilla }}</p>
+      }
+
+      <div class="modal-botones">
+        <button type="button" class="btn-secundario" [disabled]="guardandoNueva" (click)="cerrarCrearPlantilla()">Cancelar</button>
+        <button type="submit" class="btn-primario" [disabled]="guardandoNueva">
+          {{ guardandoNueva ? 'Creando...' : 'Crear plantilla' }}
+        </button>
+      </div>
+    </form>
+  </div>
+}
+
+<!-- AVISO FLOTANTE -->
+@if (aviso) {
+  <div class="aviso" role="status">{{ aviso }}</div>
+}

@@ -131,7 +131,9 @@
 
 .kpi-change {
 
-  width: 150px;
+  width: 100%;
+  min-width: 0;
+  overflow: hidden;
   height: 20px;
   display: flex;
   align-items: center;
@@ -150,10 +152,10 @@
 /* ================================================== */
 
 .kpi-percentage {
-  width: 30px;
-  height: 14px;
+  flex-shrink: 0;
+  height: 16px;
 
-  padding: 0;
+  padding: 0 6px;
 
   background-color: #EFF6FF;
   border-radius: 12px;
@@ -195,10 +197,11 @@
 
   color: #64748B;
 
-  display: flex;
-  align-items: center;
+  display: block;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
 
-  vertical-align: middle;
   white-space: nowrap;
   opacity: 1;
 }

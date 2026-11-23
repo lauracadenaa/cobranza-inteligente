@@ -19,7 +19,12 @@
       <!-- ENCABEZADO -->
       <div class="managed-cases-header">
 
-        <h2>Cola de casos</h2>
+        <h2>
+          Cola de casos
+          <span class="contador-casos">
+            {{ casosFiltrados.length | number }} casos
+          </span>
+        </h2>
 
         <div class="managed-cases-controls">
 
@@ -30,7 +35,7 @@
 
             <input
               type="text"
-              placeholder="Buscar caso..."
+              placeholder="Buscar por caso, asociado u obligación..."
               [(ngModel)]="busqueda"
               (ngModelChange)="buscarCasos()">
 
@@ -57,173 +62,156 @@
 
             </button>
 
-            <!-- MODAL DE FILTROS -->
-            <div
-              class="filtros-modal"
-              *ngIf="mostrarModalFiltros">
+            <!-- MODAL DE FILTROS (igual que Inicio > Casos en gestión) -->
+            <div class="filtros-modal" *ngIf="mostrarModalFiltros">
 
-              <div class="filtros-modal-header">
-
-                <h3>Filtrar casos</h3>
-
-                <button
-                  type="button"
-                  class="close-filters"
-                  (click)="cerrarFiltros()">
-
+              <div class="filtros-header">
+                <h3>Filtros</h3>
+                <button type="button" class="cerrar-filtros" aria-label="Cerrar filtros" (click)="cerrarFiltros()">
                   <i class="bi bi-x"></i>
-
                 </button>
-
               </div>
 
-              <div class="filtros-modal-body">
+              <div class="filtros-body">
 
                 <!-- RIESGO -->
-                <div class="filter-group">
-
+                <div class="filtro-grupo filtro-riesgo">
                   <label>Riesgo</label>
-
-                  <div class="filter-options">
-
-                    <label
-                      *ngFor="let riesgo of ['Bajo', 'Medio', 'Alto', 'Crítico']">
-
-                      <input
-                        type="checkbox"
-                        [checked]="filtros.riesgos.includes($any(riesgo))"
-                        (change)="alternarRiesgo($any(riesgo))">
-
+                  <div class="filtro-riesgos">
+                    <button
+                      *ngFor="let riesgo of ['Bajo', 'Medio', 'Alto', 'Crítico']"
+                      type="button"
+                      class="btn-riesgo"
+                      [class.seleccionado]="filtros.riesgos.includes($any(riesgo))"
+                      [attr.aria-pressed]="filtros.riesgos.includes($any(riesgo))"
+                      (click)="alternarRiesgo($any(riesgo))">
                       {{ riesgo }}
-
-                    </label>
-
+                    </button>
                   </div>
-
-                </div>
-
-                <!-- ASESOR -->
-                <div class="filter-group">
-
-                  <label for="filtro-asesor">Asesor</label>
-
-                  <input
-                    id="filtro-asesor"
-                    type="text"
-                    placeholder="Nombre del asesor"
-                    [(ngModel)]="filtros.asesor">
-
-                </div>
-
-                <!-- DÍAS DE MORA -->
-                <div class="filter-group">
-
-                  <label>Días de mora</label>
-
-                  <div class="filter-range">
-
-                    <input
-                      type="number"
-                      min="0"
-                      placeholder="Desde"
-                      [(ngModel)]="filtros.diasMoraDesde">
-
-                    <input
-                      type="number"
-                      min="0"
-                      placeholder="Hasta"
-                      [(ngModel)]="filtros.diasMoraHasta">
-
-                  </div>
-
                 </div>
 
                 <!-- SEGMENTO -->
-                <div class="filter-group">
-
+                <div class="filtro-grupo">
                   <label for="filtro-segmento">Segmento</label>
-
-                  <select
-                    id="filtro-segmento"
-                    [(ngModel)]="filtros.segmento">
-
-                    <option value="">Todos</option>
-                    <option value="Preventiva">Preventiva</option>
-                    <option value="Administrativa">Administrativa</option>
-                    <option value="Prejudicial">Prejudicial</option>
-                    <option value="Jurídica">Jurídica</option>
-
-                  </select>
-
+                  <div class="filtro-select">
+                    <select
+                      id="filtro-segmento"
+                      [class.con-valor]="filtros.segmento !== ''"
+                      [(ngModel)]="filtros.segmento">
+                      <option value="">Todos los segmentos</option>
+                      <option value="Preventiva">Preventiva</option>
+                      <option value="Administrativa">Administrativa</option>
+                      <option value="Prejudicial">Prejurídica</option>
+                      <option value="Jurídica">Jurídica</option>
+                    </select>
+                    <img src="/imagenes/flecha.admin.png" alt="">
+                  </div>
                 </div>
 
-                <!-- ESTADO -->
-                <div class="filter-group">
-
-                  <label for="filtro-estado">Estado</label>
-
-                  <select
-                    id="filtro-estado"
-                    [(ngModel)]="filtros.estado">
-
-                    <option value="">Todos</option>
-                    <option value="NUEVO">Nuevo</option>
-                    <option value="EN_GESTION">En gestión</option>
-                    <option value="ILOCALIZADO">Ilocalizado</option>
-                    <option value="PROMESA_PAGO">Promesa de pago</option>
-                    <option value="PREJURIDICO">Prejurídico</option>
-                    <option value="CERRADO">Cerrado</option>
-
-                  </select>
-
+                <!-- ESTADO DEL CASO -->
+                <div class="filtro-grupo filtro-estado">
+                  <label for="filtro-estado">Estado del caso</label>
+                  <div class="filtro-select">
+                    <select
+                      id="filtro-estado"
+                      [class.con-valor]="filtros.estado !== ''"
+                      [(ngModel)]="filtros.estado">
+                      <option value="">Todos los estados</option>
+                      <option value="NUEVO">Nuevo</option>
+                      <option value="EN_GESTION">En gestión</option>
+                      <option value="ILOCALIZADO">Ilocalizado</option>
+                      <option value="PROMESA_PAGO">Promesas de pago</option>
+                      <option value="PREJURIDICO">Prejurídico</option>
+                      <option value="CERRADO">Cerrado</option>
+                    </select>
+                    <img src="/imagenes/flecha.admin.png" alt="">
+                  </div>
                 </div>
 
-                <!-- FECHAS -->
-                <div class="filter-group">
-
-                  <label>Fecha de creación</label>
-
+                <!-- ASESOR -->
+                <div class="filtro-grupo">
+                  <label for="filtro-asesor">Asesor</label>
                   <input
-                    type="date"
-                    [(ngModel)]="filtros.fechaExacta">
+                    id="filtro-asesor"
+                    type="text"
+                    placeholder="Buscar asesor..."
+                    [class.con-valor]="filtros.asesor.trim() !== ''"
+                    [(ngModel)]="filtros.asesor">
+                </div>
 
-                  <div class="filter-range">
+                <!-- DÍAS DE MORA -->
+                <div class="filtro-grupo">
+                  <label>Días de mora</label>
+                  <div class="filtro-dos-columnas">
+                    <input
+                      type="number"
+                      min="0"
+                      placeholder="Desde 0"
+                      [class.con-valor]="filtros.diasMoraDesde !== null"
+                      [(ngModel)]="filtros.diasMoraDesde">
+                    <input
+                      type="number"
+                      min="0"
+                      placeholder="Hasta 0"
+                      [class.con-valor]="filtros.diasMoraHasta !== null"
+                      [(ngModel)]="filtros.diasMoraHasta">
+                  </div>
+                </div>
 
+                <!-- FECHA -->
+                <div class="filtro-grupo filtro-fechas">
+                  <label>Fecha</label>
+
+                  <div class="campo-fecha campo-fecha-creacion">
                     <input
                       type="date"
-                      [(ngModel)]="filtros.fechaDesde">
-
-                    <input
-                      type="date"
-                      [(ngModel)]="filtros.fechaHasta">
-
+                      [class.con-valor]="filtros.fechaExacta !== ''"
+                      [(ngModel)]="filtros.fechaExacta">
                   </div>
 
+                  <div class="filtro-fechas-contenedor">
+                    <div class="campo-fecha">
+                      <input
+                        type="date"
+                        [class.con-valor]="filtros.fechaDesde !== ''"
+                        [(ngModel)]="filtros.fechaDesde">
+                      <i class="bi bi-calendar3"></i>
+                    </div>
+                    <div class="campo-fecha">
+                      <input
+                        type="date"
+                        [class.con-valor]="filtros.fechaHasta !== ''"
+                        [(ngModel)]="filtros.fechaHasta">
+                      <i class="bi bi-calendar3"></i>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- ORIGEN -->
+                <div class="filtro-grupo filtro-origen">
+                  <label>Origen</label>
+                  <div class="filtro-origenes">
+                    <button
+                      *ngFor="let origen of opcionesOrigen"
+                      type="button"
+                      class="btn-origen"
+                      [class.seleccionado]="filtros.origenes.includes(origen.clave)"
+                      [attr.aria-pressed]="filtros.origenes.includes(origen.clave)"
+                      (click)="alternarOrigen(origen.clave)">
+                      {{ origen.texto }}
+                    </button>
+                  </div>
                 </div>
 
               </div>
 
-              <!-- ACCIONES DE FILTROS -->
-              <div class="filtros-modal-footer">
-
-                <button
-                  type="button"
-                  class="clear-filters"
-                  (click)="limpiarFiltros()">
-
+              <div class="filtros-footer">
+                <button type="button" class="btn-limpiar-filtros" (click)="limpiarFiltros()">
                   Limpiar
-
                 </button>
-
-                <button
-                  type="button"
-                  class="apply-filters"
-                  (click)="aplicarFiltros()">
-
+                <button type="button" class="btn-aplicar-filtros" (click)="aplicarFiltros()">
                   Aplicar filtros
-
                 </button>
-
               </div>
 
             </div>
@@ -291,7 +279,7 @@
               <th>Días de mora</th>
               <th>Tiempo límite</th>
               <th>Asesor</th>
-              <th>Última gestión</th>
+              <th>Última acción</th>
               <th>Acciones</th>
 
             </tr>
@@ -300,14 +288,20 @@
 
           <tbody>
 
-            <tr *ngFor="let caso of casosPaginados">
+            <!-- Al hacer clic en la fila se abre el resumen rápido (como en Figma) -->
+            <tr
+              *ngFor="let caso of casosPaginados"
+              class="fila-caso"
+              [class.fila-seleccionada]="estaSeleccionado(caso)"
+              (click)="seleccionarCaso(caso)">
 
-              <!-- SELECCIÓN -->
+              <!-- SELECCIÓN (oculta: la fila completa sirve para seleccionar) -->
               <td class="col-seleccion">
 
                 <input
                   type="checkbox"
                   [checked]="estaSeleccionado(caso)"
+                  (click)="$event.stopPropagation()"
                   (change)="seleccionarCaso(caso)"
                   [attr.aria-label]="'Seleccionar caso ' + caso.id">
 
@@ -404,23 +398,59 @@
               <!-- ÚLTIMA GESTIÓN -->
               <td class="case-last-action-cell">
 
-                <span>—</span>
+                <span>{{ caso.ultimaGestion || '—' }}</span>
 
-                <small>Sin información</small>
+                <small>{{ caso.ultimaGestionDetalle || 'Sin información' }}</small>
 
               </td>
 
               <!-- ACCIONES -->
-              <td class="col-acciones">
+              <td class="col-acciones" (click)="$event.stopPropagation()">
 
+                <!-- Como en Figma: abierto, el mismo botón se vuelve una X -->
                 <button
                   type="button"
                   class="btn-acciones"
-                  [attr.aria-label]="'Más acciones para ' + caso.id">
+                  [class.abierto]="menuAccionesId === caso.id"
+                  [attr.aria-label]="(menuAccionesId === caso.id ? 'Cerrar acciones de ' : 'Más acciones para ') + caso.id"
+                  [attr.aria-expanded]="menuAccionesId === caso.id"
+                  (click)="alternarMenuAcciones(caso)">
 
-                  <i class="bi bi-three-dots-vertical"></i>
+                  <i
+                    class="bi"
+                    [class.bi-three-dots-vertical]="menuAccionesId !== caso.id"
+                    [class.bi-x-lg]="menuAccionesId === caso.id">
+                  </i>
 
                 </button>
+
+                <!-- MENÚ DE ACCIONES (como en Figma) -->
+                <div
+                  class="menu-acciones"
+                  role="menu"
+                  *ngIf="menuAccionesId === caso.id">
+
+                  <button type="button" role="menuitem" (click)="accionAbrirCaso(caso)">
+                    <i class="bi bi-box-arrow-up-right"></i>
+                    Abrir caso
+                  </button>
+
+                  <button type="button" role="menuitem" (click)="accionAsignar(caso)">
+                    <i class="bi bi-person-gear"></i>
+                    Asignar o reasignar
+                  </button>
+
+                  <button type="button" role="menuitem" (click)="accionCopiarId(caso)">
+                    <i class="bi bi-copy"></i>
+                    Copiar ID del caso
+                  </button>
+
+                  <button type="button" role="menuitem" (click)="accionAbrirCaso(caso)">
+                    <i class="bi bi-send"></i>
+                    Enviar link de pago
+                  </button>
+
+                </div>
 
               </td>
 
@@ -577,7 +607,7 @@
     <!-- IDENTIFICACIÓN -->
     <div class="summary-case-heading">
 
-      <strong>{{ caso.id }}</strong>
+      <strong [attr.title]="caso.id">{{ caso.id }}</strong>
 
       <span
         class="summary-status"
@@ -672,26 +702,56 @@
 
         <strong>Contexto IA</strong>
 
-        <span>Sin análisis</span>
+        <span>
+          {{ scoringResumenRapido ? 'Score ' + scoringResumenRapido.creditScore + '/1000' : (cargandoScoringRapido ? 'Consultando...' : 'Sin análisis') }}
+        </span>
 
       </div>
 
-      <p>
-        No hay recomendaciones disponibles para este caso.
-      </p>
+      <ng-container *ngIf="scoringResumenRapido as s; else sinScoring">
+        <div class="summary-gestion-fila">
+          <span>Mejor siguiente acción</span>
+          <strong>{{ s.calculationDetail?.result?.next_action || '—' }}</strong>
+        </div>
+        <div class="summary-gestion-fila">
+          <span>Canal sugerido</span>
+          <strong>{{ s.calculationDetail?.result?.recommended_channel || '—' }}</strong>
+        </div>
+        <div class="summary-gestion-fila">
+          <span>Propensión de pago</span>
+          <strong class="propension">{{ textoProbabilidad(s.collectionProbability) }}</strong>
+        </div>
+        <div class="summary-gestion-fila">
+          <span>Nivel de riesgo</span>
+          <strong>{{ s.calculationDetail?.result?.risk_level || '—' }}</strong>
+        </div>
+      </ng-container>
+
+      <ng-template #sinScoring>
+        <p>
+          {{ cargandoScoringRapido ? 'Consultando el scoring del cliente...' : 'No hay scoring disponible para este cliente.' }}
+        </p>
+      </ng-template>
 
     </section>
 
     <!-- ÚLTIMA GESTIÓN -->
     <section class="summary-last-management">
 
-      <h4>Última gestión</h4>
+      <h4>Gestión</h4>
 
-      <p>Sin registro de gestión</p>
-
-      <span>
-        La información de seguimiento aún no está disponible.
-      </span>
+      <div class="summary-gestion-fila">
+        <span>Responsable</span>
+        <strong>{{ caso.asesor || 'Sin asignar' }}</strong>
+      </div>
+      <div class="summary-gestion-fila">
+        <span>Tiempo límite</span>
+        <strong>{{ caso.tiempoLimite || 'Sin información' }}</strong>
+      </div>
+      <div class="summary-gestion-fila">
+        <span>Última gestión</span>
+        <strong>{{ caso.ultimaGestion || '—' }} · {{ caso.ultimaGestionDetalle || 'Sin intentos' }}</strong>
+      </div>
 
     </section>
 
@@ -736,6 +796,7 @@
   (click)="cerrarModalAsignacion()">
 
   <section
+    *ngIf="pasoAsignacion === 'formulario'"
     class="assignment-modal"
     role="dialog"
     aria-modal="true"
@@ -931,7 +992,41 @@
 
       </div>
 
-      <!-- REGLA DE ASIGNACIÓN -->
+      <!-- ASESOR (solo asignación manual) -->
+      <div class="assignment-field" *ngIf="asignacion.criterio === 'MANUAL'">
+
+        <label for="assignment-advisor">
+          Asesor *
+        </label>
+
+        <div class="assignment-select-wrapper">
+
+          <select
+            id="assignment-advisor"
+            name="asesor"
+            [(ngModel)]="asesorElegidoId"
+            [disabled]="cargandoAsesores">
+
+            <option [ngValue]="null" disabled>
+              {{ cargandoAsesores ? 'Cargando asesores...' : 'Selecciona un asesor' }}
+            </option>
+
+            <option
+              *ngFor="let asesor of asesoresDisponibles"
+              [ngValue]="asesor.advisorId"
+              [disabled]="!asesor.active || asesor.atCapacity">
+              {{ asesor.fullName }} · {{ asesor.activeCases }}/{{ asesor.effectiveMaxCases || '—' }} casos{{ asesor.atCapacity ? ' (sin cupo)' : '' }}
+            </option>
+
+          </select>
+
+          <i class="bi bi-chevron-down"></i>
+
+        </div>
+
+      </div>
+
+      <!-- REGLA DE ASIGNACIÓN (datos reales del caso) -->
       <div class="assignment-rule">
 
         <div class="assignment-rule-title">
@@ -948,7 +1043,7 @@
 
           <span>Skill requerido</span>
 
-          <strong>Cobranza avanzada</strong>
+          <strong>{{ casoSeleccionado.skillRuta || 'Sin información' }}</strong>
 
         </div>
 
@@ -956,15 +1051,15 @@
 
           <span>Producto / Región</span>
 
-          <strong>Tarjeta de crédito / Bogotá</strong>
+          <strong>{{ casoSeleccionado.productoRuta || 'Sin información' }} / {{ casoSeleccionado.regionRuta || 'Sin información' }}</strong>
 
         </div>
 
         <div class="assignment-rule-row">
 
-          <span>Capacidad máxima / Sin disp.</span>
+          <span>Asesor sugerido (menos carga)</span>
 
-          <strong>45 casos / Mantener en cola</strong>
+          <strong>{{ asesorAutomatico ? asesorAutomatico.fullName + ' · ' + asesorAutomatico.activeCases + ' casos' : (cargandoAsesores ? 'Calculando...' : 'Sin asesores con cupo') }}</strong>
 
         </div>
 
@@ -1078,4 +1173,108 @@
 
   </section>
 
+  <!-- ========================================= -->
+  <!-- PASO 2: REVISAR ASIGNACIÓN (como en Figma) -->
+  <!-- Solo diseño: al confirmar no se guarda nada. -->
+  <!-- ========================================= -->
+
+  <section
+    *ngIf="pasoAsignacion === 'revision'"
+    class="review-modal"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="review-title"
+    (click)="$event.stopPropagation()">
+
+    <header class="review-header">
+
+      <span class="review-icon">
+        <i class="bi bi-shield-check"></i>
+      </span>
+
+      <div>
+        <h2 id="review-title">Revisar asignación</h2>
+        <p>Confirma los cambios antes de continuar con la reasignación</p>
+      </div>
+
+      <button
+        type="button"
+        class="review-close"
+        aria-label="Cerrar"
+        (click)="cerrarModalAsignacion()">
+        <i class="bi bi-x-lg"></i>
+      </button>
+
+    </header>
+
+    <!-- ACTUAL VS NUEVA -->
+    <div class="review-compare">
+
+      <div class="review-box">
+        <span class="review-box-title">Asignación actual</span>
+        <small>Cola</small>
+        <strong>{{ casoSeleccionado.colaActual || 'Sin cola' }}</strong>
+        <small>Asesor</small>
+        <strong>{{ casoSeleccionado.asesor || 'Sin asignar' }}</strong>
+      </div>
+
+      <div class="review-box nueva">
+        <span class="review-box-title">Nueva asignación</span>
+        <small>Cola</small>
+        <strong>{{ nombreCola(asignacion.colaDestino) }}</strong>
+        <small>Asesor</small>
+        <strong>{{ asesorDestino?.fullName || 'Sin asesor disponible' }}</strong>
+        <span class="review-criterio">
+          {{ asignacion.criterio === 'AUTOMATICA' ? 'Automática' : 'Manual' }}
+        </span>
+      </div>
+
+    </div>
+
+    <!-- MOTIVO Y COMENTARIO -->
+    <div class="review-motivo">
+      <div class="review-motivo-fila">
+        <small>Motivo seleccionado:</small>
+        <strong>{{ nombreMotivo(asignacion.motivo) }}</strong>
+      </div>
+      <small>Comentario:</small>
+      <p>
+        {{ asignacion.comentario.trim()
+           ? '"' + asignacion.comentario.trim() + '"'
+           : 'Sin comentario' }}
+      </p>
+    </div>
+
+    <p class="review-aviso">
+      El cambio actualizará de inmediato la bandeja del caso y quedará registrado
+      de forma permanente en la bitácora de auditoría.
+    </p>
+
+    <footer class="review-footer">
+      <button
+        type="button"
+        class="assignment-cancel"
+        (click)="volverAFormularioAsignacion()">
+        Volver
+      </button>
+      <button
+        type="button"
+        class="assignment-review"
+        [disabled]="guardandoAsignacion || !asesorDestino"
+        (click)="confirmarAsignacion()">
+        {{ guardandoAsignacion ? 'Guardando...' : 'Confirmar asignación' }}
+      </button>
+    </footer>
+
+  </section>
+
+</div>
+
+<!-- AVISO AL CONFIRMAR -->
+<div
+  class="aviso-asignacion"
+  role="status"
+  *ngIf="mensajeAsignacion">
+  <i class="bi bi-info-circle"></i>
+  {{ mensajeAsignacion }}
 </div>

@@ -41,10 +41,23 @@
 
     <div class="case-status-pie">
 
-      <svg viewBox="0 0 235 235" class="donut-svg">
+      <svg viewBox="0 0 235 235" class="donut-svg" (mouseleave)="ocultarInfo()">
 
+        <!-- Anillo gris de fondo (se ve cuando no hay casos) -->
         <circle
-          *ngFor="let item of caseStatusData; let i = index"
+          cx="117.5"
+          cy="117.5"
+          [attr.r]="radio"
+          fill="none"
+          stroke="#EEF2F5"
+          [attr.stroke-width]="grosor"
+        ></circle>
+
+        <!-- Un pedazo por cada estado que tiene casos -->
+        <circle
+          *ngFor="let segmento of segmentosDona; trackBy: seguirSegmento"
+
+          class="donut-segmento"
 
           cx="117.5"
           cy="117.5"
@@ -52,25 +65,25 @@
 
           fill="none"
 
-          [attr.stroke]="item.color"
-          stroke-width="24"
+          [attr.stroke]="segmento.item.color"
+          [attr.stroke-width]="grosor"
 
-          [attr.stroke-dasharray]="obtenerDashArray(item.porcentaje)"
-          [attr.stroke-dashoffset]="obtenerDashOffset(i)"
+          [attr.stroke-dasharray]="segmento.dashArray"
+          [attr.stroke-dashoffset]="segmento.dashOffset"
 
-          stroke-linecap="round"
+          [attr.stroke-linecap]="segmento.puntaRedonda ? 'round' : 'butt'"
 
           transform="rotate(-90 117.5 117.5)"
 
-          (mouseenter)="mostrarInfo(item.estado, item.cantidad, item.porcentaje)"
+          (mouseenter)="mostrarInfo(segmento.item.estado, segmento.item.cantidad, segmento.item.porcentaje)"
           (mouseleave)="ocultarInfo()"
 
         >
 
           <title>
-            {{ item.estado }}:
-            {{ formatearCantidad(item.cantidad) }}
-            ({{ formatearPorcentaje(item.porcentaje) }})
+            {{ segmento.item.estado }}:
+            {{ formatearCantidad(segmento.item.cantidad) }}
+            ({{ formatearPorcentaje(segmento.item.porcentaje) }})
           </title>
 
         </circle>

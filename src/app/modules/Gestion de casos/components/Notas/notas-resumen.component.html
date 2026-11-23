@@ -1,314 +1,199 @@
-
-<div class="notas-layout">
+<div class="nt-layout">
 
   <!-- =====================================
-       CONTENEDOR IZQUIERDO: LISTADO
+       NOTAS DEL CASO (como en Figma)
   ====================================== -->
 
-  <section class="notas-container">
+  <section class="nt-card nt-listado">
 
-    <div class="notas-header">
-      <h2>Notas del caso</h2>
-      <span>{{ notasFiltradas.length }} notas</span>
-    </div>
+    <h2 class="nt-titulo">
+      <i class="bi bi-file-earmark-text" aria-hidden="true"></i>
+      Notas del caso
+    </h2>
 
-    <!-- =====================================
-         FILTROS
-    ====================================== -->
+    <!-- FILTROS -->
+    <div class="nt-filtros">
 
-    <div class="notas-filtros">
-
-      <!-- BUSCAR -->
-      <div class="filtro-item">
+      <label class="nt-control nt-buscar">
+        <i class="bi bi-search" aria-hidden="true"></i>
         <input
           type="text"
-          placeholder="Buscar en nota"
-          [(ngModel)]="busquedaNota"
-        />
-      </div>
+          placeholder="Buscar en notas"
+          aria-label="Buscar en notas"
+          [(ngModel)]="busquedaNota">
+      </label>
 
-      <!-- CATEGORÍA -->
-      <div class="filtro-item">
-        <select
-          [(ngModel)]="categoriaFiltro"
-          name="categoriaFiltro">
-
+      <label class="nt-control nt-select">
+        <span class="nt-prefijo">Categoría:</span>
+        <select [(ngModel)]="categoriaFiltro" name="categoriaFiltro" aria-label="Filtrar por categoría">
           <option value="Todas">Todas</option>
-
-          <option
-            *ngFor="let categoria of categorias"
-            [value]="categoria">
-            {{ categoria }}
-          </option>
-
+          <option *ngFor="let categoria of categorias" [value]="categoria">{{ categoria }}</option>
         </select>
-      </div>
+        <i class="bi bi-chevron-down" aria-hidden="true"></i>
+      </label>
 
-      <!-- AUTOR -->
-      <div class="filtro-item">
-        <select
-          [(ngModel)]="autorFiltro"
-          name="autorFiltro">
-
+      <label class="nt-control nt-select">
+        <span class="nt-prefijo">Autor:</span>
+        <select [(ngModel)]="autorFiltro" name="autorFiltro" aria-label="Filtrar por autor">
           <option value="Todos">Todos</option>
-
-          <option
-            *ngFor="let autor of autores"
-            [value]="autor">
-            {{ autor }}
-          </option>
-
+          <option *ngFor="let autor of autores" [value]="autor">{{ autor }}</option>
         </select>
-      </div>
+        <i class="bi bi-chevron-down" aria-hidden="true"></i>
+      </label>
 
-      <!-- FECHA -->
-      <div class="filtro-item filtro-fecha">
-        <input
-          type="date"
-          [(ngModel)]="fechaFiltro"
-          name="fechaFiltro"
-          aria-label="Filtrar por fecha"
-        />
-      </div>
+      <label class="nt-control nt-select nt-periodo">
+        <i class="bi bi-calendar3" aria-hidden="true"></i>
+        <select [(ngModel)]="periodoFiltro" name="periodoFiltro" aria-label="Filtrar por fecha">
+          <option *ngFor="let opcion of opcionesPeriodo" [value]="opcion.valor">{{ opcion.texto }}</option>
+        </select>
+      </label>
 
     </div>
 
-    <!-- =====================================
-         LISTADO DE NOTAS
-    ====================================== -->
+    <!-- LISTADO -->
+    <div class="nt-lista">
 
-    <div class="notas-list">
+      <article class="nt-nota" *ngFor="let nota of notasFiltradas">
 
-      <article
-        class="nota-card"
-        *ngFor="let nota of notasFiltradas">
-
-        <div class="nota-top">
-          <h3>{{ nota.nombre }}</h3>
-
-          <span class="nota-fecha">
-            {{ nota.fecha }} · {{ nota.hora }}
+        <div class="nt-nota-arriba">
+          <span class="nt-avatar" [class.sistema]="esSistema(nota)">
+            {{ iniciales(nota.nombre) }}
           </span>
+
+          <div class="nt-autor">
+            <strong>{{ nota.nombre }}</strong>
+            <span>{{ nota.rol }}</span>
+          </div>
+
+          <span class="nt-fecha">{{ nota.fecha }} {{ nota.hora }}</span>
         </div>
 
-        <div class="nota-rol">
-          <span [ngClass]="'rol-' + nota.rol.toLowerCase()">
-            {{ nota.rol }}
-          </span>
+        <div class="nt-etiquetas">
+          <span class="nt-etiqueta {{ claseCategoria(nota.gestion) }}">{{ nota.gestion }}</span>
+          <span class="nt-etiqueta nt-interna">Nota interna</span>
         </div>
 
-        <p class="nota-gestion">
-          {{ nota.gestion }}
-        </p>
+        <p class="nt-texto">{{ nota.notaInterna }}</p>
 
-        <p class="nota-interna">
-          <strong>Nota interna:</strong>
-          {{ nota.notaInterna }}
-        </p>
-
-        <div class="nota-actions">
-
-          <button
-            type="button"
-            (click)="verDetalle(nota)">
-            Ver detalle
-          </button>
-
-          <button
-            type="button"
-            (click)="abrirAclaracion(nota)">
-            Agregar aclaración
-          </button>
-
+        <div class="nt-enlaces">
+          <button type="button" (click)="verDetalle(nota)">Ver detalle</button>
+          <button type="button" (click)="abrirAclaracion(nota)">Agregar aclaración</button>
           <button
             *ngIf="nota.archivo"
             type="button"
-            class="archivo-button"
+            class="nt-archivo"
             (click)="abrirArchivo(nota)">
-            <span>PDF</span>
+            <i class="bi bi-file-earmark-text-fill" aria-hidden="true"></i>
             {{ nota.archivo }}
           </button>
-
         </div>
 
       </article>
 
-      <!-- SIN RESULTADOS -->
-      <p
-        class="sin-notas"
-        *ngIf="notasFiltradas.length === 0">
-        No se encontraron notas con los filtros seleccionados.
-      </p>
+      <div class="nt-vacio" *ngIf="notasFiltradas.length === 0">
+        <i class="bi bi-journal-text" aria-hidden="true"></i>
+        <p>{{ notas.length === 0 ? 'Este caso aún no tiene notas.' : 'No se encontraron notas con los filtros seleccionados.' }}</p>
+      </div>
 
     </div>
 
   </section>
 
-
   <!-- =====================================
-       CONTENEDOR DERECHO: AGREGAR NOTA
+       AGREGAR NOTA
   ====================================== -->
 
-  <aside class="notas-right-panel">
+  <aside class="nt-card nt-agregar">
 
-    <section class="agregar-nota-container">
+    <h2 class="nt-titulo">
+      <i class="bi bi-file-earmark-text" aria-hidden="true"></i>
+      Agregar nota
+    </h2>
 
-      <h2>Agregar nota</h2>
+    <form class="nt-form" (ngSubmit)="guardarNota()">
 
-      <form
-        class="agregar-nota-form"
-        (ngSubmit)="guardarNota()">
+      <label for="categoriaNota">Categoría</label>
+      <div class="nt-control nt-select nt-select-ancho">
+        <select
+          id="categoriaNota"
+          name="categoriaNota"
+          [class.vacio]="!categoriaSeleccionada"
+          [(ngModel)]="categoriaSeleccionada"
+          required>
+          <option value="" disabled>Selecciona una categoría</option>
+          <option *ngFor="let categoria of categorias" [value]="categoria">{{ categoria }}</option>
+        </select>
+        <i class="bi bi-chevron-down" aria-hidden="true"></i>
+      </div>
 
-        <!-- CATEGORÍA -->
+      <label for="nuevaNota">Nota</label>
+      <textarea
+        id="nuevaNota"
+        name="nuevaNota"
+        [(ngModel)]="nuevaNota"
+        maxlength="500"
+        placeholder="Escribe una nota sobre la gestión..."
+        required>
+      </textarea>
+      <span class="nt-contador">{{ nuevaNota.length }}/500</span>
 
-        <div class="form-group">
+      <button
+        type="submit"
+        class="nt-guardar"
+        [disabled]="guardando || !categoriaSeleccionada || !nuevaNota.trim() || nuevaNota.length > 500">
+        <i class="bi bi-floppy" aria-hidden="true"></i>
+        {{ guardando ? 'Guardando...' : 'Guardar nota' }}
+      </button>
 
-          <label for="categoriaNota">
-            Categoría
-          </label>
+      <p class="nt-error" *ngIf="error" role="alert">{{ error }}</p>
 
-          <select
-            id="categoriaNota"
-            name="categoriaNota"
-            [(ngModel)]="categoriaSeleccionada"
-            required>
-
-            <option value="" disabled>
-              Selecciona una categoría
-            </option>
-
-            <option
-              *ngFor="let categoria of categorias"
-              [value]="categoria">
-              {{ categoria }}
-            </option>
-
-          </select>
-
-        </div>
-
-        <!-- NOTA -->
-
-        <div class="form-group nota-textarea-group">
-
-          <label for="nuevaNota">
-            Nota
-          </label>
-
-          <textarea
-            id="nuevaNota"
-            name="nuevaNota"
-            [(ngModel)]="nuevaNota"
-            maxlength="500"
-            placeholder="Escribe aquí la nota..."
-            required>
-          </textarea>
-
-          <div class="contador-caracteres">
-            {{ nuevaNota.length }}/500
-          </div>
-
-        </div>
-
-        <!-- GUARDAR -->
-
-        <button
-          type="submit"
-          class="guardar-nota-button"
-          [disabled]="
-            !categoriaSeleccionada ||
-            !nuevaNota.trim() ||
-            nuevaNota.length > 500
-          ">
-
-          Guardar nota
-
-        </button>
-
-      </form>
-
-    </section>
+    </form>
 
   </aside>
 
 </div>
 
-
 <!-- =====================================
-     MODAL VER DETALLE
+     VENTANA: VER DETALLE
 ====================================== -->
 
-<div
-  class="nota-modal-overlay"
-  *ngIf="mostrarDetalle">
+<div class="nt-fondo" *ngIf="mostrarDetalle && notaSeleccionada" (click)="cerrarDetalle()">
+  <div class="nt-modal" role="dialog" aria-modal="true" aria-labelledby="titulo-detalle-nota" (click)="$event.stopPropagation()">
 
-  <div
-    class="nota-modal"
-    *ngIf="notaSeleccionada">
-
-    <div class="modal-header">
-
-      <h2>Detalle de la nota</h2>
-
-      <button
-        type="button"
-        (click)="cerrarDetalle()">
-        ×
-      </button>
-
+    <div class="nt-modal-encabezado">
+      <h3 id="titulo-detalle-nota">Detalle de la nota</h3>
+      <button type="button" aria-label="Cerrar" (click)="cerrarDetalle()"><i class="bi bi-x-lg"></i></button>
     </div>
 
-    <p>
-      <strong>Autor:</strong>
-      {{ notaSeleccionada.nombre }}
-    </p>
+    <div class="nt-nota-arriba">
+      <span class="nt-avatar" [class.sistema]="esSistema(notaSeleccionada)">{{ iniciales(notaSeleccionada.nombre) }}</span>
+      <div class="nt-autor">
+        <strong>{{ notaSeleccionada.nombre }}</strong>
+        <span>{{ notaSeleccionada.rol }}</span>
+      </div>
+      <span class="nt-fecha">{{ notaSeleccionada.fecha }} {{ notaSeleccionada.hora }}</span>
+    </div>
 
-    <p>
-      <strong>Rol:</strong>
-      {{ notaSeleccionada.rol }}
-    </p>
+    <div class="nt-etiquetas">
+      <span class="nt-etiqueta {{ claseCategoria(notaSeleccionada.gestion) }}">{{ notaSeleccionada.gestion }}</span>
+      <span class="nt-etiqueta nt-interna">Nota interna</span>
+    </div>
 
-    <p>
-      <strong>Fecha:</strong>
-      {{ notaSeleccionada.fecha }} ·
-      {{ notaSeleccionada.hora }}
-    </p>
-
-    <p>
-      <strong>Gestión:</strong>
-      {{ notaSeleccionada.gestion }}
-    </p>
-
-    <p>
-      <strong>Nota interna:</strong>
-      {{ notaSeleccionada.notaInterna }}
-    </p>
+    <p class="nt-texto nt-texto-completo">{{ notaSeleccionada.notaInterna }}</p>
 
   </div>
-
 </div>
 
-
 <!-- =====================================
-     MODAL AGREGAR ACLARACIÓN
+     VENTANA: AGREGAR ACLARACIÓN
 ====================================== -->
 
-<div
-  class="nota-modal-overlay"
-  *ngIf="mostrarAclaracion">
+<div class="nt-fondo" *ngIf="mostrarAclaracion" (click)="cerrarAclaracion()">
+  <div class="nt-modal" role="dialog" aria-modal="true" aria-labelledby="titulo-aclaracion" (click)="$event.stopPropagation()">
 
-  <div class="nota-modal">
-
-    <div class="modal-header">
-
-      <h2>Agregar aclaración</h2>
-
-      <button
-        type="button"
-        (click)="cerrarAclaracion()">
-        ×
-      </button>
-
+    <div class="nt-modal-encabezado">
+      <h3 id="titulo-aclaracion">Agregar aclaración</h3>
+      <button type="button" aria-label="Cerrar" (click)="cerrarAclaracion()"><i class="bi bi-x-lg"></i></button>
     </div>
 
     <textarea
@@ -317,15 +202,12 @@
       rows="5">
     </textarea>
 
-    <button
-      type="button"
-      class="guardar-aclaracion"
-      (click)="guardarAclaracion()">
-
-      Guardar aclaración
-
-    </button>
+    <div class="nt-modal-botones">
+      <button type="button" class="nt-secundario" (click)="cerrarAclaracion()">Cancelar</button>
+      <button type="button" class="nt-guardar" [disabled]="!aclaracion.trim()" (click)="guardarAclaracion()">
+        Guardar aclaración
+      </button>
+    </div>
 
   </div>
-
 </div>

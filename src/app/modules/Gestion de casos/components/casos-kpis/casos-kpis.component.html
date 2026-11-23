@@ -1,10 +1,15 @@
-
 <section class="kpi-container">
 
   <div class="kpi-card" *ngFor="let kpi of kpis">
 
     <div class="kpi-icon">
-      <img [src]="kpi.imagen" [alt]="kpi.alt">
+      <i
+        *ngIf="kpi.icono"
+        class="bi"
+        [ngClass]="kpi.icono"
+        [style.color]="kpi.color"
+        [attr.aria-label]="kpi.alt"></i>
+      <img *ngIf="!kpi.icono && kpi.imagen" [src]="kpi.imagen" [alt]="kpi.alt">
     </div>
 
     <div class="kpi-title">
@@ -13,6 +18,19 @@
 
     <div class="kpi-value">
       {{ cargando && !caso ? '...' : kpi.valor }}
+    </div>
+
+    <!-- Cajita de color + texto (como en Figma) -->
+    <div class="kpi-detalle" *ngIf="kpi.etiqueta || kpi.descripcion">
+      <span
+        *ngIf="kpi.etiqueta"
+        class="kpi-etiqueta"
+        [ngClass]="'tono-' + (kpi.tono || 'azul')">
+        {{ kpi.etiqueta }}
+      </span>
+      <span class="kpi-descripcion" *ngIf="kpi.descripcion">
+        {{ kpi.descripcion }}
+      </span>
     </div>
 
   </div>

@@ -191,6 +191,15 @@
   overflow: visible;
 }
 
+.donut-segmento {
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+
+.donut-segmento:hover {
+  opacity: 0.8;
+}
+
 /* ================================================== */
 /* TOOLTIP PERSONALIZADO */
 /* ================================================== */

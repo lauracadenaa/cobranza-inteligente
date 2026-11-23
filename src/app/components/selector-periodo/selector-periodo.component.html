@@ -1,0 +1,96 @@
+<!-- BOTÓN: muestra el periodo aplicado; abierto se convierte en una X -->
+<button
+  *ngIf="!abierto"
+  type="button"
+  class="periodo-boton"
+  aria-haspopup="true"
+  [attr.aria-expanded]="abierto"
+  (click)="alternar()">
+  <i class="bi bi-calendar3" aria-hidden="true"></i>
+  <span>{{ aplicado.etiqueta }}</span>
+  <i class="bi bi-chevron-down" aria-hidden="true"></i>
+</button>
+
+<button
+  *ngIf="abierto"
+  type="button"
+  class="periodo-cerrar"
+  aria-label="Cerrar selector de periodo"
+  (click)="cerrar()">
+  <i class="bi bi-x-lg" aria-hidden="true"></i>
+</button>
+
+<!-- MENÚ -->
+<div
+  *ngIf="abierto"
+  class="periodo-menu"
+  [class.con-calendario]="tipoMarcado === 'personalizado'"
+  role="dialog"
+  aria-label="Elegir periodo">
+
+  <!-- Opciones rápidas -->
+  <div class="periodo-opciones" role="radiogroup">
+    <label class="periodo-opcion" *ngFor="let opcion of opciones">
+      <input
+        type="radio"
+        name="periodo-cartera"
+        [checked]="tipoMarcado === opcion.tipo"
+        (change)="elegir(opcion.tipo)">
+      <span class="periodo-radio" aria-hidden="true"></span>
+      {{ opcion.texto }}
+    </label>
+  </div>
+
+  <!-- Calendario (solo en Personalizado) -->
+  <div class="periodo-calendario" *ngIf="tipoMarcado === 'personalizado'">
+
+    <div class="periodo-fechas">
+      <label>
+        Desde
+        <span class="periodo-fecha" [class.vacia]="!desdeTemporal">
+          {{ textoFecha(desdeTemporal) || 'DD/MM/AAAA' }}
+          <i class="bi bi-calendar3" aria-hidden="true"></i>
+        </span>
+      </label>
+      <label>
+        Hasta
+        <span class="periodo-fecha" [class.vacia]="!hastaTemporal">
+          {{ textoFecha(hastaTemporal) || 'DD/MM/AAAA' }}
+          <i class="bi bi-calendar3" aria-hidden="true"></i>
+        </span>
+      </label>
+    </div>
+
+    <div class="periodo-meses" #listaMeses>
+      <div class="periodo-mes" *ngFor="let mes of meses">
+        <h4>{{ mes.titulo }}</h4>
+
+        <div class="periodo-semana">
+          <span>L</span><span>M</span><span>X</span><span>J</span><span>V</span><span>S</span><span>D</span>
+        </div>
+
+        <div class="periodo-dias">
+          <ng-container *ngFor="let dia of mes.dias">
+            <span *ngIf="!dia.fecha"></span>
+            <button
+              *ngIf="dia.fecha"
+              type="button"
+              class="periodo-dia"
+              [class.extremo]="esExtremo(dia)"
+              [class.en-rango]="enRango(dia)"
+              [class.hoy]="esHoy(dia)"
+              [disabled]="dia.futuro"
+              (click)="elegirDia(dia)">
+              {{ dia.numero }}
+            </button>
+          </ng-container>
+        </div>
+      </div>
+    </div>
+
+    <p class="periodo-ayuda">
+      {{ !desdeTemporal ? 'Elige el día de inicio' : 'Ahora elige el día final' }}
+    </p>
+  </div>
+
+</div>

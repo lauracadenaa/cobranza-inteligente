@@ -489,3 +489,86 @@
   }
 
 }
+
+/* ================================================== */
+/* AJUSTES PARA IGUALAR EL FIGMA                       */
+/* ================================================== */
+
+/* Los eventos solo se ven: sin mano ni efecto al pasar el mouse */
+.evento-card {
+  cursor: default;
+}
+
+.evento-card:hover {
+  background: #FFFFFF;
+  border-color: #E2E8F0;
+}
+
+.evento-card.evento-seleccionado,
+.evento-card.evento-seleccionado:hover {
+  background: #EEF4FF;
+  border-color: #EEF4FF;
+}
+
+/* Etiqueta de quién generó el evento */
+.evento-origen {
+  display: inline-block;
+  width: fit-content;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 500;
+}
+
+.origen-sistema { background: #F1F5F9; color: #475569; }
+.origen-ia { background: #EDE9FE; color: #7C3AED; }
+.origen-agente { background: #DBEAFE; color: #1D4ED8; }
+
+.detalle-subtitulo {
+  color: #64748B;
+  font-size: 11px;
+}
+
+/* Resumen de la bitácora: 4 cuadritos de colores */
+.resumen-cuadros {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.resumen-cuadro {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  min-height: 54px;
+  padding: 8px 4px;
+  border-radius: 10px;
+  text-align: center;
+}
+
+.resumen-cuadro strong {
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 1;
+}
+
+.resumen-cuadro span {
+  color: #64748B;
+  font-size: 10px;
+}
+
+.tono-verde { background: #ECFDF5; }
+.tono-verde strong { color: #10B981; }
+.tono-morado { background: #EDE9FE; }
+.tono-morado strong { color: #7C3AED; }
+.tono-azul { background: #DBEAFE; }
+.tono-azul strong { color: #1D4ED8; }
+.tono-gris { background: #F1F5F9; }
+.tono-gris strong { color: #64748B; }
+
+@media (max-width: 420px) {
+  .resumen-cuadros { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}

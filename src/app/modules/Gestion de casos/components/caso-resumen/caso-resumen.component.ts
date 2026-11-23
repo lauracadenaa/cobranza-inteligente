@@ -7,7 +7,8 @@ import {
   OnChanges,
   OnDestroy,
   SimpleChanges,
-  ChangeDetectorRef
+  ChangeDetectorRef,
+  HostListener
 } from '@angular/core';
 
 import { CommonModule } from '@angular/common';
@@ -22,10 +23,15 @@ import {
   ScoreSummary,
   ScoreFeatureImpact,
   PaymentLinkRequest,
-  PaymentLinkDetailDTO
+  PaymentLinkDetailDTO,
+  DecisionIACaso
 } from '../../../../service/cartera.service';
 
 import { CasosKpisComponent } from '../casos-kpis/casos-kpis.component';
+import { AcuerdoCaso, AsesorCarga, CaseService, NotaBackend } from '../../../../service/case.service';
+import { DashboardService, UsuarioActual } from '../../../../service/dashboard.service';
+import { Observable, forkJoin, of } from 'rxjs';
+import { catchError, map } from 'rxjs/operators';
 
 import {
   HistorialBitacoraComponent
@@ -75,6 +81,40 @@ interface HistorialContacto {
   claseEstado: string;
 }
 
+// Nota como la muestra la pestaña Notas
+export interface NotaVista {
+  id: number;
+  nombre: string;
+  rol: string;
+  fecha: string;
+  hora: string;
+  gestion: string;
+  notaInterna: string;
+}
+
+// Evento como lo muestra la pestaña Historial y bitácora
+export interface EventoBitacoraVista {
+  id: string;
+  fecha: string;
+  fechaOrden: string | number;
+  tipo: string;
+  titulo: string;
+  responsable: string;
+  resultado: string;
+  descripcion: string;
+  canal: string;
+  observacion: string;
+  origen: 'Sistema' | 'Motor IA' | 'Agente';
+}
+
+// Las notas se guardan como "[Categoría] texto"
+function separarCategoria(contenido: string): { categoria: string; texto: string } {
+  const coincide = /^\[([^\]]{1,40})\]\s*/.exec(contenido || '');
+  return coincide
+    ? { categoria: coincide[1], texto: contenido.slice(coincide[0].length) }
+    : { categoria: '', texto: contenido || '' };
+}
+
 @Component({
   selector: 'app-caso-resumen',
   standalone: true,
@@ -93,6 +133,9 @@ export class CasoResumenComponent implements OnChanges, OnDestroy {
   @Input() caso: ManagedCase | null = null;
 
   @Output() cerrar = new EventEmitter<void>();
+
+  // Avisa a Gestión de casos que el caso cambió (para recargar la cola)
+  @Output() casoActualizado = new EventEmitter<ManagedCase | null>();
 
   // =========================================
   // INFORMACIÓN DEL CLIENTE
@@ -144,7 +187,7 @@ export class CasoResumenComponent implements OnChanges, OnDestroy {
   // NOTAS DEL CASO
   // =========================================
 
-  notasCaso: any[] = [];
+  notasCaso: NotaVista[] = [];
 
   // =========================================
   // MODAL DE EXPLICACIÓN DEL SCORE
@@ -216,7 +259,9 @@ export class CasoResumenComponent implements OnChanges, OnDestroy {
 
   constructor(
     private carteraService: CarteraService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private caseService: CaseService,
+    private dashboardService: DashboardService
   ) {}
 
   // =========================================
@@ -232,6 +277,12 @@ export class CasoResumenComponent implements OnChanges, OnDestroy {
       this.cargarScoringIA();
 
       this.cargarHistorialContactos();
+
+      this.cargarNotasYBitacora();
+
+      this.cargarUsuarios();
+
+      this.cargarDesborde();
 
     }
 
@@ -736,6 +787,15 @@ export class CasoResumenComponent implements OnChanges, OnDestroy {
           this.linkPagoGenerado = respuesta;
           this.generandoLinkPago = false;
           this.errorLinkPago = '';
+          this.linkEnviado = false;
+          this.estadoPago = '';
+
+          // El backend no guarda el concepto: queda como nota en el caso
+          this.registrarNotaLink(
+            `Link de pago generado por ${this.formatearMoneda(respuesta?.amount ?? this.valorPago)}. ` +
+            `Concepto: ${this.conceptosPago.find(c => c.value === this.conceptoPago)?.label ?? this.conceptoPago}. ` +
+            `Vigencia: ${this.vigenciaPago} horas. Canal: ${this.formatearCanal(this.canalPago)}.`
+          );
 
           if (!respuesta?.generatedUrl) {
 
@@ -803,6 +863,83 @@ export class CasoResumenComponent implements OnChanges, OnDestroy {
   }
 
   // =========================================
+  // ENVIAR EL LINK AL ASOCIADO
+  // El backend solo genera el link; el envío se hace abriendo
+  // WhatsApp, SMS o correo con el mensaje listo, y se registra
+  // el intento de contacto en el caso.
+  // =========================================
+
+  linkEnviado = false;
+  estadoPago = '';
+  consultandoEstadoPago = false;
+
+  get mensajeLinkPago(): string {
+    const nombre = (this.clienteDetalle?.fullName || this.caso?.asociado || '').split(' ')[0];
+    const valor = this.formatearMoneda(this.linkPagoGenerado?.amount ?? this.valorPago);
+    return `Hola ${nombre}, te compartimos el enlace para pagar tu obligación ${this.caso?.obligacion ?? ''} ` +
+      `por ${valor}: ${this.linkPagoGenerado?.generatedUrl ?? ''}`;
+  }
+
+  enviarLinkPago(): void {
+    const url = this.linkPagoGenerado?.generatedUrl;
+    const destino = this.destinatarioPago.trim();
+    if (!url || !destino) {
+      this.errorLinkPago = 'Falta el enlace o el destinatario.';
+      return;
+    }
+
+    const texto = encodeURIComponent(this.mensajeLinkPago);
+    const numero = destino.replace(/\D/g, '');
+
+    if (this.canalPago === 'WHATSAPP') {
+      window.open(`https://wa.me/${numero.length === 10 ? '57' + numero : numero}?text=${texto}`, '_blank', 'noopener');
+    } else if (this.canalPago === 'SMS') {
+      window.location.href = `sms:${numero}?body=${texto}`;
+    } else {
+      window.location.href = `mailto:${destino}?subject=${encodeURIComponent('Enlace de pago')}&body=${texto}`;
+    }
+
+    this.linkEnviado = true;
+
+    const id = this.caso?.backendId;
+    if (id != null) {
+      this.caseService.registrarIntento(id, this.canalPago, 'SENT').subscribe({ error: () => undefined });
+    }
+    this.registrarNotaLink(`Link de pago enviado por ${this.formatearCanal(this.canalPago)} a ${destino}.`);
+  }
+
+  // "Ver detalle": consulta el estado del pago en la pasarela
+  consultarEstadoPago(): void {
+    const pagoId = this.linkPagoGenerado?.zolevPaymentId;
+    if (!pagoId) {
+      this.estadoPago = this.linkPagoGenerado?.transactionStatus || this.linkPagoGenerado?.status || 'Sin información';
+      return;
+    }
+    this.consultandoEstadoPago = true;
+    this.carteraService.getEstadoPago(pagoId).subscribe({
+      next: respuesta => {
+        this.estadoPago = respuesta?.nombreEstado || 'Sin información';
+        this.consultandoEstadoPago = false;
+        this.cdr.markForCheck();
+      },
+      error: () => {
+        this.estadoPago = 'No fue posible consultar el estado.';
+        this.consultandoEstadoPago = false;
+        this.cdr.markForCheck();
+      }
+    });
+  }
+
+  private registrarNotaLink(texto: string): void {
+    const id = this.caso?.backendId;
+    if (id == null) return;
+    this.caseService.crearNota(id, `[Link de pago] ${texto}`).subscribe({
+      next: () => this.recargarNotas(),
+      error: () => undefined
+    });
+  }
+
+  // =========================================
   // CERRAR MODAL DE LINK DE PAGO
   // =========================================
 
@@ -829,6 +966,10 @@ export class CasoResumenComponent implements OnChanges, OnDestroy {
     this.errorLinkPago = '';
 
     this.linkPagoGenerado = null;
+
+    this.linkEnviado = false;
+
+    this.estadoPago = '';
 
     this.mensajeCopiado = '';
 
@@ -902,6 +1043,7 @@ export class CasoResumenComponent implements OnChanges, OnDestroy {
 
       this.historialContactos = [...intentos, ...mensajes]
         .sort((a, b) => b.fechaOrden - a.fechaOrden);
+      this.eventosBitacora = this.armarBitacora();
 
       if (intentosFinalizados && mensajesFinalizados) {
 
@@ -1205,16 +1347,615 @@ export class CasoResumenComponent implements OnChanges, OnDestroy {
 
   }
 
+  // =========================================
+  // USUARIOS (para poner nombre a quien escribió cada nota)
+  // =========================================
+
+  private usuarioActual: UsuarioActual | null = null;
+  private nombresUsuarios = new Map<number, string>();
+
+  private cargarUsuarios(): void {
+    this.dashboardService.obtenerUsuarioActual().subscribe(usuario => {
+      this.usuarioActual = usuario;
+      this.recalcularVistas();
+    });
+    this.dashboardService.obtenerContextoCasos().pipe(catchError(() => of(null))).subscribe(contexto => {
+      if (contexto) this.nombresUsuarios = contexto.asesores;
+      this.recalcularVistas();
+    });
+  }
+
+  private nombreUsuario(id: number | null | undefined): string {
+    if (id == null) return 'Sistema';
+    if (this.usuarioActual?.id === id) return this.usuarioActual.nombre;
+    return this.nombresUsuarios.get(Number(id)) || `Usuario #${id}`;
+  }
+
+  // =========================================
+  // NOTAS, DECISIONES IA Y ACUERDOS DEL CASO (para Notas y Bitácora)
+  // =========================================
+
+  private notasBackend: NotaBackend[] = [];
+  private decisionesIA: DecisionIACaso[] = [];
+  private acuerdos: AcuerdoCaso[] = [];
+
+  eventosBitacora: EventoBitacoraVista[] = [];
+  guardandoNota = false;
+  errorNota = '';
+
+  private cargarNotasYBitacora(): void {
+    const id = this.caso?.backendId;
+    this.notasBackend = [];
+    this.decisionesIA = [];
+    this.acuerdos = [];
+    this.recalcularVistas();
+    if (id == null) return;
+
+    forkJoin({
+      notas: this.caseService.obtenerNotasCaso(id).pipe(catchError(() => of([] as NotaBackend[]))),
+      decisiones: this.carteraService.getDecisionesIAporCaso(id, 0, 50).pipe(
+        map(r => r?.content ?? []),
+        catchError(() => of([] as DecisionIACaso[]))
+      ),
+      acuerdos: this.caseService.obtenerAcuerdosCaso(id).pipe(catchError(() => of([] as AcuerdoCaso[])))
+    }).subscribe(({ notas, decisiones, acuerdos }) => {
+      this.notasBackend = notas ?? [];
+      this.decisionesIA = decisiones ?? [];
+      this.acuerdos = acuerdos ?? [];
+      this.recalcularVistas();
+    });
+  }
+
+  private recargarNotas(): void {
+    const id = this.caso?.backendId;
+    if (id == null) return;
+    this.caseService.obtenerNotasCaso(id).pipe(catchError(() => of(this.notasBackend))).subscribe(notas => {
+      this.notasBackend = notas ?? [];
+      this.recalcularVistas();
+    });
+  }
+
+  // Convierte lo del backend en lo que muestran las pestañas Notas y Bitácora
+  private recalcularVistas(): void {
+    this.notasCaso = [...this.notasBackend]
+      .sort((a, b) => Date.parse(b.createdAt || '') - Date.parse(a.createdAt || ''))
+      .map(nota => {
+        const { categoria, texto } = separarCategoria(nota.content);
+        const esIA = nota.source === 'AI';
+        const fecha = new Date(nota.createdAt || '');
+        return {
+          id: nota.id,
+          nombre: esIA ? 'Motor IA' : this.nombreUsuario(nota.createdBy),
+          rol: esIA ? 'Sistema' : (nota.createdBy == null ? 'Sistema' : 'Agente'),
+          fecha: Number.isNaN(fecha.getTime()) ? '' : fecha.toLocaleDateString('es-CO', { day: '2-digit', month: '2-digit', year: 'numeric' }),
+          hora: Number.isNaN(fecha.getTime()) ? '' : fecha.toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit', hour12: false }),
+          gestion: categoria || (esIA ? 'Gestión' : 'Seguimiento'),
+          notaInterna: texto
+        };
+      });
+
+    this.eventosBitacora = this.armarBitacora();
+    this.cdr.markForCheck();
+  }
+
+  private armarBitacora(): EventoBitacoraVista[] {
+    const eventos: EventoBitacoraVista[] = [];
+    const fechaTexto = (valor: string | number | null | undefined) => {
+      const f = new Date(valor ?? '');
+      return Number.isNaN(f.getTime())
+        ? '—'
+        : f.toLocaleString('es-CO', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: false });
+    };
+
+    // Creación del caso
+    if (this.caso?.fechaCreacion) {
+      const desdeCarga = this.caso.origen === 'integracionCartera';
+      eventos.push({
+        id: 'creado',
+        fechaOrden: this.caso.fechaCreacion,
+        fecha: fechaTexto(this.caso.fechaCreacion),
+        tipo: 'Caso',
+        titulo: desdeCarga ? 'Caso creado desde carga de cartera' : 'Caso creado',
+        responsable: 'Sistema',
+        resultado: 'Nuevo',
+        descripcion: `Obligación ${this.caso.obligacion}`,
+        canal: 'Sistema',
+        observacion: '',
+        origen: 'Sistema'
+      });
+    }
+
+    // Decisiones del Motor IA
+    this.decisionesIA.forEach(d => eventos.push({
+      id: `ia-${d.id}`,
+      fechaOrden: d.createdAt,
+      fecha: fechaTexto(d.createdAt),
+      tipo: 'Motor IA',
+      titulo: d.humanOverflow ? 'Caso desbordado a gestión humana' : `Contacto por ${this.formatearCanal(d.channelSelected || 'canal')}`,
+      responsable: 'Motor IA',
+      resultado: d.humanOverflow ? 'Escalado' : (d.apiStatus || d.engineStatus || 'Procesado'),
+      descripcion: `Score: ${d.score ?? '—'} · Riesgo ${d.riskSegment || '—'}`,
+      canal: this.formatearCanal(d.channelSelected || 'Sistema'),
+      observacion: d.fallbackUsed ? 'Se usó la regla de respaldo (fallback).' : '',
+      origen: 'Motor IA'
+    }));
+
+    // Notas (incluye las que deja el backend al registrar intentos, cambios y reasignaciones)
+    this.notasBackend.forEach(n => {
+      const { categoria, texto } = separarCategoria(n.content);
+      const esIA = n.source === 'AI';
+      eventos.push({
+        id: `nota-${n.id}`,
+        fechaOrden: n.createdAt || '',
+        fecha: fechaTexto(n.createdAt),
+        tipo: 'Nota',
+        titulo: categoria ? `Nota: ${categoria}` : 'Nota agregada',
+        responsable: esIA ? 'Motor IA' : this.nombreUsuario(n.createdBy),
+        resultado: 'Registrada',
+        descripcion: texto,
+        canal: 'Interno',
+        observacion: '',
+        origen: esIA ? 'Motor IA' : (n.createdBy == null ? 'Sistema' : 'Agente')
+      });
+    });
+
+    // Intentos de contacto y mensajes
+    this.historialContactos.forEach(c => eventos.push({
+      id: `contacto-${c.id}`,
+      fechaOrden: c.fechaOrden,
+      fecha: c.fecha,
+      tipo: c.canal,
+      titulo: c.descripcion,
+      responsable: 'Agente',
+      resultado: c.estado,
+      descripcion: c.descripcion,
+      canal: c.canal,
+      observacion: '',
+      origen: 'Agente'
+    }));
+
+    // Acuerdos y promesas de pago
+    this.acuerdos.forEach(a => eventos.push({
+      id: `acuerdo-${a.id}`,
+      fechaOrden: a.createdAt || '',
+      fecha: fechaTexto(a.createdAt),
+      tipo: 'Acuerdo',
+      titulo: a.agreementType === 'PTP' ? 'Promesa de pago creada' : 'Acuerdo de pago creado',
+      responsable: 'Agente',
+      resultado: a.status || 'Registrado',
+      descripcion: a.promiseDate ? `Fecha prometida: ${new Date(a.promiseDate).toLocaleDateString('es-CO')}` : '',
+      canal: 'Interno',
+      observacion: '',
+      origen: 'Agente'
+    }));
+
+    return eventos;
+  }
+
+  // Guardar nota desde la pestaña Notas
+  guardarNotaCaso(evento: { categoria: string; texto: string }): void {
+    const id = this.caso?.backendId;
+    if (id == null || this.guardandoNota) return;
+    this.guardandoNota = true;
+    this.errorNota = '';
+    this.caseService.crearNota(id, `[${evento.categoria}] ${evento.texto}`).subscribe({
+      next: () => {
+        this.guardandoNota = false;
+        this.recargarNotas();
+      },
+      error: error => {
+        this.guardandoNota = false;
+        this.errorNota = error?.status === 403
+          ? 'Tu rol no tiene permiso para agregar notas.'
+          : 'No fue posible guardar la nota.';
+        this.cdr.markForCheck();
+      }
+    });
+  }
+
+  // Aclaración = nota nueva que hace referencia a la original
+  guardarAclaracionCaso(evento: { nota: NotaVista; texto: string }): void {
+    this.guardarNotaCaso({
+      categoria: 'Aclaración',
+      texto: `Sobre la nota de ${evento.nota.nombre} (${evento.nota.fecha} ${evento.nota.hora}): ${evento.texto}`
+    });
+  }
+
+  // =========================================
+  // MOTIVO DE DESBORDE (GET /management/cases/{id}/overflow-status)
+  // =========================================
+
+  desborde: {
+    triggered: boolean;
+    condition1Mora: boolean;
+    condition2Intentos: boolean;
+    condition3AcuerdoIncumplido: boolean;
+    condition4SinAutorizacion: boolean;
+    reasonDetail: string;
+  } | null = null;
+
+  private cargarDesborde(): void {
+    this.desborde = null;
+    const id = this.caso?.backendId;
+    if (id == null) return;
+    this.caseService.obtenerEstadoDesborde(id).pipe(catchError(() => of(null))).subscribe(resultado => {
+      this.desborde = resultado;
+      this.cdr.markForCheck();
+    });
+  }
+
+  // Condiciones que se cumplen, en palabras
+  get condicionesDesborde(): string[] {
+    const d = this.desborde;
+    if (!d) return [];
+    return [
+      d.condition1Mora ? 'Mora avanzada' : '',
+      d.condition2Intentos ? 'Intentos de contacto agotados' : '',
+      d.condition3AcuerdoIncumplido ? 'Acuerdo incumplido' : '',
+      d.condition4SinAutorizacion ? 'Sin autorización de contacto digital' : ''
+    ].filter(Boolean);
+  }
+
+  // =========================================
+  // CONTACTO PREFERIDO
+  // El canal con más contactos efectivos; si no hay historial,
+  // el canal que recomienda el Motor IA.
+  // =========================================
+
+  // =========================================
+  // PROPENSIÓN DE PAGO Y MOTIVO DE PRIORIDAD (tarjeta "Contexto IA del caso")
+  // =========================================
+
+  // Alta / Media / Baja según la probabilidad de recaudo del motor IA
+  get propensionTexto(): string {
+    const p = this.probabilidadRecaudoIA;
+    if (p === null) return 'No disponible';
+    const texto = p >= 60 ? 'Alta' : p >= 30 ? 'Media' : 'Baja';
+    return `${texto} (${Math.round(p)}%)`;
+  }
+
+  get propensionClase(): string {
+    const p = this.probabilidadRecaudoIA;
+    if (p === null) return 'nd';
+    return p >= 60 ? 'alta' : p >= 30 ? 'media' : 'baja';
+  }
+
+  // Ej.: "Riesgo crítico y mora avanzada"
+  get motivoPrioridad(): string {
+    const riesgo = (this.nivelRiesgoIA || this.caso?.riesgo || '').toString().trim();
+    const dias = this.caso?.diasMora ?? 0;
+    const partes: string[] = [];
+    if (riesgo && riesgo !== 'Sin información') {
+      partes.push('Riesgo ' + riesgo.toLowerCase().replace('critico', 'crítico'));
+    }
+    if (dias > 90) partes.push('mora avanzada');
+    else if (dias > 30) partes.push('mora media');
+    return partes.length ? partes.join(' y ') : 'No disponible';
+  }
+
+  get contactoPreferido(): string {
+    const efectivos = new Map<string, number>();
+    this.historialContactos
+      .filter(c => c.claseEstado === 'contacto-efectivo')
+      .forEach(c => efectivos.set(c.canal, (efectivos.get(c.canal) ?? 0) + 1));
+
+    const mejor = [...efectivos.entries()].sort((a, b) => b[1] - a[1])[0];
+    if (mejor) return mejor[0];
+
+    return this.canalRecomendadoIA ? `${this.formatearCanal(this.canalRecomendadoIA)} (sugerido IA)` : 'No definido';
+  }
+
+  // =========================================
+  // CONFIANZA DE LA RECOMENDACIÓN (solo si el modelo la reporta)
+  // =========================================
+
+  get confianzaRecomendacion(): number | null {
+    const resultado = this.scoringResumen?.calculationDetail?.result as unknown as Record<string, unknown> | undefined;
+    const valor = Number(resultado?.['confidence_score']);
+    if (!Number.isFinite(valor) || resultado?.['confidence_score'] == null) return null;
+    return valor <= 1 ? Math.round(valor * 100) : Math.round(valor);
+  }
+
+  // =========================================
+  // HISTÓRICO DE EFECTIVIDAD (con los contactos reales del cliente)
+  // =========================================
+
+  efectividadCanal(canal: 'WHATSAPP' | 'SMS' | 'LLAMADA'): string {
+    const coincide = (texto: string) => {
+      const t = (texto || '').toUpperCase();
+      if (canal === 'LLAMADA') return t.includes('LLAMADA') || t.includes('CALL') || t.includes('TELEF');
+      return t.includes(canal);
+    };
+    const delCanal = this.historialContactos.filter(c => coincide(c.canal));
+    if (delCanal.length === 0) return 'Sin datos';
+    const efectivos = delCanal.filter(c => c.claseEstado === 'contacto-efectivo').length;
+    return `${Math.round(efectivos / delCanal.length * 100)}%`;
+  }
+
+  // =========================================
+  // TIPIFICACIÓN RÁPIDA
+  // Se guarda como intento de contacto + nota en la bitácora
+  // =========================================
+
+  tipificacion = { resultado: '', proximaAccion: '', comentario: '' };
+  guardandoTipificacion = false;
+
+  private readonly textosResultado: Record<string, string> = {
+    'contacto-efectivo': 'Contacto efectivo',
+    'sin-respuesta': 'Sin respuesta',
+    'no-contactado': 'No contactado',
+    'numero-equivocado': 'Número equivocado',
+    'tercero-contactado': 'Contacto con tercero',
+    'promesa-pago': 'Promesa de pago',
+    'rechaza-pago': 'Rechaza realizar el pago'
+  };
+
+  private readonly textosProximaAccion: Record<string, string> = {
+    'nueva-llamada': 'Programar nueva llamada',
+    'enviar-whatsapp': 'Enviar WhatsApp',
+    'enviar-sms': 'Enviar SMS',
+    'enviar-email': 'Enviar email',
+    'crear-promesa': 'Crear promesa de pago',
+    'seguimiento': 'Realizar seguimiento',
+    'escalar-caso': 'Escalar caso',
+    'sin-accion': 'Sin acción adicional'
+  };
+
+  // Resultado del formulario → resultado que entiende el backend
+  private readonly resultadoBackend: Record<string, string> = {
+    'contacto-efectivo': 'RESPONDED',
+    'tercero-contactado': 'RESPONDED',
+    'promesa-pago': 'RESPONDED',
+    'sin-respuesta': 'FAILED',
+    'no-contactado': 'FAILED',
+    'numero-equivocado': 'FAILED',
+    'rechaza-pago': 'REJECTED'
+  };
+
+  guardarGestion(): void {
+    const id = this.caso?.backendId;
+    const t = this.tipificacion;
+    if (id == null || !t.resultado || !t.proximaAccion || this.guardandoTipificacion) {
+      if (!t.resultado || !t.proximaAccion) {
+        this.mostrarAvisoAcciones('Selecciona el resultado de contacto y la próxima acción.');
+      }
+      return;
+    }
+
+    this.guardandoTipificacion = true;
+    const nota = [
+      `Resultado: ${this.textosResultado[t.resultado]}.`,
+      `Próxima acción: ${this.textosProximaAccion[t.proximaAccion]}.`,
+      t.comentario.trim() ? `Comentario: ${t.comentario.trim()}` : ''
+    ].filter(Boolean).join(' ');
+
+    forkJoin([
+      this.caseService.registrarIntento(id, 'GESTION_MANUAL', this.resultadoBackend[t.resultado] ?? 'SENT'),
+      this.caseService.crearNota(id, `[Gestión] ${nota}`)
+    ]).subscribe({
+      next: () => {
+        this.guardandoTipificacion = false;
+        this.tipificacion = { resultado: '', proximaAccion: '', comentario: '' };
+        this.mostrarAvisoAcciones('Gestión guardada.');
+        this.recargarNotas();
+        this.cargarHistorialContactos();
+      },
+      error: error => {
+        this.guardandoTipificacion = false;
+        this.mostrarAvisoAcciones(error?.status === 403
+          ? 'Tu rol no tiene permiso para registrar gestiones.'
+          : 'No fue posible guardar la gestión.');
+      }
+    });
+  }
+
+  // =========================================
+  // ACCIONES RÁPIDAS DE CONTACTO
+  // Abren la app del equipo (teléfono, WhatsApp, correo, SMS)
+  // y dejan registrado el intento en el caso.
+  // =========================================
+
+  private registrarContacto(canal: string): void {
+    const id = this.caso?.backendId;
+    if (id == null) return;
+    this.caseService.registrarIntento(id, canal, 'SENT').subscribe({
+      next: () => {
+        this.mostrarAvisoAcciones(`Intento de contacto por ${this.formatearCanal(canal)} registrado en el caso.`);
+        this.recargarNotas();
+      },
+      error: () => this.mostrarAvisoAcciones('Se abrió el contacto, pero no se pudo registrar el intento.')
+    });
+  }
+
+  private soloDigitos(valor: string | null | undefined): string {
+    return (valor || '').replace(/\D/g, '');
+  }
+
+  // =========================================
+  // VENTANAS DE ACCIONES (asignar, cerrar)
+  // =========================================
+
+  ventanaAccion: '' | 'asignar' | 'cerrar' = '';
+  guardandoAccion = false;
+  errorAccion = '';
+
+  tipoCierre = '';
+  detalleCierre = '';
+  asesoresCaso: AsesorCarga[] = [];
+  asesorCasoId: number | null = null;
+
+  readonly tiposCierre = [
+    { valor: 'PAYMENT_COMPLETE', texto: 'Pago total' },
+    { valor: 'PAYMENT_AGREEMENT', texto: 'Acuerdo de pago' },
+    { valor: 'DISPUTE_RESOLVED', texto: 'Disputa resuelta' },
+    { valor: 'UNABLE_TO_COLLECT', texto: 'No se pudo recaudar' },
+    { valor: 'WRITE_OFF', texto: 'Castigo de cartera' },
+    { valor: 'ILOCALIZADO', texto: 'Ilocalizado' },
+    { valor: 'JURIDICO', texto: 'Pasa a jurídico' }
+  ];
+
+  abrirVentanaAccion(tipo: 'asignar' | 'cerrar'): void {
+    this.cerrarAcciones();
+    this.errorAccion = '';
+    this.ventanaAccion = tipo;
+    this.tipoCierre = '';
+    this.detalleCierre = '';
+    this.asesorCasoId = null;
+
+    if (tipo === 'asignar') {
+      this.asesoresCaso = [];
+      this.caseService.obtenerAsesores().subscribe({
+        next: lista => {
+          this.asesoresCaso = lista ?? [];
+          this.cdr.markForCheck();
+        },
+        error: error => {
+          this.errorAccion = error?.status === 403
+            ? 'Solo un administrador o supervisor puede asignar asesores.'
+            : 'No fue posible consultar los asesores.';
+          this.cdr.markForCheck();
+        }
+      });
+    }
+  }
+
+  cerrarVentanaAccion(): void {
+    if (this.guardandoAccion) return;
+    this.ventanaAccion = '';
+  }
+
+  confirmarVentanaAccion(): void {
+    const id = this.caso?.backendId;
+    if (id == null || this.guardandoAccion) return;
+
+    let peticion$: Observable<unknown> | null = null;
+    let exito = '';
+
+    switch (this.ventanaAccion) {
+      case 'asignar':
+        if (this.asesorCasoId == null) { this.errorAccion = 'Elige un asesor.'; return; }
+        peticion$ = this.caseService.reasignarCaso(id, this.asesorCasoId);
+        exito = `Caso asignado a ${this.asesoresCaso.find(a => a.advisorId === this.asesorCasoId)?.fullName ?? 'el asesor'}.`;
+        break;
+      case 'cerrar':
+        if (!this.tipoCierre) { this.errorAccion = 'Elige cómo se cierra el caso.'; return; }
+        peticion$ = this.caseService.cerrarCaso(id, this.tipoCierre, this.detalleCierre);
+        exito = 'Caso cerrado.';
+        break;
+    }
+
+    if (!peticion$) return;
+
+    this.guardandoAccion = true;
+    this.errorAccion = '';
+
+    peticion$.subscribe({
+      next: () => {
+        this.guardandoAccion = false;
+        this.ventanaAccion = '';
+        this.mostrarAvisoAcciones(exito);
+        this.cargarNotasYBitacora();
+        this.casoActualizado.emit(null);
+      },
+      error: error => {
+        this.guardandoAccion = false;
+        this.errorAccion = error?.status === 403
+          ? 'Tu rol no tiene permiso para hacer esta acción.'
+          : error?.error?.message || 'No fue posible completar la acción.';
+        this.cdr.markForCheck();
+      }
+    });
+  }
+
+  // =========================================
+  // MENÚ "ACCIONES" (como en Figma)
+  // =========================================
+
+  submenuEstadoAbierto = false;
+
+  avisoAcciones = '';
+  private temporizadorAviso?: ReturnType<typeof setTimeout>;
+
+  readonly estadosCaso = [
+    { valor: 'EN_GESTION', texto: 'En Gestión' },
+    { valor: 'ILOCALIZADO', texto: 'Ilocalizado / Sin respuesta' },
+    { valor: 'PROMESA_PAGO', texto: 'Promesa Pago' },
+    { valor: 'PREJURIDICO', texto: 'Prejurídico' }
+  ];
+
   abrirAcciones(): void {
-
-    this.mostrarAcciones = true;
-
+    this.mostrarAcciones = !this.mostrarAcciones;
+    this.submenuEstadoAbierto = false;
   }
 
   cerrarAcciones(): void {
-
     this.mostrarAcciones = false;
+    this.submenuEstadoAbierto = false;
+  }
 
+  @HostListener('document:click')
+  cerrarAccionesAlHacerClicAfuera(): void {
+    if (this.mostrarAcciones) {
+      this.cerrarAcciones();
+    }
+  }
+
+  @HostListener('document:keydown.escape')
+  cerrarAccionesConEscape(): void {
+    this.cerrarAcciones();
+  }
+
+  esEstadoActual(valor: string): boolean {
+    return (this.caso?.estado ?? '').toUpperCase() === valor;
+  }
+
+  // PUT /management/cases/{id}?status=
+  cambiarEstadoCaso(estado: { valor: string; texto: string }): void {
+    this.cerrarAcciones();
+    const id = this.caso?.backendId;
+    if (id == null || this.esEstadoActual(estado.valor)) return;
+
+    this.caseService.cambiarEstado(id, estado.valor).subscribe({
+      next: () => {
+        const actualizado = this.caso ? { ...this.caso, estado: estado.valor } : null;
+        this.mostrarAvisoAcciones(`Estado cambiado a "${estado.texto}".`);
+        // El encabezado y el caso se refrescan con el estado nuevo
+        this.casoActualizado.emit(actualizado);
+      },
+      error: error => this.mostrarAvisoAcciones(error?.status === 403
+        ? 'Tu rol no tiene permiso para cambiar el estado.'
+        : error?.error?.message || 'No fue posible cambiar el estado.')
+    });
+  }
+
+  accionAsignarAsesor(): void {
+    this.abrirVentanaAccion('asignar');
+  }
+
+  accionEnviarLink(): void {
+    this.cerrarAcciones();
+    this.generarLink();
+  }
+
+  // Lleva a la pestaña Notas y pone el cursor en el campo de la nota
+  accionAgregarNota(): void {
+    this.cerrarAcciones();
+    this.cambiarSeccion('notas');
+    setTimeout(() => document.getElementById('nuevaNota')?.focus(), 50);
+  }
+
+  accionCerrarCaso(): void {
+    this.abrirVentanaAccion('cerrar');
+  }
+
+  private mostrarAvisoAcciones(texto: string): void {
+    this.cdr.markForCheck();
+    this.avisoAcciones = texto;
+    clearTimeout(this.temporizadorAviso);
+    this.temporizadorAviso = setTimeout(() => {
+      this.avisoAcciones = '';
+      this.cdr.markForCheck();
+    }, 3500);
   }
 
   // =========================================
@@ -1254,57 +1995,31 @@ export class CasoResumenComponent implements OnChanges, OnDestroy {
   // =========================================
 
   contactarWhatsApp(): void {
-
-    console.log(
-      'Contactar por WhatsApp:',
-      this.clienteDetalle?.mobile
-    );
-
+    const numero = this.soloDigitos(this.clienteDetalle?.mobile || this.clienteDetalle?.phone);
+    if (!numero) { this.mostrarAvisoAcciones('El cliente no tiene celular registrado.'); return; }
+    window.open(`https://wa.me/${numero.length === 10 ? '57' + numero : numero}`, '_blank', 'noopener');
+    this.registrarContacto('WHATSAPP');
   }
 
   llamarAsociado(): void {
-
-    console.log(
-      'Llamar al asociado:',
-      this.clienteDetalle?.mobile
-    );
-
+    const numero = this.soloDigitos(this.clienteDetalle?.mobile || this.clienteDetalle?.phone);
+    if (!numero) { this.mostrarAvisoAcciones('El cliente no tiene teléfono registrado.'); return; }
+    window.location.href = `tel:${numero}`;
+    this.registrarContacto('LLAMADA');
   }
 
   enviarEmail(): void {
-
-    console.log(
-      'Enviar email:',
-      this.clienteDetalle?.email
-    );
-
-  }
-
-  crearPromesa(): void {
-
-    console.log(
-      'Crear promesa para el caso:',
-      this.caso?.id
-    );
-
+    const correo = this.clienteDetalle?.email;
+    if (!correo) { this.mostrarAvisoAcciones('El cliente no tiene correo registrado.'); return; }
+    window.location.href = `mailto:${correo}`;
+    this.registrarContacto('EMAIL');
   }
 
   enviarSMS(): void {
-
-    console.log(
-      'Enviar SMS:',
-      this.clienteDetalle?.mobile
-    );
-
-  }
-
-  escalarCaso(): void {
-
-    console.log(
-      'Escalar caso:',
-      this.caso?.id
-    );
-
+    const numero = this.soloDigitos(this.clienteDetalle?.mobile || this.clienteDetalle?.phone);
+    if (!numero) { this.mostrarAvisoAcciones('El cliente no tiene celular registrado.'); return; }
+    window.location.href = `sms:${numero}`;
+    this.registrarContacto('SMS');
   }
 
   // =========================================

@@ -1,5 +1,7 @@
 
-import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, DestroyRef, OnInit, inject } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
@@ -153,6 +155,27 @@ export class DashboardComponent implements OnInit {
   // CASOS FILTRADOS
   // ==================================================
 
+  // Texto escrito en el buscador de la tabla
+  textoBusqueda = '';
+
+  buscarEnTabla(texto: string): void {
+    this.textoBusqueda = texto;
+    this.paginaActual = 1;
+  }
+
+  // Iniciales del asesor para el circulito de la tabla
+  inicialesAsesor(asesor: string | undefined): string {
+    const texto = (asesor ?? '').trim();
+    if (!texto || texto === 'Sin asignar') {
+      return '—';
+    }
+    return texto
+      .split(/\s+/)
+      .slice(0, 2)
+      .map(parte => parte.charAt(0).toUpperCase())
+      .join('');
+  }
+
   get casosFiltrados(): ManagedCase[] {
 
     return this.cases.filter(caso => {
@@ -227,8 +250,27 @@ export class DashboardComponent implements OnInit {
         );
 
 
+      // BUSCADOR: caso, asociado, documento u obligación
+      const texto = this.normalizarTexto(this.textoBusqueda);
+      const coincideBusqueda =
+        texto === '' ||
+        [caso.id, caso.asociado, caso.documento, caso.obligacion]
+          .some(valor => this.normalizarTexto(valor).includes(texto));
+
+
+      // FILTRO POR ORIGEN (si no se marca ninguno, pasan todos)
+      const origenesMarcados = Object.entries(this.filtrosAplicados.origenes)
+        .filter(([, marcado]) => marcado)
+        .map(([clave]) => clave);
+      const coincideOrigen =
+        origenesMarcados.length === 0 ||
+        origenesMarcados.includes(caso.origen ?? '');
+
+
       // RESULTADO FINAL
       return (
+        coincideBusqueda &&
+        coincideOrigen &&
         coincideRiesgo &&
         coincideAsesor &&
         coincideMoraDesde &&
@@ -538,8 +580,6 @@ export class DashboardComponent implements OnInit {
 
   openSearchCase(): void {
 
-    console.log('BOTÓN BUSCAR CASO FUNCIONA');
-
     this.isSearchCaseOpen = true;
 
   }
@@ -550,12 +590,37 @@ export class DashboardComponent implements OnInit {
 
   }
 
-  goToManagedCases(): void {
+  // Desde el buscador: abre el caso elegido o va a Gestión de casos
+  goToManagedCases(caso: ManagedCase | null = null): void {
     this.closeSearchCase();
-    document.getElementById('managed-cases')?.scrollIntoView({
-      behavior: 'smooth',
-      block: 'start'
+
+    if (caso) {
+      this.abrirCaso(caso);
+    } else {
+      void this.router.navigateByUrl('/gestion-casos');
+    }
+  }
+
+  // ==================================================
+  // ACCIONES RÁPIDAS
+  // ==================================================
+
+  private readonly router = inject(Router);
+
+  // Abre el detalle del caso en Gestión de casos
+  abrirCaso(caso: ManagedCase): void {
+    void this.router.navigate(['/gestion-casos'], {
+      state: { casoAAbrir: caso.id }
     });
+  }
+
+  // Cargar archivo: la carga batch está en Cartera > Integración de cartera
+  irACargarArchivo(): void {
+    void this.router.navigateByUrl('/cartera');
+  }
+
+  irAGenerarReporte(): void {
+    void this.router.navigateByUrl('/reportes-auditoria');
   }
 
 
@@ -599,12 +664,29 @@ export class DashboardComponent implements OnInit {
 
 
   // NÚMEROS DE PÁGINA
-  get paginas(): number[] {
+  // Como en Figma: "1 2 3 … 15" (null = puntos suspensivos)
+  get paginas(): (number | null)[] {
 
-    return Array.from(
-      { length: this.totalPaginas },
-      (_, i) => i + 1
-    );
+    const total = this.totalPaginas;
+
+    if (total <= 5) {
+      return Array.from({ length: total }, (_, i) => i + 1);
+    }
+
+    const actual = Math.min(Math.max(this.paginaActual, 1), total);
+
+    // Al inicio: 1 2 3 … total
+    if (actual <= 3) {
+      return [1, 2, 3, null, total];
+    }
+
+    // Al final: 1 … total-2 total-1 total
+    if (actual >= total - 2) {
+      return [1, null, total - 2, total - 1, total];
+    }
+
+    // En medio: 1 … actual … total
+    return [1, null, actual, null, total];
 
   }
 
@@ -675,28 +757,32 @@ export class DashboardComponent implements OnInit {
   // INICIALIZACIÓN
   // ==================================================
 
+  private readonly destroyRef = inject(DestroyRef);
+
   ngOnInit(): void {
+
+    this.cargarCasos();
+
+    // Botón "Actualizar" del encabezado
+    this.dashboardService.recargar$
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => this.cargarCasos());
+
+  }
+
+  private cargarCasos(): void {
 
     this.dashboardService.getManagedCases().subscribe({
 
       next: (data) => {
-
-        console.log('CASOS RECIBIDOS DEL BACKEND:', data);
-
         this.cases = data;
-
         this.paginaActual = 1;
-
         this.changeDetectorRef.markForCheck();
-
       },
 
       error: (error) => {
-
         console.error('ERROR AL CONSULTAR LOS CASOS:', error);
-
         this.changeDetectorRef.markForCheck();
-
       }
 
     });

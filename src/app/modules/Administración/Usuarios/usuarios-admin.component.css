@@ -291,3 +291,234 @@ button:disabled {
     overflow: visible;
   }
 }
+
+
+/* =========================================
+   MENÚ Y VENTANAS DE ACCIONES (diseño Figma)
+========================================= */
+
+/* ⋮ se vuelve X en un recuadro azul claro */
+.btn-menu.abierto {
+  width: 36px;
+  height: 36px;
+  margin: -3px;
+  border-radius: 8px;
+  background: #DBEAFE;
+  color: #0F2937;
+  font-size: 15px;
+}
+
+/* El menú se abre a la izquierda del botón, a su altura */
+.menu-desplegable {
+  top: -6px;
+  right: calc(100% + 14px);
+  min-width: 244px;
+  padding: 6px;
+  border: 1px solid #E2E8F0;
+  border-radius: 10px;
+  box-shadow: 0 6px 18px rgba(15, 23, 42, 0.10);
+}
+
+.menu-desplegable button {
+  gap: 14px;
+  min-height: 40px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  color: #0F2937;
+  font-size: 14px;
+}
+
+.menu-desplegable button i { font-size: 17px; }
+
+.menu-desplegable button:hover { background: #E8EEF6; color: #1763F5; }
+.menu-desplegable button.peligro { color: #DC2626; }
+.menu-desplegable button.peligro:hover { background: #FEE2E2; color: #DC2626; }
+
+/* Ventana base */
+.modal {
+  position: relative;
+  border-radius: 20px;
+}
+
+.modal-cerrar {
+  position: absolute;
+  top: 18px;
+  right: 18px;
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: #1763F5;
+  font-size: 15px;
+  cursor: pointer;
+}
+
+.modal-cerrar:hover { background: #EAF1FF; }
+
+.modal-icono {
+  display: grid;
+  place-items: center;
+  width: 56px;
+  height: 56px;
+  flex-shrink: 0;
+  border-radius: 10px;
+  font-size: 24px;
+}
+
+.modal-icono.azul { background: #DBEAFE; color: #1E3A5F; }
+.modal-icono.amarillo { background: #FEF9E7; color: #D97706; }
+.modal-icono.rojo { background: #FDE2E2; color: #DC2626; }
+.modal-icono.verde { background: #DCFCE7; color: #15803D; }
+
+.btn-contorno,
+.btn-azul,
+.btn-naranja,
+.btn-rojo {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 42px;
+  padding: 0 22px;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.btn-contorno { background: #FFFFFF; color: #1763F5; border: 1px solid #D5DEE5; }
+.btn-contorno:hover:not(:disabled) { background: #F5F8FF; }
+.btn-azul { background: #1763F5; color: #FFFFFF; border: none; }
+.btn-azul:hover:not(:disabled) { background: #0F52D6; }
+.btn-naranja { background: #F59E0B; color: #FFFFFF; border: none; }
+.btn-naranja:hover:not(:disabled) { background: #D97706; }
+.btn-rojo { background: #DC2626; color: #FFFFFF; border: none; }
+.btn-rojo:hover:not(:disabled) { background: #B91C1C; }
+.btn-chico { height: 34px; padding: 0 12px; font-size: 12px; }
+
+.modal-botones.izquierda { justify-content: flex-start; gap: 16px; margin-top: 12px; }
+
+/* Crear / editar usuario */
+.modal-form {
+  max-width: 520px;
+  gap: 14px;
+  padding: 24px 30px 28px;
+  max-height: calc(100vh - 32px);
+  overflow-y: auto;
+}
+
+.modal-cabecera {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding-right: 32px;
+}
+
+.modal-cabecera h3 { font-size: 22px; font-weight: 600; color: #0F172A; }
+.modal-cabecera p { margin-top: 2px; font-size: 13px; color: #64748B; }
+
+.modal-form label {
+  gap: 8px;
+  font-size: 15px;
+  font-weight: 600;
+  color: #0F172A;
+}
+
+.modal-form label.label-suave { font-weight: 400; color: #64748B; }
+
+.modal-form input,
+.modal-form select {
+  width: 100%;
+  height: 46px;
+  padding: 0 14px;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  background: #F2F2F2;
+  font-size: 14px;
+  font-weight: 400;
+  color: #1E293B;
+  box-sizing: border-box;
+}
+
+.modal-form input::placeholder { color: #64748B; }
+
+.modal-form input:disabled { background: #F2F2F2; color: #94A3B8; }
+
+.modal-seccion {
+  margin: 6px 0 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: #0F172A;
+}
+
+.select-caja { position: relative; display: block; }
+.select-caja select { appearance: none; padding-right: 40px; cursor: pointer; }
+.select-caja i {
+  position: absolute;
+  top: 50%;
+  right: 14px;
+  transform: translateY(-50%);
+  color: #64748B;
+  font-size: 13px;
+  pointer-events: none;
+}
+
+.info-clave {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 16px;
+  border: 1px solid #D6E4FF;
+  border-radius: 6px;
+  background: #EEF4FF;
+}
+
+.info-clave-icono {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: #DCE8FF;
+  color: #1763F5;
+  font-size: 17px;
+}
+
+.info-clave strong { display: block; font-size: 13px; color: #0F172A; }
+.info-clave p { margin-top: 4px; font-size: 12px; line-height: 1.55; color: #475569; }
+
+.modal-form .modal-botones { justify-content: flex-end; gap: 16px; margin-top: 8px; }
+
+/* Restablecer acceso / desactivar / contraseña */
+.modal-aviso {
+  max-width: 546px;
+  gap: 0;
+  padding: 56px 80px 44px;
+}
+
+.modal-aviso .modal-icono { width: 64px; height: 64px; margin-bottom: 26px; font-size: 26px; }
+
+.modal-aviso h3 {
+  margin-bottom: 14px;
+  font-size: 32px;
+  font-weight: 600;
+  line-height: 1.2;
+  color: #0F172A;
+}
+
+.modal-aviso p { font-size: 14px; line-height: 1.45; color: #334155; }
+.modal-aviso p strong { color: #0F2937; }
+
+.modal-aviso .clave { margin-top: 16px; }
+.modal-aviso > .nota { margin-top: 8px; }
+.modal-aviso .modal-botones { margin-top: 28px; }
+
+@media (max-width: 600px) {
+  .modal-aviso { padding: 48px 24px 28px; }
+  .modal-aviso h3 { font-size: 24px; }
+  .modal-form { padding: 22px 18px; }
+}

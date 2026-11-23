@@ -43,17 +43,13 @@
 
       <label class="grupo">
         <span class="etiqueta">Capacidad general</span>
-        <div class="campo-sufijo campo solo-lectura">
-          <strong>
-            @if (cargando) { Cargando... }
-            @else if (capacidadGeneral !== null) { {{ capacidadGeneral }} }
-            @else { Sin tope }
-          </strong>
-          <span>casos por agente</span>
+        <div class="campo-sufijo campo" [class.invalido]="!capacidadValida">
+          <input type="number" min="1" step="1" [(ngModel)]="capacidadForm" (ngModelChange)="capacidadEditada = true"
+                 [placeholder]="cargando ? 'Cargando...' : 'Sin tope'" aria-label="Capacidad general">
+          
         </div>
         <small class="ayuda azul">
           Se aplica a todos los agentes, excepto a quienes tengan una capacidad personalizada.
-          La define el servidor; la de cada agente se cambia en "Capacidad por agente".
         </small>
       </label>
 
@@ -97,7 +93,7 @@
 
     <p class="vista-previa">
       <i class="bi bi-eye" aria-hidden="true"></i>
-      El método de asignación, el umbral y la redistribución automática son una vista previa:
+      El método de asignación, la capacidad general, el umbral y la redistribución automática son una vista previa:
       el backend todavía no guarda estas reglas.
     </p>
 

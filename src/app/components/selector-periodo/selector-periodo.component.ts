@@ -56,6 +56,9 @@ export class SelectorPeriodoComponent implements OnInit, AfterViewChecked {
 
   @Input() tipoInicial: TipoPeriodo = '12m';
 
+  // Periodo ya elegido antes (si se manda, el botón arranca con él)
+  @Input() periodoInicial: PeriodoSeleccionado | null = null;
+
   // Cuántos meses hacia atrás muestra el calendario
   @Input() mesesCalendario = 12;
 
@@ -86,8 +89,15 @@ export class SelectorPeriodoComponent implements OnInit, AfterViewChecked {
   private bajarCalendario = false;
 
   ngOnInit(): void {
-    this.aplicado = this.construirPeriodo(this.tipoInicial);
-    this.tipoMarcado = this.tipoInicial;
+    const previo = this.periodoInicial;
+    if (previo?.tipo === 'personalizado') {
+      // Rango con días exactos: se deja tal cual
+      this.aplicado = previo;
+    } else {
+      // "Últimos X": se recalcula desde hoy
+      this.aplicado = this.construirPeriodo(previo?.tipo ?? this.tipoInicial);
+    }
+    this.tipoMarcado = this.aplicado.tipo;
     this.meses = this.armarMeses();
   }
 

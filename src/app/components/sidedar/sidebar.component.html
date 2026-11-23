@@ -105,11 +105,11 @@
    
 <!-- MOTOR IA -->
 <a
-  routerLink="/motor-ia"
+  href="/motor-ia"
   class="menu-item"
   [class.active]="opcionSeleccionada === 'Motor IA y Scoring'"
   title="Motor IA y Scoring"
-  (click)="seleccionarOpcion('Motor IA y Scoring')"
+  (click)="seleccionarOpcion('Motor IA y Scoring'); $event.preventDefault()"
 >
   <img
     src="imagenes/Sildedar/Motor IA.png"
@@ -142,11 +142,11 @@
 
     <!-- LINKS Y PAGOS -->
     <a
-      routerLink="/links-pagos"
+      href="/links-pagos"
       class="menu-item"
       [class.active]="opcionSeleccionada === 'Pagos y recaudos'"
       title="Links y pagos"
-      (click)="seleccionarOpcion('Pagos y recaudos')"
+      (click)="seleccionarOpcion('Pagos y recaudos'); $event.preventDefault()"
     >
       <img
         src="imagenes/Sildedar/Pagos-recaudo.png"

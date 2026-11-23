@@ -76,6 +76,8 @@ export class DistribucionCargasComponent implements OnInit, OnDestroy {
   // Valores del formulario (vista previa)
   metodo: Metodo = 'menor-ocupacion';
   umbralSaturacion = 85;
+  capacidadForm: number | null = null;   // arranca con la capacidad que tiene el servidor
+  capacidadEditada = false;
   redistribuir = true;
 
   // Datos del backend
@@ -92,6 +94,11 @@ export class DistribucionCargasComponent implements OnInit, OnDestroy {
 
   get ayudaMetodo(): string {
     return this.metodos.find(m => m.valor === this.metodo)?.ayuda ?? '';
+  }
+
+  get capacidadValida(): boolean {
+    const c = this.capacidadForm;
+    return c === null || (Number.isInteger(c) && c >= 1);
   }
 
   get umbralValido(): boolean {
@@ -121,6 +128,8 @@ export class DistribucionCargasComponent implements OnInit, OnDestroy {
         const temporal = filas.find(f => f.agenteTemporal) ?? null;
 
         this.capacidadGeneral = this.calcularCapacidadGeneral(humanos);
+        // Solo se llena con el dato del servidor si la persona no la ha cambiado
+        if (!this.capacidadEditada) this.capacidadForm = this.capacidadGeneral;
         this.cola = cola?.items ?? [];
         this.totalCola = cola?.total ?? temporal?.activeCases ?? 0;
         this.kpis = this.armarKpis(temporal, humanos);

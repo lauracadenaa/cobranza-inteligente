@@ -66,7 +66,7 @@
                   [attr.aria-label]="'Activar o suspender a ' + u.nombre"
                   [class.on]="u.estado === 'ACTIVE'"
                   [disabled]="procesandoId === u.id"
-                  (click)="alternarEstado(u)">
+                  (click)="u.estado === 'ACTIVE' ? pedirEliminar(u) : pedirActivar(u)">
                   <span></span>
                 </button>
                 <span class="estado-texto">{{ textoEstado(u.estado) }}</span>
@@ -76,11 +76,12 @@
             <td class="col-acciones">
               <div class="menu-acciones">
                 <button type="button" class="btn-menu" title="Acciones"
+                  [class.abierto]="menuAbiertoId === u.id"
                   [attr.aria-expanded]="menuAbiertoId === u.id"
-                  [attr.aria-label]="'Acciones de ' + u.nombre"
+                  [attr.aria-label]="(menuAbiertoId === u.id ? 'Cerrar acciones de ' : 'Acciones de ') + u.nombre"
                   [disabled]="procesandoId === u.id"
                   (click)="alternarMenu(u, $event)">
-                  <i class="bi bi-three-dots-vertical" aria-hidden="true"></i>
+                  <i class="bi" [class.bi-three-dots-vertical]="menuAbiertoId !== u.id" [class.bi-x-lg]="menuAbiertoId === u.id" aria-hidden="true"></i>
                 </button>
 
                 @if (menuAbiertoId === u.id) {
@@ -89,7 +90,7 @@
                       <i class="bi bi-person-gear" aria-hidden="true"></i>
                       Editar usuario
                     </button>
-                    <button type="button" role="menuitem" (click)="cerrarMenu(); resetearPassword(u)">
+                    <button type="button" role="menuitem" (click)="cerrarMenu(); pedirRestablecer(u)">
                       <i class="bi bi-arrow-counterclockwise" aria-hidden="true"></i>
                       Restablecer acceso
                     </button>
@@ -97,6 +98,11 @@
                       <button type="button" role="menuitem" class="peligro" (click)="cerrarMenu(); pedirEliminar(u)">
                         <i class="bi bi-person-x" aria-hidden="true"></i>
                         Desactivar usuario
+                      </button>
+                    } @else {
+                      <button type="button" role="menuitem" (click)="cerrarMenu(); pedirActivar(u)">
+                        <i class="bi bi-person-check" aria-hidden="true"></i>
+                        Activar usuario
                       </button>
                     }
                   </div>
@@ -117,16 +123,29 @@
 
 </section>
 
-<!-- VENTANA: CREAR / EDITAR -->
+<!-- VENTANA: CREAR / EDITAR (diseño Figma) -->
 @if (modalFormularioAbierto) {
   <div class="fondo" (click)="cerrarFormulario()">
-    <form class="modal" (click)="$event.stopPropagation()" (ngSubmit)="guardarUsuario()">
+    <form class="modal modal-form" role="dialog" aria-modal="true" aria-labelledby="titulo-form-usuario"
+      (click)="$event.stopPropagation()" (ngSubmit)="guardarUsuario()">
 
-      <h3>{{ usuarioEnEdicion ? 'Editar usuario' : 'Crear usuario' }}</h3>
+      <div class="modal-cabecera">
+        <span class="modal-icono azul" aria-hidden="true">
+          <i class="bi" [class.bi-person-plus]="!usuarioEnEdicion" [class.bi-person-gear]="!!usuarioEnEdicion"></i>
+        </span>
+        <div>
+          <h3 id="titulo-form-usuario">{{ usuarioEnEdicion ? 'Editar usuario' : 'Nuevo Usuario' }}</h3>
+          <p>{{ usuarioEnEdicion ? 'Actualiza los datos y el acceso del usuario' : 'Ingresa los datos y configura el acceso' }}</p>
+        </div>
+      </div>
+
+      <button type="button" class="modal-cerrar" aria-label="Cerrar" [disabled]="guardando" (click)="cerrarFormulario()">
+        <i class="bi bi-x-lg" aria-hidden="true"></i>
+      </button>
 
       <label>
         Nombre completo
-        <input name="nombre" [(ngModel)]="formulario.nombre" autocomplete="off"
+        <input name="nombre" [(ngModel)]="formulario.nombre" autocomplete="off" placeholder="Andrea Pérez"
           [disabled]="!!usuarioEnEdicion" />
         @if (usuarioEnEdicion) {
           <small class="nota">El nombre no se puede cambiar. Si hace falta, solicítalo a soporte.</small>
@@ -134,37 +153,52 @@
       </label>
 
       <label>
-        Correo
-        <input name="correo" type="email" [(ngModel)]="formulario.correo" autocomplete="off" />
+        Correo corporativo
+        <input name="correo" type="email" [(ngModel)]="formulario.correo" autocomplete="off" placeholder="nombre@empresa.com" />
       </label>
 
       <label>
         Nombre de usuario
-        <input name="usuario" [(ngModel)]="formulario.usuario" autocomplete="off"
+        <input name="usuario" [(ngModel)]="formulario.usuario" autocomplete="off" placeholder="Usuario123"
           [disabled]="!!usuarioEnEdicion" />
         @if (!usuarioEnEdicion) {
-          <small class="nota">Entre 6 y 20 caracteres. La contraseña temporal la genera el sistema.</small>
+          <small class="nota">Entre 6 y 20 caracteres.</small>
         }
       </label>
 
-      <label>
+      <h4 class="modal-seccion">Configuración de acceso</h4>
+
+      <label class="label-suave">
         Rol
-        <select name="rol" [(ngModel)]="formulario.rolId">
-          <option [ngValue]="null" disabled>Selecciona un rol</option>
-          @for (r of roles; track r.id) {
-            <option [ngValue]="r.id">{{ nombreRol(r.name) }}</option>
-          }
-        </select>
+        <span class="select-caja">
+          <select name="rol" [(ngModel)]="formulario.rolId">
+            <option [ngValue]="null" disabled>Selecciona un rol</option>
+            @for (r of roles; track r.id) {
+              <option [ngValue]="r.id">{{ nombreRol(r.name) }}</option>
+            }
+          </select>
+          <i class="bi bi-chevron-down" aria-hidden="true"></i>
+        </span>
       </label>
+
+      @if (!usuarioEnEdicion) {
+        <div class="info-clave">
+          <span class="info-clave-icono" aria-hidden="true"><i class="bi bi-shield-check"></i></span>
+          <div>
+            <strong>Contraseña temporal</strong>
+            <p>El sistema generará una contraseña temporal y te la mostrará al crear el usuario para que se la compartas. El usuario deberá cambiarla al iniciar sesión.</p>
+          </div>
+        </div>
+      }
 
       @if (errorFormulario) {
         <p class="error">{{ errorFormulario }}</p>
       }
 
       <div class="modal-botones">
-        <button type="button" class="btn-secundario" [disabled]="guardando" (click)="cerrarFormulario()">Cancelar</button>
-        <button type="submit" class="btn-primario" [disabled]="guardando">
-          {{ guardando ? 'Guardando...' : 'Guardar' }}
+        <button type="button" class="btn-contorno" [disabled]="guardando" (click)="cerrarFormulario()">Cancelar</button>
+        <button type="submit" class="btn-azul" [disabled]="guardando">
+          {{ guardando ? 'Guardando...' : (usuarioEnEdicion ? 'Guardar cambios' : 'Crear usuario') }}
         </button>
       </div>
 
@@ -172,44 +206,112 @@
   </div>
 }
 
-<!-- VENTANA: CONFIRMAR ELIMINACIÓN -->
-@if (usuarioAEliminar) {
-  <div class="fondo" (click)="cancelarEliminar()">
-    <div class="modal" (click)="$event.stopPropagation()">
-      <h3>¿Desactivar usuario?</h3>
+<!-- VENTANA: RESTABLECER ACCESO (diseño Figma) -->
+@if (usuarioARestablecer) {
+  <div class="fondo" (click)="cancelarRestablecer()">
+    <div class="modal modal-aviso" role="dialog" aria-modal="true" aria-labelledby="titulo-restablecer"
+      (click)="$event.stopPropagation()">
+
+      <button type="button" class="modal-cerrar" aria-label="Cerrar" [disabled]="procesandoId !== null" (click)="cancelarRestablecer()">
+        <i class="bi bi-x-lg" aria-hidden="true"></i>
+      </button>
+
+      <span class="modal-icono amarillo" aria-hidden="true"><i class="bi bi-exclamation-triangle"></i></span>
+
+      <h3 id="titulo-restablecer">Restablecer acceso</h3>
       <p>
-        <strong>{{ usuarioAEliminar.nombre }}</strong> quedará inactivo y no podrá iniciar sesión.
-        Seguirá en la lista y podrás volver a activarlo con el interruptor.
+        Se generará una nueva contraseña temporal para
+        <strong>{{ usuarioARestablecer.nombre }}</strong>. La contraseña actual dejará de funcionar
       </p>
-      <div class="modal-botones">
-        <button type="button" class="btn-secundario" [disabled]="guardando" (click)="cancelarEliminar()">Cancelar</button>
-        <button type="button" class="btn-peligro" [disabled]="guardando" (click)="confirmarEliminar()">
-          {{ guardando ? 'Desactivando...' : 'Desactivar' }}
+
+      <div class="modal-botones izquierda">
+        <button type="button" class="btn-contorno" [disabled]="procesandoId !== null" (click)="cancelarRestablecer()">Cancelar</button>
+        <button type="button" class="btn-naranja" [disabled]="procesandoId !== null" (click)="confirmarRestablecer()">
+          {{ procesandoId !== null ? 'Restableciendo...' : 'Restablecer acceso' }}
         </button>
       </div>
     </div>
   </div>
 }
 
-<!-- VENTANA: CONTRASEÑA TEMPORAL -->
+<!-- VENTANA: CONFIRMAR DESACTIVACIÓN (diseño Figma) -->
+@if (usuarioAEliminar) {
+  <div class="fondo" (click)="cancelarEliminar()">
+    <div class="modal modal-aviso" role="dialog" aria-modal="true" aria-labelledby="titulo-desactivar"
+      (click)="$event.stopPropagation()">
+
+      <button type="button" class="modal-cerrar" aria-label="Cerrar" [disabled]="guardando" (click)="cancelarEliminar()">
+        <i class="bi bi-x-lg" aria-hidden="true"></i>
+      </button>
+
+      <span class="modal-icono rojo" aria-hidden="true"><i class="bi bi-person-x"></i></span>
+
+      <h3 id="titulo-desactivar">¿Confirmas la desactivación del usuario?</h3>
+      <p>
+        <strong>{{ usuarioAEliminar.nombre }}</strong> no podrá ingresar a la plataforma.
+        Esta acción no elimina su información ni el historial de gestiones
+      </p>
+
+      <div class="modal-botones izquierda">
+        <button type="button" class="btn-rojo" [disabled]="guardando" (click)="confirmarEliminar()">
+          {{ guardando ? 'Desactivando...' : 'Desactivar usuario' }}
+        </button>
+        <button type="button" class="btn-contorno" [disabled]="guardando" (click)="cancelarEliminar()">Mantener activo</button>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- VENTANA: CONFIRMAR ACTIVACIÓN (diseño Figma) -->
+@if (usuarioAActivar) {
+  <div class="fondo" (click)="cancelarActivar()">
+    <div class="modal modal-aviso" role="dialog" aria-modal="true" aria-labelledby="titulo-activar"
+      (click)="$event.stopPropagation()">
+
+      <button type="button" class="modal-cerrar" aria-label="Cerrar" [disabled]="procesandoId !== null" (click)="cancelarActivar()">
+        <i class="bi bi-x-lg" aria-hidden="true"></i>
+      </button>
+
+      <span class="modal-icono verde" aria-hidden="true"><i class="bi bi-person-check"></i></span>
+
+      <h3 id="titulo-activar">¿Confirmas la activación del usuario?</h3>
+      <p>
+        El usuario <strong>{{ usuarioAActivar.nombre }}</strong> recuperará el acceso a la plataforma
+        según el rol y los permisos asignados
+      </p>
+
+      <div class="modal-botones izquierda">
+        <button type="button" class="btn-contorno" [disabled]="procesandoId !== null" (click)="cancelarActivar()">Mantener inactivo</button>
+        <button type="button" class="btn-azul" [disabled]="procesandoId !== null" (click)="confirmarActivar()">
+          {{ procesandoId !== null ? 'Activando...' : 'Activar usuario' }}
+        </button>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- VENTANA: CONTRASEÑA TEMPORAL (mismo estilo) -->
 @if (claveTemporal) {
   <div class="fondo">
-    <div class="modal" role="dialog" aria-modal="true">
-      <h3>{{ claveTemporal.titulo }}</h3>
+    <div class="modal modal-aviso" role="dialog" aria-modal="true" aria-labelledby="titulo-clave">
+
+      <span class="modal-icono verde" aria-hidden="true"><i class="bi bi-shield-check"></i></span>
+
+      <h3 id="titulo-clave">{{ claveTemporal.titulo }}</h3>
       <p>
         Contraseña temporal para <strong>{{ claveTemporal.usuario }}</strong>.
-        El usuario deberá cambiarla al iniciar sesión por primera vez.
+        El usuario deberá cambiarla al iniciar sesión.
       </p>
       <div class="clave">
         <code>{{ claveTemporal.clave }}</code>
-        <button type="button" class="btn-secundario" (click)="copiarClave()">
+        <button type="button" class="btn-contorno btn-chico" (click)="copiarClave()">
           <i class="bi" [class.bi-clipboard]="!claveCopiada" [class.bi-check2]="claveCopiada"></i>
           {{ claveCopiada ? 'Copiada' : 'Copiar' }}
         </button>
       </div>
       <small class="nota">Guárdala ahora: por seguridad no se volverá a mostrar.</small>
-      <div class="modal-botones">
-        <button type="button" class="btn-primario" (click)="cerrarClave()">Entendido</button>
+      <div class="modal-botones izquierda">
+        <button type="button" class="btn-azul" (click)="cerrarClave()">Entendido</button>
       </div>
     </div>
   </div>

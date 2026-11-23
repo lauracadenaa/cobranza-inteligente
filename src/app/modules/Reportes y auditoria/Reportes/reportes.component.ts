@@ -1,4 +1,4 @@
-import { Component, OnDestroy, ChangeDetectorRef, inject } from '@angular/core';
+import { Component, OnDestroy, ChangeDetectorRef, ElementRef, ViewChild, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Subscription, timer, switchMap, takeWhile, last } from 'rxjs';
@@ -83,7 +83,7 @@ export class ReportesComponent implements OnDestroy {
 
   // ===== Ventana "Generar reporte" =====
   reporteSeleccionado: TarjetaReporte | null = null;
-  formato: FormatoReporte = 'EXCEL';
+  formato: FormatoReporte | null = null;
   desde = '';
   hasta = '';
 
@@ -94,14 +94,11 @@ export class ReportesComponent implements OnDestroy {
   private suscripcion?: Subscription;
 
   abrir(reporte: TarjetaReporte): void {
-    const hoy = new Date();
-    const haceUnMes = new Date();
-    haceUnMes.setMonth(hoy.getMonth() - 1);
-
     this.reporteSeleccionado = reporte;
-    this.formato = 'EXCEL';
-    this.desde = this.aTextoFecha(haceUnMes);
-    this.hasta = this.aTextoFecha(hoy);
+    // Como en Figma: empieza vacío y el botón se habilita al elegir fechas y formato
+    this.formato = null;
+    this.desde = '';
+    this.hasta = '';
     this.estado = 'formulario';
     this.mensajeError = '';
   }
@@ -109,6 +106,90 @@ export class ReportesComponent implements OnDestroy {
   cerrar(): void {
     this.suscripcion?.unsubscribe();
     this.reporteSeleccionado = null;
+    this.calendarioAbierto = false;
+  }
+
+  // ==================================================
+  // CALENDARIO DE RANGO (diseño Figma)
+  // Primer clic = Desde, segundo clic = Hasta.
+  // ==================================================
+
+  readonly diasSemana = ['L', 'M', 'X', 'J', 'V', 'S', 'D'];
+  calendarioAbierto = false;
+  hoyTexto = '';
+  mesesCalendario: { clave: string; titulo: string; dias: ({ fecha: string; numero: number } | null)[] }[] = [];
+
+  @ViewChild('calendario') private calendarioRef?: ElementRef<HTMLElement>;
+
+  alternarCalendario(): void {
+    this.calendarioAbierto = !this.calendarioAbierto;
+    if (!this.calendarioAbierto) return;
+
+    this.hoyTexto = this.aTextoFecha(new Date());
+    this.mesesCalendario = this.construirMeses(13);
+
+    // Lleva la vista al mes de la fecha "Desde" (o al mes actual)
+    setTimeout(() => {
+      const clave = (this.desde || this.hoyTexto).substring(0, 7);
+      const caja = this.calendarioRef?.nativeElement;
+      const mes = caja?.querySelector<HTMLElement>(`[data-mes="${clave}"]`);
+      if (caja && mes) caja.scrollTop = mes.offsetTop;
+    });
+  }
+
+  elegirDia(fecha: string): void {
+    if (fecha > this.hoyTexto) return;
+
+    // Empieza un rango nuevo
+    if (!this.desde || this.hasta) {
+      this.desde = fecha;
+      this.hasta = '';
+      return;
+    }
+
+    // Segundo clic: si es anterior, se invierten
+    if (fecha < this.desde) {
+      this.hasta = this.desde;
+      this.desde = fecha;
+    } else {
+      this.hasta = fecha;
+    }
+    this.calendarioAbierto = false;
+  }
+
+  enRango(fecha: string): boolean {
+    return !!this.desde && !!this.hasta && fecha > this.desde && fecha < this.hasta;
+  }
+
+  textoFecha(fecha: string): string {
+    if (!fecha) return 'DD/MM/AAAA';
+    const [a, m, d] = fecha.split('-');
+    return `${d}/${m}/${a}`;
+  }
+
+  private construirMeses(cantidad: number) {
+    const nombres = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio',
+      'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+    const hoy = new Date();
+    const meses = [];
+
+    for (let i = cantidad - 1; i >= 0; i--) {
+      const primero = new Date(hoy.getFullYear(), hoy.getMonth() - i, 1);
+      const totalDias = new Date(primero.getFullYear(), primero.getMonth() + 1, 0).getDate();
+      const huecos = (primero.getDay() + 6) % 7; // la semana empieza en lunes
+
+      const dias: ({ fecha: string; numero: number } | null)[] = Array(huecos).fill(null);
+      for (let d = 1; d <= totalDias; d++) {
+        dias.push({ fecha: this.aTextoFecha(new Date(primero.getFullYear(), primero.getMonth(), d)), numero: d });
+      }
+
+      meses.push({
+        clave: this.aTextoFecha(primero).substring(0, 7),
+        titulo: `${nombres[primero.getMonth()]} ${primero.getFullYear()}`,
+        dias
+      });
+    }
+    return meses;
   }
 
   get fechasValidas(): boolean {
@@ -116,7 +197,7 @@ export class ReportesComponent implements OnDestroy {
   }
 
   generar(): void {
-    if (!this.reporteSeleccionado || !this.fechasValidas) return;
+    if (!this.reporteSeleccionado || !this.fechasValidas || !this.formato) return;
 
     this.estado = 'generando';
     this.mensajeError = '';

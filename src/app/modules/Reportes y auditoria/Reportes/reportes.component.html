@@ -40,15 +40,50 @@
     <!-- 1. Formulario -->
     <ng-container *ngIf="estado === 'formulario' || estado === 'error'">
 
-      <div class="campos-fecha">
-        <label>
-          Desde
-          <input type="date" [(ngModel)]="desde" [max]="hasta">
-        </label>
-        <label>
-          Hasta
-          <input type="date" [(ngModel)]="hasta" [min]="desde">
-        </label>
+      <!-- RANGO DE FECHAS (calendario como en Figma) -->
+      <span class="rango-titulo">Seleccionar rango de fechas</span>
+
+      <div class="rango-fechas">
+        <div class="campos-fecha">
+          <div class="campo-fecha">
+            <span>Desde</span>
+            <button type="button" class="caja-fecha" [class.activa]="calendarioAbierto && !hasta"
+              [attr.aria-expanded]="calendarioAbierto" (click)="alternarCalendario()">
+              <span [class.vacia]="!desde">{{ textoFecha(desde) }}</span>
+              <i class="bi bi-calendar3" aria-hidden="true"></i>
+            </button>
+          </div>
+          <div class="campo-fecha">
+            <span>Hasta</span>
+            <button type="button" class="caja-fecha" [class.activa]="calendarioAbierto && !!desde && !hasta"
+              [attr.aria-expanded]="calendarioAbierto" (click)="alternarCalendario()">
+              <span [class.vacia]="!hasta">{{ textoFecha(hasta) }}</span>
+              <i class="bi bi-calendar3" aria-hidden="true"></i>
+            </button>
+          </div>
+        </div>
+
+        <div class="calendario" *ngIf="calendarioAbierto" #calendario role="dialog" aria-label="Calendario">
+          <section class="cal-mes" *ngFor="let mes of mesesCalendario" [attr.data-mes]="mes.clave">
+            <h4>{{ mes.titulo }}</h4>
+            <div class="cal-semana">
+              <span *ngFor="let d of diasSemana">{{ d }}</span>
+            </div>
+            <div class="cal-dias">
+              <ng-container *ngFor="let dia of mes.dias">
+                <span *ngIf="!dia" class="cal-vacio"></span>
+                <button *ngIf="dia" type="button" class="cal-dia"
+                  [disabled]="dia.fecha > hoyTexto"
+                  [class.extremo]="dia.fecha === desde || dia.fecha === hasta"
+                  [class.en-rango]="enRango(dia.fecha)"
+                  [class.hoy]="dia.fecha === hoyTexto"
+                  (click)="elegirDia(dia.fecha)">
+                  {{ dia.numero }}
+                </button>
+              </ng-container>
+            </div>
+          </section>
+        </div>
       </div>
 
       <span class="campo-titulo">Formato</span>
@@ -66,13 +101,10 @@
         {{ mensajeError }}
       </p>
 
-      <div class="modal-acciones">
-        <button type="button" class="btn-secundario" (click)="cerrar()">Cancelar</button>
-        <button type="button" class="btn-primario" [disabled]="!fechasValidas" (click)="generar()">
-          <i class="bi bi-download" aria-hidden="true"></i>
-          Generar y descargar
-        </button>
-      </div>
+      <button type="button" class="btn-generar-reporte" [disabled]="!fechasValidas || !formato" (click)="generar()">
+        <i class="bi bi-file-earmark-arrow-down" aria-hidden="true"></i>
+        Generar reporte
+      </button>
 
     </ng-container>
 

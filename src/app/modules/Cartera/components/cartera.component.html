@@ -34,8 +34,8 @@
       <!-- Período del análisis (como en Figma) -->
       <app-selector-periodo
         *ngIf="pestanaActiva === 'Análisis de cartera'"
-        [tipoInicial]="periodoAnalisis?.tipo ?? '12m'"
-        (cambio)="periodoAnalisis = $event">
+        [periodoInicial]="periodoAnalisis"
+        (cambio)="cambiarPeriodo($event)">
       </app-selector-periodo>
 
     </app-cartera-tabs>

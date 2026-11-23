@@ -195,6 +195,24 @@ export class UsuariosAdminComponent implements OnInit, OnDestroy {
   // ACTIVAR / SUSPENDER
   // ==================================================
 
+  // Ventana para confirmar la activación (al prender el interruptor)
+  usuarioAActivar: UsuarioAdmin | null = null;
+
+  pedirActivar(usuario: UsuarioAdmin): void {
+    this.usuarioAActivar = usuario;
+  }
+
+  cancelarActivar(): void {
+    if (this.procesandoId !== null) return;
+    this.usuarioAActivar = null;
+  }
+
+  confirmarActivar(): void {
+    const usuario = this.usuarioAActivar;
+    if (!usuario) return;
+    this.alternarEstado(usuario);
+  }
+
   alternarEstado(usuario: UsuarioAdmin): void {
     if (this.procesandoId !== null) return;
     this.procesandoId = usuario.id;
@@ -204,10 +222,12 @@ export class UsuariosAdminComponent implements OnInit, OnDestroy {
         // El backend pasa de Activo a Suspendido, o de cualquier otro estado a Activo
         usuario.estado = usuario.estado === 'ACTIVE' ? 'SUSPENDED' : 'ACTIVE';
         this.procesandoId = null;
+        this.usuarioAActivar = null;
         this.mostrarMensaje(`${usuario.nombre} quedó ${this.textoEstado(usuario.estado).toLowerCase()}.`);
       },
       error: (error: HttpErrorResponse) => {
         this.procesandoId = null;
+        this.usuarioAActivar = null;
         this.mostrarMensaje(this.textoError(error, 'No se pudo cambiar el estado.'));
       }
     });
@@ -347,6 +367,24 @@ export class UsuariosAdminComponent implements OnInit, OnDestroy {
   // RESETEAR CONTRASEÑA
   // ==================================================
 
+  // Ventana para confirmar "Restablecer acceso"
+  usuarioARestablecer: UsuarioAdmin | null = null;
+
+  pedirRestablecer(usuario: UsuarioAdmin): void {
+    this.usuarioARestablecer = usuario;
+  }
+
+  cancelarRestablecer(): void {
+    if (this.procesandoId !== null) return;
+    this.usuarioARestablecer = null;
+  }
+
+  confirmarRestablecer(): void {
+    const usuario = this.usuarioARestablecer;
+    if (!usuario) return;
+    this.resetearPassword(usuario);
+  }
+
   resetearPassword(usuario: UsuarioAdmin): void {
     if (this.procesandoId !== null) return;
     this.procesandoId = usuario.id;
@@ -354,10 +392,12 @@ export class UsuariosAdminComponent implements OnInit, OnDestroy {
     this.servicio.resetearPassword(usuario.id).subscribe({
       next: respuesta => {
         this.procesandoId = null;
+        this.usuarioARestablecer = null;
         this.mostrarClave('Contraseña restablecida', respuesta.username, respuesta.temporaryPassword);
       },
       error: (error: HttpErrorResponse) => {
         this.procesandoId = null;
+        this.usuarioARestablecer = null;
         this.mostrarMensaje(this.textoError(error, 'No se pudo restablecer la contraseña.'));
       }
     });
@@ -455,8 +495,13 @@ export class UsuariosAdminComponent implements OnInit, OnDestroy {
     return porDefecto;
   }
 
+  private destruido = false;
+
+  // Redibuja en el momento (sin esperar a que se mueva el mouse)
   private refrescarVista(): void {
+    if (this.destruido) return;
     this.cdr.markForCheck();
+    this.cdr.detectChanges();
   }
 
   private mostrarMensaje(texto: string): void {
@@ -472,6 +517,7 @@ export class UsuariosAdminComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
+    this.destruido = true;
     if (this.temporizadorMensaje) {
       clearTimeout(this.temporizadorMensaje);
     }

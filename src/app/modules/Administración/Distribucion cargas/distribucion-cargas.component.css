@@ -89,7 +89,9 @@
 }
 
 .campo-sufijo input {
-  width: 44px;
+  flex: 1;
+  min-width: 0;
+  height: 100%;
   border: none;
   outline: none;
   background: transparent;

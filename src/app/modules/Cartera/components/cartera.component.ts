@@ -12,6 +12,8 @@ import { AnalisisCarteraComponent } from './Analisis-cartera/analisis-cartera.co
 import { CarteraService } from '../../../service/cartera.service';
 import { PeriodoSeleccionado, SelectorPeriodoComponent } from '../../../components/selector-periodo/selector-periodo.component';
 
+const CLAVE_PERIODO = 'cartera.periodoAnalisis';
+
 @Component({
   selector: 'app-cartera',
   standalone: true,
@@ -35,8 +37,31 @@ export class CarteraComponent {
 
   pestanaActiva: string = 'Integración de cartera';
 
-  // Periodo elegido en Análisis de cartera (null = últimos 12 meses)
-  periodoAnalisis: PeriodoSeleccionado | null = null;
+  // Periodo elegido en Análisis de cartera (null = últimos 12 meses).
+  // Se guarda en el navegador (localStorage) para que siga igual al cambiar de pestaña
+  // de la app o del navegador, irse a otra página, recargar o cerrar el navegador.
+  periodoAnalisis: PeriodoSeleccionado | null = this.leerPeriodoGuardado();
+
+  cambiarPeriodo(periodo: PeriodoSeleccionado): void {
+    this.periodoAnalisis = periodo;
+    try {
+      localStorage.setItem(CLAVE_PERIODO, JSON.stringify(periodo));
+    } catch { /* si el navegador no deja guardar, solo se pierde al salir */ }
+  }
+
+  private leerPeriodoGuardado(): PeriodoSeleccionado | null {
+    try {
+      const texto = localStorage.getItem(CLAVE_PERIODO);
+      if (!texto) return null;
+      const p = JSON.parse(texto);
+      const desde = new Date(p.desde);
+      const hasta = new Date(p.hasta);
+      if (!p.tipo || isNaN(desde.getTime()) || isNaN(hasta.getTime())) return null;
+      return { tipo: p.tipo, desde, hasta, etiqueta: p.etiqueta };
+    } catch {
+      return null;
+    }
+  }
 
   seleccionarPestana(nombre: string): void {
     this.pestanaActiva = nombre;

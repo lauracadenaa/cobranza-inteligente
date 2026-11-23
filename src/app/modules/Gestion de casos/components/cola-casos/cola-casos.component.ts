@@ -265,6 +265,12 @@ motivoDesborde = 'Desborde IA';
   // INICIALIZACIÓN
   // =========================================
 
+  // El número de caso trae pegada la obligación ("...-OBL-123"); se quita
+  // porque la obligación ya tiene su propia columna.
+  textoCaso(id: string | null | undefined): string {
+    return String(id ?? '').replace(/-OBL-.*$/i, '');
+  }
+
   ngOnInit(): void {
 
     this.cargarCasosBackend();

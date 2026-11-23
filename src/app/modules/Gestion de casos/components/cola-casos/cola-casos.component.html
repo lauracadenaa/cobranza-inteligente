@@ -310,9 +310,9 @@
               <!-- CASO -->
               <td
                 class="case-id-cell"
-                [attr.title]="caso.id">
+                [attr.title]="textoCaso(caso.id)">
 
-                <span>{{ caso.id }}</span>
+                <span>{{ textoCaso(caso.id) }}</span>
 
               </td>
 
@@ -607,7 +607,7 @@
     <!-- IDENTIFICACIÓN -->
     <div class="summary-case-heading">
 
-      <strong [attr.title]="caso.id">{{ caso.id }}</strong>
+      <strong [attr.title]="textoCaso(caso.id)">{{ textoCaso(caso.id) }}</strong>
 
       <span
         class="summary-status"

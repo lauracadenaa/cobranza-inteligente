@@ -242,3 +242,31 @@
     width: min(410px, calc(100vw - 48px));
   }
 }
+
+/* ==================================================
+   MEDIDAS DEL FIGMA (botón "Últimos 12 meses")
+   32 px de alto, relleno 6 / 12 px, esquinas de 12 px,
+   fondo #2563EB, ícono calendar-days de 20 px y texto 14 px Medium
+================================================== */
+
+.periodo-boton {
+  gap: 8px;
+  height: 32px;
+  padding: 6px 12px;
+  border: 1px solid #2563EB;
+  border-radius: 12px;
+  background: #2563EB;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 20px;
+}
+
+.periodo-boton:hover {
+  background: #1D4ED8;
+}
+
+.periodo-cerrar {
+  width: 32px;
+  height: 32px;
+  border-radius: 12px;
+}

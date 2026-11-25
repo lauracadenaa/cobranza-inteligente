@@ -3,7 +3,15 @@
 
   <section class="lado-izquierdo">
 
-    <img src="imagenes/Mask group.jpg" alt="Cobranza Inteligente">
+    <!-- Decoración del fondo (antes era una imagen): círculo con una cruz -->
+    <svg class="fondo-decoracion" viewBox="0 0 520 520" aria-hidden="true" focusable="false">
+      <circle cx="260" cy="260" r="235" fill="none" stroke="#3B82F6" stroke-opacity="0.09" stroke-width="44"/>
+      <circle cx="260" cy="260" r="180" fill="#1E3A6E" fill-opacity="0.35"/>
+      <g transform="rotate(-32 260 260)" stroke="#3B82F6" stroke-opacity="0.12" stroke-width="16">
+        <line x1="260" y1="20" x2="260" y2="500"/>
+        <line x1="20" y1="260" x2="500" y2="260"/>
+      </g>
+    </svg>
 
     <div class="logo">BV</div>
 
@@ -52,7 +60,7 @@
             id="mostrarPassword"
             (click)="toggleMostrarPassword('main')">
 
-            <i class="bi" [ngClass]="mostrarPasswordMain ? 'bi-eye' : 'bi-eye-slash'"></i>
+            <app-icono [nombre]="mostrarPasswordMain ? 'eye' : 'eye-off'" [tamano]="20"></app-icono>
 
           </button>
 
@@ -107,7 +115,7 @@
 
     <div class="modal-lado-izquierdo">
 
-      <div class="cuadro-recuperacion"></div>
+      <div class="cuadro-recuperacion"><app-icono nombre="rotate-ccw-key" [tamano]="39"></app-icono></div>
 
       <h2>Recuperar<br>contraseña</h2>
 
@@ -176,7 +184,7 @@
       id="cerrarModal"
       (click)="cerrarModales()">
 
-      <i class="bi bi-x-lg"></i>
+      <app-icono nombre="x" [tamano]="20"></app-icono>
 
     </button>
 
@@ -199,7 +207,7 @@
 
     <div class="modal-lado-izquierdo">
 
-      <div class="cuadro-recuperacion"></div>
+      <div class="cuadro-recuperacion"><app-icono nombre="rotate-ccw-key" [tamano]="39"></app-icono></div>
 
       <h2>Recuperar contraseña</h2>
 
@@ -289,7 +297,7 @@
 
         <p>Espera</p>
 
-        <i class="bi bi-clock"></i>
+        <app-icono nombre="clock" [tamano]="16"></app-icono>
 
         <span id="temporizador" *ngIf="tiempoRestante > 0">
           {{ tiempoFormateado }}
@@ -310,7 +318,7 @@
 
       <div id="errorOtp" class="error-otp" *ngIf="errorOtp">
 
-        <i class="bi bi-exclamation-circle"></i>
+        <app-icono nombre="circle-alert" [tamano]="16"></app-icono>
 
         <span>Código OTP incorrecto o expirado. Verifica el código e intenta nuevamente</span>
 
@@ -318,7 +326,7 @@
 
       <div id="mensajeReenvio" class="mensaje-reenvio" *ngIf="mensajeReenvio">
 
-        <img src="assets/imagenes/Vector.png" alt="Código reenviado">
+        <app-icono nombre="circle-check-big" [tamano]="18"></app-icono>
 
         <span>Código OTP enviado al correo registrado</span>
 
@@ -353,7 +361,7 @@
       id="cerrarModalSiguiente"
       (click)="cerrarModales()">
 
-      <i class="bi bi-x-lg"></i>
+      <app-icono nombre="x" [tamano]="20"></app-icono>
 
     </button>
 
@@ -376,7 +384,7 @@
 
     <div class="modal-lado-izquierdo">
 
-      <div class="cuadro-recuperacion"></div>
+      <div class="cuadro-recuperacion"><app-icono nombre="rotate-ccw-key" [tamano]="39"></app-icono></div>
 
       <h2>Recuperar contraseña</h2>
 
@@ -408,7 +416,7 @@
             id="mostrarNuevaPassword"
             (click)="toggleMostrarPassword('nueva')">
 
-            <i class="bi" [ngClass]="mostrarNuevaPassword ? 'bi-eye' : 'bi-eye-slash'"></i>
+            <app-icono [nombre]="mostrarNuevaPassword ? 'eye' : 'eye-off'" [tamano]="20"></app-icono>
 
           </button>
 
@@ -432,7 +440,7 @@
 
         <div class="requisito" [ngClass]="{'cumplido': reqMin12}">
 
-          <i class="bi" [ngClass]="reqMin12 ? 'bi-check-circle' : 'bi-x-circle'"></i>
+          <app-icono [nombre]="reqMin12 ? 'circle-check' : 'circle-x'" [tamano]="16"></app-icono>
 
           <span>Mínimo 12 caracteres</span>
 
@@ -440,7 +448,7 @@
 
         <div class="requisito" [ngClass]="{'cumplido': reqMayuscula}">
 
-          <i class="bi" [ngClass]="reqMayuscula ? 'bi-check-circle' : 'bi-x-circle'"></i>
+          <app-icono [nombre]="reqMayuscula ? 'circle-check' : 'circle-x'" [tamano]="16"></app-icono>
 
           <span>Una letra mayúscula</span>
 
@@ -448,7 +456,7 @@
 
         <div class="requisito" [ngClass]="{'cumplido': reqMinuscula}">
 
-          <i class="bi" [ngClass]="reqMinuscula ? 'bi-check-circle' : 'bi-x-circle'"></i>
+          <app-icono [nombre]="reqMinuscula ? 'circle-check' : 'circle-x'" [tamano]="16"></app-icono>
 
           <span>Una letra minúscula</span>
 
@@ -456,7 +464,7 @@
 
         <div class="requisito" [ngClass]="{'cumplido': reqNumero}">
 
-          <i class="bi" [ngClass]="reqNumero ? 'bi-check-circle' : 'bi-x-circle'"></i>
+          <app-icono [nombre]="reqNumero ? 'circle-check' : 'circle-x'" [tamano]="16"></app-icono>
 
           <span>Un número</span>
 
@@ -464,7 +472,7 @@
 
         <div class="requisito" [ngClass]="{'cumplido': reqEspecial}">
 
-          <i class="bi" [ngClass]="reqEspecial ? 'bi-check-circle' : 'bi-x-circle'"></i>
+          <app-icono [nombre]="reqEspecial ? 'circle-check' : 'circle-x'" [tamano]="16"></app-icono>
 
           <span>Un carácter especial</span>
 
@@ -493,7 +501,7 @@
             id="mostrarConfirmarPassword"
             (click)="toggleMostrarPassword('confirmar')">
 
-            <i class="bi" [ngClass]="mostrarConfirmarPassword ? 'bi-eye' : 'bi-eye-slash'"></i>
+            <app-icono [nombre]="mostrarConfirmarPassword ? 'eye' : 'eye-off'" [tamano]="20"></app-icono>
 
           </button>
 
@@ -539,7 +547,7 @@
       id="cerrarModalCambioPassword"
       (click)="cerrarModales()">
 
-      <i class="bi bi-x-lg"></i>
+      <app-icono nombre="x" [tamano]="20"></app-icono>
 
     </button>
 
@@ -563,7 +571,7 @@
 
     <div class="modal-lado-izquierdo">
 
-      <div class="cuadro-recuperacion"></div>
+      <div class="cuadro-recuperacion"><app-icono nombre="rotate-ccw-key" [tamano]="39"></app-icono></div>
 
       <h2>Actualiza tu<br>contraseña</h2>
 
@@ -599,10 +607,7 @@
             id="mostrarPasswordTemporal"
             (click)="toggleMostrarPassword('temporal')">
 
-            <i
-              class="bi"
-              [ngClass]="mostrarPasswordTemporal ? 'bi-eye' : 'bi-eye-slash'">
-            </i>
+            <app-icono [nombre]="mostrarPasswordTemporal ? 'eye' : 'eye-off'" [tamano]="20"></app-icono>
 
           </button>
 
@@ -636,10 +641,7 @@
             id="mostrarNuevaPasswordInicial"
             (click)="toggleMostrarPassword('nuevaInicial')">
 
-            <i
-              class="bi"
-              [ngClass]="mostrarNuevaPasswordInicial ? 'bi-eye' : 'bi-eye-slash'">
-            </i>
+            <app-icono [nombre]="mostrarNuevaPasswordInicial ? 'eye' : 'eye-off'" [tamano]="20"></app-icono>
 
           </button>
 
@@ -667,7 +669,7 @@
 
         <div class="requisito" [ngClass]="{'cumplido': reqMin12Inicial}">
 
-          <i class="bi" [ngClass]="reqMin12Inicial ? 'bi-check-circle' : 'bi-x-circle'"></i>
+          <app-icono [nombre]="reqMin12Inicial ? 'circle-check' : 'circle-x'" [tamano]="16"></app-icono>
 
           <span>Mínimo 12 caracteres</span>
 
@@ -675,7 +677,7 @@
 
         <div class="requisito" [ngClass]="{'cumplido': reqMayusculaInicial}">
 
-          <i class="bi" [ngClass]="reqMayusculaInicial ? 'bi-check-circle' : 'bi-x-circle'"></i>
+          <app-icono [nombre]="reqMayusculaInicial ? 'circle-check' : 'circle-x'" [tamano]="16"></app-icono>
 
           <span>Una letra mayúscula</span>
 
@@ -683,7 +685,7 @@
 
         <div class="requisito" [ngClass]="{'cumplido': reqMinusculaInicial}">
 
-          <i class="bi" [ngClass]="reqMinusculaInicial ? 'bi-check-circle' : 'bi-x-circle'"></i>
+          <app-icono [nombre]="reqMinusculaInicial ? 'circle-check' : 'circle-x'" [tamano]="16"></app-icono>
 
           <span>Una letra minúscula</span>
 
@@ -691,7 +693,7 @@
 
         <div class="requisito" [ngClass]="{'cumplido': reqNumeroInicial}">
 
-          <i class="bi" [ngClass]="reqNumeroInicial ? 'bi-check-circle' : 'bi-x-circle'"></i>
+          <app-icono [nombre]="reqNumeroInicial ? 'circle-check' : 'circle-x'" [tamano]="16"></app-icono>
 
           <span>Un número</span>
 
@@ -699,7 +701,7 @@
 
         <div class="requisito" [ngClass]="{'cumplido': reqEspecialInicial}">
 
-          <i class="bi" [ngClass]="reqEspecialInicial ? 'bi-check-circle' : 'bi-x-circle'"></i>
+          <app-icono [nombre]="reqEspecialInicial ? 'circle-check' : 'circle-x'" [tamano]="16"></app-icono>
 
           <span>Un carácter especial</span>
 
@@ -735,10 +737,7 @@
             id="mostrarConfirmarPasswordInicial"
             (click)="toggleMostrarPassword('confirmarInicial')">
 
-            <i
-              class="bi"
-              [ngClass]="mostrarConfirmarPasswordInicial ? 'bi-eye' : 'bi-eye-slash'">
-            </i>
+            <app-icono [nombre]="mostrarConfirmarPasswordInicial ? 'eye' : 'eye-off'" [tamano]="20"></app-icono>
 
           </button>
 
@@ -808,11 +807,11 @@
       class="cerrar-modal"
       (click)="cerrarModales()">
 
-      <i class="bi bi-x-lg"></i>
+      <app-icono nombre="x" [tamano]="20"></app-icono>
 
     </button>
 
-    <div class="cuadro-recuperacion"></div>
+    <div class="cuadro-recuperacion"><app-icono nombre="badge-check" [tamano]="39"></app-icono></div>
 
     <h2>Contraseña<br>actualizada</h2>
 

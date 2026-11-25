@@ -72,10 +72,12 @@ export function tiempoRelativo(fecha: string): string {
   return valor.toLocaleDateString('es-CO', { day: '2-digit', month: '2-digit', year: 'numeric' });
 }
 
+import { IconoComponent } from '../../../../shared/icono/icono.component';
+
 @Component({
   selector: 'app-cola-casos',
   standalone: true,
-  imports: [
+  imports: [IconoComponent, 
     CommonModule,
     FormsModule
   ],

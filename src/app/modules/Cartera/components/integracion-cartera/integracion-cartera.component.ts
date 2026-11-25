@@ -18,16 +18,26 @@ import { DashboardService } from '../../../../service/dashboard.service';
 import { descargarPlantillaCarga } from '../../../../shared/plantilla-carga';
 
 import {
+  ErrorCarga,
+  RevisionArchivo,
+  descargarErroresCsv,
+  revisarArchivo
+} from '../../../../shared/validador-carga';
+
+import {
   CarteraService,
   BatchUploadResponse,
   BatchHistoryItem,
+  BatchRejectedRecord,
   BatchRowError
 } from '../../../../service/cartera.service';
+
+import { IconoComponent } from '../../../../shared/icono/icono.component';
 
 @Component({
   selector: 'app-integracion-cartera',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [IconoComponent, CommonModule, FormsModule],
   templateUrl: './integracion-cartera.component.html',
   styleUrl: './integracion-cartera.component.css'
 })
@@ -456,16 +466,116 @@ export class IntegracionCarteraComponent implements OnInit, OnDestroy {
   };
 
   // =========================================
-  // ERRORES DEVUELTOS POR EL BACKEND
+  // ERRORES DEL ARCHIVO
+  // Los que se encuentran al revisarlo aquí + los que devuelve el backend
   // =========================================
 
-  erroresDemostracion: {
-    fila: number;
-    campo: string;
-    valor: string;
-    error: string;
-    codigo?: string;
-  }[] = [];
+  private revision: RevisionArchivo | null = null;
+  private erroresBackend: ErrorCarga[] = [];
+
+  erroresCarga: ErrorCarga[] = [];
+
+  get hayErrores(): boolean {
+    return this.erroresCarga.length > 0;
+  }
+
+  private actualizarErrores(): void {
+    const vistos = new Set<string>();
+    this.erroresCarga = [...(this.revision?.errores ?? []), ...this.erroresBackend]
+      .filter(e => {
+        const clave = `${e.fila}|${e.campo}|${e.error}`;
+        return !vistos.has(clave) && !!vistos.add(clave);
+      })
+      .sort((a, b) => (a.fila ?? 0) - (b.fila ?? 0));
+  }
+
+  // El backend numera los registros que guardó (1, 2, 3...); aquí se pasa a la fila del archivo
+  private filaDelArchivo(numero: number | null): number | null {
+    return numero === null ? null : this.revision?.filasValidas[numero - 1] ?? numero;
+  }
+
+  private errorDeFilaBackend(e: BatchRowError): ErrorCarga {
+    const esRegistro = !e.field || e.field === 'record';
+    return {
+      fila: esRegistro && e.errorCode ? this.filaDelArchivo(e.rowNumber) : e.rowNumber || null,
+      campo: esRegistro ? 'Fila completa' : e.field,
+      valor: e.value ?? '',
+      esperado: e.expectedValue ?? '',
+      error: e.message ?? 'Registro rechazado',
+      codigo: e.errorCode ?? ''
+    };
+  }
+
+  private errorDeRechazado(r: BatchRejectedRecord, fila: number | null): ErrorCarga {
+    return {
+      fila,
+      campo: 'Fila completa',
+      valor: r.obligationId ?? '',
+      esperado: '',
+      error: r.errorDetails || 'Registro rechazado',
+      codigo: r.errorCode ?? ''
+    };
+  }
+
+  private errorGeneral(mensaje: string): ErrorCarga {
+    return { fila: null, campo: 'Archivo', valor: '', esperado: '', error: mensaje, codigo: '' };
+  }
+
+  // Los leídos, válidos y rechazados de verdad (incluye las filas que el backend descartó)
+  private conteosReales(leidos: number, validos: number, rechazados: number, terminado: boolean) {
+    const revision = this.revision;
+    if (revision && revision.totalRegistros > 0) {
+      leidos = revision.totalRegistros;
+      if (!terminado && validos === 0) validos = leidos - revision.filasConError;
+      rechazados = Math.max(0, leidos - validos);
+    }
+    return {
+      registrosLeidos: leidos,
+      registrosValidos: validos,
+      registrosObservaciones: 0,
+      registrosRechazados: rechazados
+    };
+  }
+
+  descargarErroresResultado(): void {
+    descargarErroresCsv(this.archivoSeleccionado?.name || 'carga', this.erroresCarga);
+  }
+
+  private get numeroLoteActual(): string {
+    return this.resultadoCarga?.batchNumber || this.loteSeguimiento?.batchNumber || '';
+  }
+
+  // Guarda los errores para poder verlos después desde la tabla
+  private guardarRevisionActual(): void {
+    if (!this.numeroLoteActual) return;
+    this.carteraService.guardarRevision(
+      this.numeroLoteActual,
+      this.revision?.totalRegistros || null,
+      this.erroresCarga
+    );
+  }
+
+  // Trae los rechazados que el backend guardó (duplicados, conflictos de obligación...)
+  private traerRechazados(): void {
+    const id = this.loteIdActual;
+    const version = this.cargaVersion;
+    if (id === null) return;
+
+    this.carteraService.getRejectedRecords(id).subscribe({
+      next: lista => {
+        if (version !== this.cargaVersion || !lista?.length) return;
+        this.erroresBackend = [
+          // Los errores de fila del backend llegan completos en esta lista
+          ...this.erroresBackend.filter(e => e.campo !== 'Fila completa'),
+          ...lista.map(r => this.errorDeRechazado(r, this.filaDelArchivo(r.recordNumber)))
+        ];
+        this.actualizarErrores();
+        this.guardarRevisionActual();
+        this.changeDetectorRef.markForCheck();
+      },
+      error: error => console.error('Error consultando los registros rechazados:', error)
+    });
+  }
 
   // =========================================
   // RESULTADOS DE PROMOCIÓN
@@ -520,6 +630,17 @@ export class IntegracionCarteraComponent implements OnInit, OnDestroy {
   // INICIALIZACIÓN
   // =========================================
 
+  // Ícono (Lucide, en código) y color de cada indicador, como en el Figma
+  iconoKpi(tipo: string): { nombre: string; color: string } {
+    const iconos: Record<string, { nombre: string; color: string }> = {
+      lotes: { nombre: 'file-text', color: '#10B981' },
+      casos: { nombre: 'file-plus', color: '#3B82F6' },
+      rechazados: { nombre: 'book-x', color: '#F59E0B' },
+      fecha: { nombre: 'circle-check-big', color: '#8B5CF6' }
+    };
+    return iconos[tipo] ?? { nombre: 'file-text', color: '#64748B' };
+  }
+
   ngOnInit(): void {
     this.cargarHistorial();
 
@@ -553,6 +674,8 @@ export class IntegracionCarteraComponent implements OnInit, OnDestroy {
         this.lotes = respuesta.content.map(
           lote => this.mapearLote(lote)
         );
+
+        this.quitarLocalesRepetidas();
 
         this.totalPaginas = respuesta.totalPages;
         this.totalLotes = respuesta.totalElements;
@@ -597,6 +720,22 @@ export class IntegracionCarteraComponent implements OnInit, OnDestroy {
 
   private mapearLote(lote: BatchHistoryItem): any {
 
+    let estado = this.formatearEstadoLote(lote.status || 'Sin estado');
+    let leidos = lote.totalRecords ?? 0;
+    const validos = lote.successfulRecords ?? 0;
+    let rechazados = lote.failedRecords ?? 0;
+
+    // El backend no cuenta las filas que descartó por formato: se suman aquí
+    const leidosArchivo = this.carteraService.registrosLeidos(lote.batchNumber);
+    if (leidosArchivo !== undefined && (estado === 'Exitoso' || estado === 'Rechazado')) {
+      leidos = leidosArchivo;
+      rechazados = Math.max(0, leidos - validos);
+    }
+
+    if (estado === 'Exitoso' && rechazados > 0) {
+      estado = 'Con errores';
+    }
+
     return {
       id: lote.batchNumber || `LOT-${lote.id}`,
       batchId: lote.id,
@@ -615,12 +754,12 @@ export class IntegracionCarteraComponent implements OnInit, OnDestroy {
       fechaIso: this.diaLocal(lote.uploadedAt || lote.createdAt),
       marcaTiempo: new Date(lote.uploadedAt || lote.createdAt || 0).getTime() || 0,
 
-      leidos: lote.totalRecords ?? 0,
-      validos: lote.successfulRecords ?? 0,
-      rechazados: lote.failedRecords ?? 0,
+      leidos,
+      validos,
+      rechazados,
       casos: lote.casesCreated ?? '—',
 
-      estado: this.formatearEstadoLote(lote.status || 'Sin estado'),
+      estado,
 
       mensaje: lote.errorMessage || '',
       porcentaje: lote.progressPercent ?? 0
@@ -684,102 +823,51 @@ export class IntegracionCarteraComponent implements OnInit, OnDestroy {
   }
 
   // =========================================
-  // DESCARGAR REPORTE CSV DE ERRORES
-  // GET /integration/batches/{id}/error-report
+  // ERRORES DE UN LOTE DE LA TABLA (descargar)
   // =========================================
 
-  descargarErroresLote(
-    lote: { batchId: number; archivo: string }
-  ): void {
+  tieneErrores(lote: any): boolean {
+    return !!lote.local || lote.rechazados > 0 || lote.estado === 'Rechazado';
+  }
 
+  descargarErroresLote(lote: any): void {
     this.cerrarMenuLote();
-
-    // Carga rechazada que el backend no guardó: el CSV se arma con los errores recibidos
-    if ((lote as any)?.local) {
-      this.descargarErroresLocales(lote as any);
-      return;
-    }
-
-    if (!lote || !Number.isFinite(Number(lote.batchId))) {
-      window.alert('No se encontró el identificador del lote.');
-      return;
-    }
-
-    if (this.descargandoErrores) {
-      return;
-    }
-
+    if (this.descargandoErrores) return;
     this.descargandoErrores = true;
 
-    this.carteraService
-      .downloadBatchErrorReport(Number(lote.batchId))
-      .subscribe({
+    this.buscarErroresLote(lote, errores => {
+      this.descargandoErrores = false;
+      descargarErroresCsv(lote.archivo, errores);
+    });
+  }
 
-        next: archivo => {
+  // Primero los guardados al subir el archivo; si no hay, los que tenga el backend
+  private buscarErroresLote(lote: any, listo: (errores: ErrorCarga[]) => void): void {
 
-          this.descargandoErrores = false;
+    const guardados: ErrorCarga[] = lote.local ? lote.errores : this.carteraService.erroresGuardados(lote.id);
 
-          if (!(archivo instanceof Blob) || archivo.size === 0) {
-            window.alert(
-              'El servidor no devolvió un reporte de errores para este lote.'
-            );
-            return;
-          }
+    if (lote.local || guardados.length > 0) {
+      listo(guardados.length > 0 ? guardados : [this.errorGeneral(lote.mensaje)]);
+      return;
+    }
 
-          const url = window.URL.createObjectURL(archivo);
-          const enlace = document.createElement('a');
+    const terminar = (errores: ErrorCarga[], aviso: string) => {
+      listo(errores.length > 0 ? errores : [this.errorGeneral(lote.mensaje || aviso)]);
+      this.changeDetectorRef.markForCheck();
+    };
 
-          const nombreBase = (lote.archivo || 'lote')
-            .replace(/\.csv$/i, '')
-            .replace(/[^a-zA-Z0-9_-]/g, '_');
-
-          enlace.href = url;
-          enlace.download = `${nombreBase}_errores.csv`;
-
-          document.body.appendChild(enlace);
-          enlace.click();
-          document.body.removeChild(enlace);
-
-          window.setTimeout(() => {
-            window.URL.revokeObjectURL(url);
-          }, 1000);
-        },
-
-        error: (error: HttpErrorResponse) => {
-
-          this.descargandoErrores = false;
-
-          console.error(
-            'Error descargando reporte de errores del lote:',
-            error
-          );
-
-          if (error.status === 404) {
-            window.alert(
-              'No se encontró un reporte de errores para este lote.'
-            );
-            return;
-          }
-
-          if (error.status === 204) {
-            window.alert(
-              'Este lote no tiene registros rechazados ni errores.'
-            );
-            return;
-          }
-
-          if (error.status === 401 || error.status === 403) {
-            window.alert(
-              'No tienes autorización para descargar el reporte de este lote.'
-            );
-            return;
-          }
-
-          window.alert(
-            'No fue posible descargar el reporte de errores. Inténtalo nuevamente.'
-          );
-        }
-      });
+    this.carteraService.getRejectedRecords(Number(lote.batchId)).subscribe({
+      next: lista => terminar(
+        // Sin el archivo no se sabe la fila real: se reconocen por su obligación
+        (lista ?? []).map(r => this.errorDeRechazado(r, null)),
+        'El detalle de estos errores ya no está disponible. Vuelve a subir el archivo corregido para revisarlo.'
+      ),
+      error: (error: HttpErrorResponse) => terminar([],
+        error.status === 401 || error.status === 403
+          ? 'No tienes autorización para ver los errores de este lote.'
+          : 'No fue posible consultar los errores. Inténtalo nuevamente.'
+      )
+    });
   }
 
   // =========================================
@@ -793,11 +881,10 @@ export class IntegracionCarteraComponent implements OnInit, OnDestroy {
   ): void {
 
     // Si el backend sí creó el lote, ya aparece en el historial real
-    if (respuesta?.batchId != null) return;
+    if (respuesta?.batchId != null || this.loteSeguimiento) return;
 
     const ahora = new Date();
-    const errores = respuesta?.rowErrors ?? [];
-    const leidos = respuesta?.totalRecords ?? 0;
+    const r = this.resumenValidacion;
 
     this.carteraService.cargasRechazadasLocales = [
       {
@@ -809,56 +896,31 @@ export class IntegracionCarteraComponent implements OnInit, OnDestroy {
         fecha: this.formatearFecha(ahora.toISOString()),
         fechaIso: this.diaLocal(ahora.toISOString()),
         marcaTiempo: ahora.getTime(),
-        leidos,
-        validos: respuesta?.validRecords ?? 0,
-        rechazados: respuesta?.failedRecords ?? (errores.length > 0 ? new Set(errores.map(e => e.rowNumber)).size : leidos),
+        leidos: r.registrosLeidos,
+        validos: r.registrosValidos,
+        rechazados: r.registrosRechazados,
         casos: 0,
         estado: 'Rechazado',
         mensaje: mensaje || respuesta?.message || 'El archivo fue rechazado.',
         porcentaje: 0,
-        errores
+        errores: this.erroresCarga,
+        // Con esto se reconoce si el backend sí creó el lote, aunque no lo haya avisado
+        idPrevio: this.idsLotesPrevios.size > 0 ? Math.max(...this.idsLotesPrevios) : null
       },
       ...this.carteraService.cargasRechazadasLocales
     ];
   }
 
-  private descargarErroresLocales(lote: { archivo: string; mensaje: string; errores: BatchRowError[] }): void {
-
-    const celda = (valor: unknown) => {
-      const texto = valor === null || valor === undefined ? '' : String(valor);
-      return /[",;\n\r]/.test(texto) ? `"${texto.replace(/"/g, '""')}"` : texto;
-    };
-
-    const filas: string[] = [
-      ['Fila', 'Campo', 'Valor recibido', 'Valor esperado', 'Error', 'Código'].join(',')
-    ];
-
-    if (lote.errores?.length) {
-      lote.errores.forEach(error => filas.push([
-        error.rowNumber || '',
-        error.field,
-        error.value,
-        error.expectedValue,
-        error.message,
-        error.errorCode
-      ].map(celda).join(',')));
-    } else {
-      // Error general del archivo (por ejemplo, columnas que no coinciden)
-      filas.push(['', '', '', '', lote.mensaje, ''].map(celda).join(','));
-    }
-
-    const archivo = new Blob(['\uFEFF' + filas.join('\r\n')], { type: 'text/csv;charset=utf-8' });
-    const url = window.URL.createObjectURL(archivo);
-    const enlace = document.createElement('a');
-
-    enlace.href = url;
-    enlace.download = `${(lote.archivo || 'carga').replace(/\.csv$/i, '').replace(/[^a-zA-Z0-9_-]/g, '_')}_errores.csv`;
-
-    document.body.appendChild(enlace);
-    enlace.click();
-    document.body.removeChild(enlace);
-
-    window.setTimeout(() => window.URL.revokeObjectURL(url), 1000);
+  // Si el lote rechazado sí quedó en el backend, se deja solo ese (con sus errores)
+  private quitarLocalesRepetidas(): void {
+    this.carteraService.cargasRechazadasLocales = this.cargasLocales.filter(local => {
+      const real = local.idPrevio == null ? undefined : this.lotes.find(lote =>
+        lote.batchId > local.idPrevio && lote.archivo === local.archivo && lote.estado === 'Rechazado'
+      );
+      if (!real) return true;
+      this.carteraService.guardarRevision(real.id, null, local.errores);
+      return false;
+    });
   }
 
   // =========================================
@@ -946,9 +1008,9 @@ export class IntegracionCarteraComponent implements OnInit, OnDestroy {
 
   private actualizarKpis(lotes: BatchHistoryItem[]): void {
 
-    this.hayCargas = lotes.length > 0;
+    this.hayCargas = lotes.length > 0 || this.cargasLocales.length > 0;
 
-    if (lotes.length === 0) {
+    if (!this.hayCargas) {
       this.kpis.forEach(kpi => {
         kpi.valor = '—';
         kpi.variacion = '';
@@ -970,10 +1032,18 @@ export class IntegracionCarteraComponent implements OnInit, OnDestroy {
     const sumar = (lista: BatchHistoryItem[], campo: (l: BatchHistoryItem) => number | undefined) =>
       lista.reduce((total, l) => total + (Number(campo(l)) || 0), 0);
 
+    // Las cargas rechazadas que el backend no guardó también cuentan
+    const rechazadosLocales = (delPeriodo: (f: Date) => boolean) => this.cargasLocales
+      .filter(local => delPeriodo(new Date(local.marcaTiempo)))
+      .reduce((total, local) => total + (Number(local.rechazados) || 0), 0);
+
     const indicadores = [
       { actual: delMes.length, antes: delAnterior.length },
       { actual: sumar(delMes, l => l.casesCreated), antes: sumar(delAnterior, l => l.casesCreated) },
-      { actual: sumar(delMes, l => l.failedRecords), antes: sumar(delAnterior, l => l.failedRecords) }
+      {
+        actual: sumar(delMes, l => this.mapearLote(l).rechazados) + rechazadosLocales(esteMes),
+        antes: sumar(delAnterior, l => this.mapearLote(l).rechazados) + rechazadosLocales(mesAnterior)
+      }
     ];
 
     indicadores.forEach((dato, i) => {
@@ -1091,6 +1161,22 @@ export class IntegracionCarteraComponent implements OnInit, OnDestroy {
       (lote.progressPhase || '').toUpperCase() === 'COMPLETED';
   }
 
+  private esEstadoFallido(estado: string): boolean {
+    const valor = (estado || '').toUpperCase().replace(/[\s_-]+/g, '');
+
+    return [
+      'FAILED',
+      'FAILURE',
+      'REJECTED',
+      'RECHAZADO',
+      'RECHAZADA',
+      'ERROR',
+      'VALIDATIONFAILED',
+      'CANCELLED',
+      'CANCELED'
+    ].includes(valor);
+  }
+
   private esEstadoFinalizado(estado: string): boolean {
     const valor = (estado || '').toUpperCase().replace(/[\s_-]+/g, '');
 
@@ -1111,6 +1197,7 @@ export class IntegracionCarteraComponent implements OnInit, OnDestroy {
       'RECHAZADO',
       'RECHAZADA',
       'ERROR',
+      'VALIDATIONFAILED',
       'CANCELLED',
       'CANCELED'
     ].includes(valor);
@@ -1277,12 +1364,12 @@ export class IntegracionCarteraComponent implements OnInit, OnDestroy {
       );
     }
 
-    this.resumenValidacion = {
-      registrosLeidos: lote.totalRecords ?? 0,
-      registrosValidos: lote.successfulRecords ?? 0,
-      registrosObservaciones: 0,
-      registrosRechazados: lote.failedRecords ?? 0
-    };
+    this.resumenValidacion = this.conteosReales(
+      lote.totalRecords ?? 0,
+      lote.successfulRecords ?? 0,
+      lote.failedRecords ?? 0,
+      this.esLoteFinalizado(lote)
+    );
 
     this.errorSeguimiento = '';
   }
@@ -1515,7 +1602,7 @@ export class IntegracionCarteraComponent implements OnInit, OnDestroy {
     this.estadoResultado = '';
     this.mensajeResultado = '';
 
-    this.erroresDemostracion = [];
+    this.limpiarErrores();
 
     this.progreso = 0;
     this.progresoDisponible = false;
@@ -1525,9 +1612,12 @@ export class IntegracionCarteraComponent implements OnInit, OnDestroy {
     this.cargandoArchivo = true;
 
     const version = ++this.cargaVersion;
-    const nombreArchivo = this.archivoSeleccionado.name;
+    const archivo = this.archivoSeleccionado;
+    const padre = this.correccionDe;
 
-    this.iniciarSeguimientoLote(version);
+    this.correccionDe = null;
+    this.loteIdActual = null;
+    this.cargaFallida = false;
 
     this.cargasConfirmacion.forEach(carga => {
       carga.cantidad = 0;
@@ -1535,13 +1625,48 @@ export class IntegracionCarteraComponent implements OnInit, OnDestroy {
       carga.progreso = 0;
     });
 
-    const envio$ = this.correccionDe !== null
-      ? this.carteraService.reuploadCsv(this.correccionDe, this.archivoSeleccionado)
-      : this.carteraService.uploadCsv(this.archivoSeleccionado);
+    // Primero se revisa el archivo aquí y luego se envía
+    void revisarArchivo(archivo).catch(() => null).then(revision => {
+      if (version !== this.cargaVersion) return;
 
-    this.correccionDe = null;
-    this.loteIdActual = null;
-    this.cargaFallida = false;
+      this.revision = revision;
+      this.actualizarErrores();
+
+      // Ninguna fila se puede cargar: se rechaza sin enviarlo
+      if (revision && !revision.archivoEnvio) {
+        this.errorCarga = 'Todos los registros del archivo tienen errores. Descarga el archivo de errores, corrígelos y vuelve a cargarlo.';
+        this.estadoResultado = 'FAILED';
+        this.mensajeResultado = this.errorCarga;
+        this.terminarConFallo(archivo.name, null);
+        return;
+      }
+
+      this.enviarArchivo(revision?.archivoEnvio ?? archivo, padre, version);
+      this.changeDetectorRef.markForCheck();
+    });
+  }
+
+  private limpiarErrores(): void {
+    this.revision = null;
+    this.erroresBackend = [];
+    this.erroresCarga = [];
+    this.resumenValidacion = {
+      registrosLeidos: 0,
+      registrosValidos: 0,
+      registrosObservaciones: 0,
+      registrosRechazados: 0
+    };
+  }
+
+  private enviarArchivo(archivo: File, padre: number | null, version: number): void {
+
+    const nombreArchivo = archivo.name;
+
+    this.iniciarSeguimientoLote(version);
+
+    const envio$ = padre !== null
+      ? this.carteraService.reuploadCsv(padre, archivo)
+      : this.carteraService.uploadCsv(archivo);
 
     this.suscripcionCarga = envio$.subscribe({
 
@@ -1596,16 +1721,7 @@ export class IntegracionCarteraComponent implements OnInit, OnDestroy {
           this.estadoResultado = 'ERROR';
           this.mensajeResultado = this.errorCarga;
 
-          this.procesando = false;
-          this.cargandoArchivo = false;
-
-          this.cargaFallida = true;
-          this.pasoActual = 5;
-
-          this.registrarRechazoLocal(nombreArchivo, null, this.errorCarga);
-          this.marcarArchivoSubido();
-          this.cargarHistorial();
-          this.changeDetectorRef.detectChanges();
+          this.terminarConFallo(nombreArchivo, null);
 
           return;
         }
@@ -1640,7 +1756,8 @@ export class IntegracionCarteraComponent implements OnInit, OnDestroy {
         // Mostrar información real recibida del backend.
         this.mostrarDetalleErrorCarga(error);
 
-        if (this.hayResultadoCarga) {
+        // El lote terminó bien aunque la respuesta se haya perdido
+        if (this.hayResultadoCarga && !this.esEstadoFallido(this.loteSeguimiento?.status ?? '')) {
 
           this.procesando = false;
           this.cargandoArchivo = false;
@@ -1668,8 +1785,7 @@ export class IntegracionCarteraComponent implements OnInit, OnDestroy {
         ) {
 
           this.procesarRespuesta(respuesta);
-
-          
+          this.loteIdActual = respuesta.batchId ?? this.loteIdActual;
 
           this.errorCarga =
             respuesta.message ||
@@ -1685,23 +1801,12 @@ export class IntegracionCarteraComponent implements OnInit, OnDestroy {
           this.mensajeResultado = this.errorCarga;
         }
 
-        this.cargandoArchivo = false;
-        this.procesando = false;
-
-        this.cargaFallida = true;
-        this.pasoActual = 5;
-
-        this.registrarRechazoLocal(
-          nombreArchivo,
-          respuesta && typeof respuesta === 'object' && !(respuesta instanceof Blob) ? respuesta : null,
-          this.errorCarga
-        );
-        this.marcarArchivoSubido();
-        this.cargarHistorial();
-
         console.error('Error en la carga CSV:', error);
 
-        this.changeDetectorRef.detectChanges();
+        this.terminarConFallo(
+          nombreArchivo,
+          respuesta && typeof respuesta === 'object' && !(respuesta instanceof Blob) ? respuesta : null
+        );
       },
 
       complete: () => {
@@ -1722,19 +1827,37 @@ export class IntegracionCarteraComponent implements OnInit, OnDestroy {
         this.estadoResultado = 'ERROR';
         this.mensajeResultado = this.errorCarga;
 
-        this.cargandoArchivo = false;
-        this.procesando = false;
-
-        this.cargaFallida = true;
-        this.pasoActual = 5;
-
-        this.registrarRechazoLocal(nombreArchivo, null, this.errorCarga);
-        this.marcarArchivoSubido();
-        this.cargarHistorial();
-
-        this.changeDetectorRef.detectChanges();
+        this.terminarConFallo(nombreArchivo, null);
       }
     });
+  }
+
+  // La carga no se pudo procesar: pasa por Revisar errores y termina en Resultado
+  private terminarConFallo(nombreArchivo: string, respuesta: BatchUploadResponse | null): void {
+    this.cargandoArchivo = false;
+    this.procesando = false;
+    this.cargaFallida = true;
+    this.progreso = 100;
+    this.progresoDisponible = true;
+    // El backend no respondió con conteos: nada quedó cargado
+    if (!respuesta) {
+      this.resumenValidacion = this.conteosReales(0, 0, 0, true);
+    }
+
+    this.guardarRevisionActual();
+    if (respuesta?.batchId != null) this.traerRechazados();
+
+    this.registrarRechazoLocal(nombreArchivo, respuesta, this.errorCarga);
+    this.marcarArchivoSubido();
+    this.cargarHistorial();
+
+    clearTimeout(this.temporizadorPresentacion);
+    if (this.hayErrores) {
+      this.temporizadorPresentacion = setTimeout(() => this.avanzarPresentacion(), 600);
+    } else {
+      this.pasoActual = 5;
+    }
+    this.changeDetectorRef.markForCheck();
   }
 
   // =========================================
@@ -1836,22 +1959,37 @@ export class IntegracionCarteraComponent implements OnInit, OnDestroy {
     this.mensajeResultado =
       respuesta.message || 'El backend finalizó el procesamiento.';
 
-    this.resumenValidacion = {
-      registrosLeidos: respuesta.totalRecords ?? 0,
-      registrosValidos: respuesta.validRecords ?? 0,
-      registrosObservaciones: 0,
-      registrosRechazados: respuesta.failedRecords ?? 0
-    };
+    const terminado = this.esEstadoFinalizado(respuesta.status || '');
 
-    this.erroresDemostracion = (
-      respuesta.rowErrors || []
-    ).map((error: BatchRowError) => ({
-      fila: error.rowNumber,
-      campo: error.field,
-      valor: error.value,
-      error: error.message,
-      codigo: error.errorCode
-    }));
+    this.resumenValidacion = this.conteosReales(
+      respuesta.totalRecords ?? 0,
+      respuesta.validRecords ?? 0,
+      respuesta.failedRecords ?? 0,
+      terminado
+    );
+
+    // Si el backend aceptó todas las filas, manda lo que diga el backend
+    if (terminado && this.esEstadoExitoso(respuesta.status) &&
+        this.revision && this.resumenValidacion.registrosRechazados === 0) {
+      this.revision.errores = [];
+    }
+
+    this.erroresBackend = (respuesta.rowErrors || []).map(e => this.errorDeFilaBackend(e));
+
+    // Archivo muy grande para revisarlo aquí: al menos se muestran los motivos
+    if (!this.revision) {
+      (respuesta.errorSummary || []).forEach(motivo => this.erroresBackend.push(
+        this.errorGeneral(`${motivo.motivo}: ${this.formatearNumero(motivo.records)} registro(s)`)
+      ));
+    }
+
+    // Rechazo de todo el archivo (estructura, archivo repetido, otra carga en curso...)
+    if (this.esEstadoFallido(respuesta.status) && respuesta.message &&
+        this.erroresBackend.length === 0 && !this.revision?.errores.length) {
+      this.erroresBackend = [this.errorGeneral(respuesta.message)];
+    }
+
+    this.actualizarErrores();
 
     this.cargasConfirmacion = [
       {
@@ -2153,7 +2291,7 @@ export class IntegracionCarteraComponent implements OnInit, OnDestroy {
       registrosRechazados: 0
     };
 
-    this.erroresDemostracion = [];
+    this.limpiarErrores();
 
     this.pasoActual = 1;
   }
@@ -2220,21 +2358,41 @@ export class IntegracionCarteraComponent implements OnInit, OnDestroy {
     this.procesando = false;
     this.cargandoArchivo = false;
 
-    this.cargarHistorial();
+    // En segundo plano el lote también puede fallar: no es una carga correcta
+    const estadoFinal = this.loteSeguimiento && this.esLoteFinalizado(this.loteSeguimiento)
+      ? this.loteSeguimiento.status
+      : this.resultadoCarga?.status ?? '';
 
-    const avanzar = () => {
-      if (this.pasoActual >= 5) return;
-      this.pasoActual += 1;
-      this.changeDetectorRef.markForCheck();
-      if (this.pasoActual < 5) {
-        this.temporizadorPresentacion = setTimeout(avanzar, 1200);
+    if (this.esEstadoFallido(estadoFinal)) {
+      this.cargaFallida = true;
+      this.mensajeResultado = this.loteSeguimiento?.errorMessage || 'El lote no pudo procesarse.';
+      if (!this.hayErrores) {
+        this.erroresBackend = [this.errorGeneral(this.mensajeResultado)];
+        this.actualizarErrores();
       }
-    };
+    }
+
+    // Primero se guarda: la tabla usa estos datos
+    this.guardarRevisionActual();
+    if (this.resumenValidacion.registrosRechazados > 0) this.traerRechazados();
+    this.cargarHistorial();
 
     this.pasoActual = Math.max(this.pasoActual, 2);
     clearTimeout(this.temporizadorPresentacion);
-    this.temporizadorPresentacion = setTimeout(avanzar, 600);
+    this.temporizadorPresentacion = setTimeout(() => this.avanzarPresentacion(), 600);
     this.changeDetectorRef.markForCheck();
+  }
+
+  // Pasa de un paso al siguiente (una carga rechazada no pasa por Confirmar carga)
+  private avanzarPresentacion(): void {
+    if (this.pasoActual >= 5) return;
+
+    this.pasoActual = this.cargaFallida && this.pasoActual >= 3 ? 5 : this.pasoActual + 1;
+    this.changeDetectorRef.markForCheck();
+
+    if (this.pasoActual < 5) {
+      this.temporizadorPresentacion = setTimeout(() => this.avanzarPresentacion(), 1200);
+    }
   }
 
   // =========================================
@@ -2254,6 +2412,21 @@ export class IntegracionCarteraComponent implements OnInit, OnDestroy {
     return this.resumenValidacion.registrosLeidos ||
       this.loteSeguimiento?.totalRecords ||
       this.loteSeguimiento?.progressTotal || 0;
+  }
+
+  // Mensaje debajo del resultado
+  get mensajeFinal(): string {
+    if (this.cargaFallida) {
+      // Rechazada por errores en las filas: no lleva mensaje.
+      // Si fue por otra cosa (archivo repetido, sin conexión...), se dice el motivo.
+      if (this.erroresCarga.some(e => e.fila !== null)) return '';
+      const motivo = this.mensajeResultado || this.errorCarga || 'No fue posible procesar el archivo.';
+      return /^Procesamiento fallido:/i.test(motivo) ? '' : motivo;
+    }
+
+    return this.resumenValidacion.registrosRechazados > 0
+      ? 'Algunos registros no pudieron procesarse. Descarga el archivo de errores para corregirlos y volver a cargarlos.'
+      : 'Todos los registros fueron procesados correctamente.';
   }
 
   get tasaExito(): string {
@@ -2331,8 +2504,8 @@ export class IntegracionCarteraComponent implements OnInit, OnDestroy {
 
   // Abre el selector de archivo para subir las correcciones de este lote
   subirCorrecciones(input: HTMLInputElement): void {
-    if (this.loteIdActual === null) return;
-    this.correccionPendiente = this.loteIdActual;
+    // Sin lote en el backend se corrige subiendo el archivo de nuevo (carga normal)
+    this.correccionPendiente = this.loteIdActual ?? -1;
     input.value = '';
     input.click();
   }
@@ -2364,14 +2537,6 @@ export class IntegracionCarteraComponent implements OnInit, OnDestroy {
     if (!this.archivoSeleccionado) {
       this.correccionDe = null;
     }
-  }
-
-  descargarErroresResultado(): void {
-    if (this.loteIdActual === null) return;
-    this.descargarErroresLote({
-      batchId: this.loteIdActual,
-      archivo: this.archivoSeleccionado?.name || 'lote'
-    });
   }
 
   // =========================================
@@ -2406,6 +2571,7 @@ export class IntegracionCarteraComponent implements OnInit, OnDestroy {
         this.carteraService.cargasRechazadasLocales.filter(item => item.batchId !== lote.batchId);
       this.loteAEliminar = null;
       this.mostrarHistorialLotes = this.subioArchivo && this.lotesRecientes.length > 0;
+      this.cargarKpis();
       this.changeDetectorRef.markForCheck();
       return;
     }

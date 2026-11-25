@@ -627,3 +627,149 @@
   }
 
 }
+
+/* ==================================================
+   MEDIDAS DEL FIGMA (Navigation / Sidebar / Light)
+   Zona de 244 px: margen de 10 px y tarjeta de 234 px,
+   esquinas de 20 px y borde de 1 px #D9E3EA.
+================================================== */
+
+.sidebar {
+  position: sticky;
+  top: 10px;
+  align-self: flex-start;
+
+  width: 234px;
+  min-width: 234px;
+  height: calc(100vh - 20px);
+  margin: 10px 0 10px 10px;
+  padding: 0;
+
+  transform: none;
+  background-color: #FFFFFF;
+  border: 1px solid #D9E3EA;
+  border-radius: 20px;
+  overflow: hidden;
+}
+
+.sidebar.contraido {
+  width: 64px;
+  min-width: 64px;
+  height: calc(100vh - 20px);
+  padding: 0;
+  background-color: #FFFFFF;
+}
+
+/* Encabezado: 64 px de alto, relleno 14 / 16 px */
+.sidebar-logo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 64px;
+  margin: 0;
+  padding: 14px 16px;
+  box-sizing: border-box;
+}
+
+.sidebar.contraido .sidebar-logo {
+  justify-content: center;
+  margin: 0;
+  padding: 14px 0;
+}
+
+.logo {
+  order: 1;
+  width: auto;
+  height: auto;
+  gap: 12px;
+}
+
+/* Cuadro BV: 38 x 38 px, esquinas de 8 px */
+.logo-bv {
+  width: 38px;
+  height: 38px;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 800;
+  line-height: 24px;
+  letter-spacing: -0.32px;
+}
+
+.logo-text {
+  width: auto;
+  height: auto;
+  font-size: 17px;
+  font-weight: 800;
+  line-height: 100%;
+  color: #173042;
+}
+
+/* Botón para contraer: visible a la derecha, 36 px de alto */
+.sidebar:not(.contraido) .sidebar-toggle {
+  order: 2;
+  position: static;
+  width: 36px;
+  height: 36px;
+  opacity: 1;
+  visibility: visible;
+  border: 1px solid #D9E3EA;
+  border-radius: 8px;
+  background-color: #FFFFFF;
+  color: #64748B;
+}
+
+.sidebar:not(.contraido) .sidebar-toggle:hover {
+  background-color: #F4F7FA;
+}
+
+.sidebar.contraido .sidebar-toggle {
+  top: 14px;
+  left: 13px;
+  width: 38px;
+  height: 38px;
+  color: #10989B;
+}
+
+.toggle-icon {
+  width: auto;
+  height: auto;
+}
+
+/* Menú: relleno 16 / 10 px y 4 px entre opciones */
+.menu {
+  gap: 4px;
+  margin: 0;
+  padding: 16px 10px;
+  box-sizing: border-box;
+}
+
+.sidebar.contraido .menu {
+  width: 100%;
+  margin: 0;
+  padding: 16px 10px;
+}
+
+/* Opción: 43 px de alto, relleno 11 / 12 px, 12 px entre ícono y texto */
+.menu-item {
+  height: 43px;
+  padding: 11px 12px;
+  gap: 12px;
+  border-radius: 12px;
+  color: #64748B;
+}
+
+.menu-item.active {
+  background-color: #EAF2FF;
+  color: #2563EB;
+}
+
+.menu-item:hover {
+  background-color: #EAF2FF;
+}
+
+.menu-icon,
+.sidebar.contraido .menu-icon {
+  width: auto;
+  height: auto;
+  min-width: 0;
+}

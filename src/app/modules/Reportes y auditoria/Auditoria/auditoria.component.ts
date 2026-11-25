@@ -13,10 +13,12 @@ import {
 } from '../../../components/selector-periodo/selector-periodo.component';
 
 
+import { IconoComponent } from '../../../shared/icono/icono.component';
+
 @Component({
   selector: 'app-auditoria',
   standalone: true,
-  imports: [CommonModule, FormsModule, SelectorPeriodoComponent],
+  imports: [IconoComponent, CommonModule, FormsModule, SelectorPeriodoComponent],
   templateUrl: './auditoria.component.html',
   styleUrl: './auditoria.component.css'
 })

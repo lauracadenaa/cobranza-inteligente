@@ -13,14 +13,16 @@ interface TarjetaReporte {
   tipo: TipoReporte;
   titulo: string;
   descripcion: string;
-  icono: string;   // clase de Bootstrap Icons
+  icono: string;   // ícono Lucide (en código)
   tono: string;    // color del cuadrito del ícono
 }
+
+import { IconoComponent } from '../../../shared/icono/icono.component';
 
 @Component({
   selector: 'app-reportes',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [IconoComponent, CommonModule, FormsModule],
   templateUrl: './reportes.component.html',
   styleUrl: './reportes.component.css'
 })
@@ -34,50 +36,50 @@ export class ReportesComponent implements OnDestroy {
       tipo: 'AUDIT',
       titulo: 'Auditoria',
       descripcion: 'Trazabilidad completa de acciones, usuarios, fechas y cambios del sistema.',
-      icono: 'bi-shield-check',
+      icono: 'shield-check',
       tono: 'azul'
     },
     {
       tipo: 'RECOVERED_PORTFOLIO',
       titulo: 'Recuperación de cartera',
       descripcion: 'Consulta los valores recuperados, pagos confirmados y evolución de la recuperación durante el período seleccionado.',
-      icono: 'bi-graph-up-arrow',
+      icono: 'trending-up',
       tono: 'verde'
     },
     {
       tipo: 'UNRECOVERED_PORTFOLIO',
       titulo: 'Cartera pendiente de recuperación',
       descripcion: 'Analiza el saldo vencido pendiente según antigüedad de mora, nivel de riesgo, producto y segmento.',
-      icono: 'bi-coin',
+      icono: 'circle-dollar-sign',
       tono: 'azul'
     },
     {
       tipo: 'PAYMENT_PROPENSITY',
       titulo: 'Propensión de Pago',
       descripcion: 'Consulta el score, la propensión estimada, el nivel de confianza y las recomendaciones generadas por el Motor IA.',
-      icono: 'bi-fingerprint',
+      icono: 'brain-cog',
       tono: 'morado'
     },
     {
       tipo: 'ESCALATED_OVER_90',
       titulo: 'Casos con mora avanzada',
       descripcion: 'Consulta casos relacionados con obligaciones superiores a 90 días de mora y su estado actual de gestión.',
-      icono: 'bi-calendar2-x',
+      icono: 'calendar-clock',
       tono: 'naranja'
     },
     {
       tipo: 'CHANNEL_EFFECTIVENESS',
       titulo: 'Efectividad por Canal',
       descripcion: 'Compara contactos enviados, entregados, respondidos y convertidos por WhatsApp, SMS, email y voz.',
-      icono: 'bi-chat-square',
+      icono: 'message-square',
       tono: 'turquesa'
     },
     {
       tipo: 'PAYMENT_RECONCILIATION',
       titulo: 'Conciliación de pagos',
       descripcion: 'Consulta pagos conciliados, pendientes y con diferencias, relacionados con sus obligaciones y transacciones.',
-      icono: 'bi-bank',
-      tono: 'turquesa'
+      icono: 'scale',
+      tono: 'verde-azulado'
     }
   ];
 

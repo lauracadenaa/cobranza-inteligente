@@ -1,61 +1,70 @@
-import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
+import { Component, OnDestroy, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { forkJoin } from 'rxjs';
 
 import { SidebarComponent } from '../../../components/sidedar/sidebar.component';
 import { DashboardHeaderComponent } from '../../../components/dashboard-header/dashboard-header.component';
-import {
-  MotorIaService,
-  ModeloScoring,
-  PesosModelo,
-  UmbralBackend
-} from '../../../service/motor-ia.service';
+
+// ==================================================
+// MOTOR IA Y SCORING
+// Solo diseño (igual que en Figma). NO está conectado al backend:
+// los datos son de ejemplo y los cambios solo viven en esta pantalla.
+// (El servicio motor-ia.service.ts sigue existiendo para conectarlo después.)
+// ==================================================
 
 // Una fila de "Pesos de Variables de Scoring"
 interface VariableScoring {
-  clave: keyof PesosModelo;
+  id: number;
   nombre: string;
   peso: number; // en porcentaje (0 a 100)
+  nueva?: boolean; // agregada ahora: se le puede escribir el nombre
 }
 
 // Una fila de "Umbrales de Riesgo"
 interface UmbralRiesgo {
-  nivel: string; // CRITICO, ALTO, MEDIO, BAJO
   nombre: string;
   minimo: number;
   maximo: number;
   color: string;
 }
 
+// Lo que guarda cada versión del modelo
+interface ConfiguracionModelo {
+  variables: VariableScoring[];
+  umbrales: UmbralRiesgo[];
+}
+
 // Una fila de "Histórico de versiones"
 interface VersionModelo {
   version: string;
-  fecha: string | null;
+  fecha: Date;
   creador: string;
+  iniciales: string;
   activo: boolean;
+  configuracion: ConfiguracionModelo;
 }
 
-// Nombres y colores de cada nivel de riesgo
-const NIVELES: Record<string, { nombre: string; color: string; orden: number }> = {
-  CRITICO: { nombre: 'Crítico', color: '#991B1B', orden: 0 },
-  ALTO: { nombre: 'Alto', color: '#F97316', orden: 1 },
-  MEDIO: { nombre: 'Medio', color: '#F59E0B', orden: 2 },
-  BAJO: { nombre: 'Bajo', color: '#10B981', orden: 3 }
-};
-
-// Las 4 variables que maneja el backend
-const VARIABLES: { clave: keyof PesosModelo; nombre: string }[] = [
-  { clave: 'weightPaymentHistory', nombre: 'Historial de pago' },
-  { clave: 'weightDaysPastDue', nombre: 'Días de mora' },
-  { clave: 'weightDefaultFrequency', nombre: 'Frecuencia de incumplimiento' },
-  { clave: 'weightSeniority', nombre: 'Antigüedad del cliente' }
+// Datos de ejemplo (los mismos del Figma)
+const VARIABLES_EJEMPLO: VariableScoring[] = [
+  { id: 1, nombre: 'Historial de pago', peso: 35 },
+  { id: 2, nombre: 'Días de mora', peso: 30 },
+  { id: 3, nombre: 'Frecuencia de incumplimiento', peso: 20 },
+  { id: 4, nombre: 'Antigüedad del cliente', peso: 15 }
 ];
+
+const UMBRALES_EJEMPLO: UmbralRiesgo[] = [
+  { nombre: 'Crítico', minimo: 0, maximo: 300, color: '#991B1B' },
+  { nombre: 'Alto', minimo: 301, maximo: 500, color: '#F97316' },
+  { nombre: 'Medio', minimo: 501, maximo: 700, color: '#F59E0B' },
+  { nombre: 'Bajo', minimo: 701, maximo: 1000, color: '#10B981' }
+];
+
+import { IconoComponent } from '../../../shared/icono/icono.component';
 
 @Component({
   selector: 'app-motor-ia',
   standalone: true,
-  imports: [
+  imports: [IconoComponent, 
     CommonModule,
     FormsModule,
     SidebarComponent,
@@ -64,107 +73,51 @@ const VARIABLES: { clave: keyof PesosModelo; nombre: string }[] = [
   templateUrl: './motor-ia.component.html',
   styleUrl: './motor-ia.component.css'
 })
-export class MotorIaComponent implements OnInit {
-  private readonly motorIaService = inject(MotorIaService);
+export class MotorIaComponent implements OnDestroy {
   private readonly cdr = inject(ChangeDetectorRef);
 
   nombreModelo = 'LightGBM';
-  modelo: ModeloScoring | null = null;
 
+  versiones: VersionModelo[] = [
+    this.crearVersion('v2.4.1', new Date(2026, 8, 15, 14, 32), true),
+    this.crearVersion('v2.4.0', new Date(2026, 8, 15, 10, 5), false),
+    this.crearVersion('v2.3.9', new Date(2026, 8, 15, 8, 40), false)
+  ];
+
+  // Lo que se está editando en pantalla (copia de la versión activa)
   variables: VariableScoring[] = [];
   umbrales: UmbralRiesgo[] = [];
-  versiones: VersionModelo[] = [];
 
-  cargando = true;
-  errorCarga = '';
+  readonly campos: ('minimo' | 'maximo')[] = ['minimo', 'maximo'];
 
-  // Copia de lo que vino del backend, para saber si hay cambios
-  private copiaOriginal = '';
+  private siguienteId = 100;
 
+  porId(_: number, variable: VariableScoring): number {
+    return variable.id;
+  }
+
+  // Ventanas de confirmación
   mostrarConfirmacion = false;
-  guardando = false;
+  versionARestaurar: VersionModelo | null = null;
+
   aviso: { texto: string; tipo: 'exito' | 'error' | 'info' } | null = null;
   private temporizadorAviso?: ReturnType<typeof setTimeout>;
 
-  ngOnInit(): void {
-    this.cargarConfiguracion();
-  }
-
-  // ==================================================
-  // CARGA DE DATOS REALES
-  // ==================================================
-
-  cargarConfiguracion(): void {
-    this.cargando = true;
-    this.errorCarga = '';
-
-    this.motorIaService.obtenerModeloActivo().subscribe({
-      next: modelo => {
-        this.modelo = modelo;
-        this.variables = VARIABLES.map(v => ({
-          ...v,
-          peso: Math.round((Number(modelo[v.clave]) || 0) * 100)
-        }));
-        this.versiones = [{
-          version: modelo.modelVersion,
-          fecha: modelo.updatedAt || modelo.createdAt || null,
-          creador: 'Sistema',
-          activo: true
-        }];
-
-        this.motorIaService.obtenerUmbrales(modelo.modelVersion).subscribe({
-          next: umbrales => {
-            this.umbrales = this.convertirUmbrales(umbrales);
-            this.terminarCarga();
-          },
-          error: () => {
-            this.umbrales = [];
-            this.errorCarga = 'No fue posible cargar los umbrales de riesgo.';
-            this.terminarCarga();
-          }
-        });
-      },
-      error: () => {
-        this.errorCarga = 'No fue posible cargar la configuración del modelo.';
-        this.terminarCarga();
-      }
-    });
-  }
-
-  private terminarCarga(): void {
-    this.cargando = false;
-    this.copiaOriginal = this.fotoActual();
-    this.cdr.markForCheck();
-  }
-
-  private convertirUmbrales(lista: UmbralBackend[]): UmbralRiesgo[] {
-    return lista
-      .map(u => {
-        const nivel = (u.riskLevel || '').toUpperCase();
-        const info = NIVELES[nivel] ?? { nombre: u.riskLevel, color: '#94A3B8', orden: 9 };
-        return {
-          nivel,
-          nombre: info.nombre,
-          minimo: u.minScore,
-          maximo: u.maxScore,
-          color: info.color,
-          orden: info.orden
-        };
-      })
-      .sort((a, b) => a.orden - b.orden)
-      .map(({ orden, ...u }) => u);
-  }
-
-  private fotoActual(): string {
-    return JSON.stringify({ v: this.variables, u: this.umbrales });
+  constructor() {
+    this.cargarEnPantalla(this.versionActiva);
   }
 
   // ==================================================
   // ESTADO DE LA PANTALLA
   // ==================================================
 
+  get versionActiva(): VersionModelo {
+    return this.versiones.find(v => v.activo) ?? this.versiones[0];
+  }
+
   get hayCambios(): boolean {
-    return !this.cargando && this.fotoActual() !== this.copiaOriginal;
+    return this.foto(this.variables, this.umbrales) !==
+      this.foto(this.versionActiva.configuracion.variables, this.versionActiva.configuracion.umbrales);
   }
 
   get totalPesos(): number {
@@ -179,8 +132,20 @@ export class MotorIaComponent implements OnInit {
     return this.umbrales.every(u => u.minimo <= u.maximo);
   }
 
+  get nombresValidos(): boolean {
+    return this.variables.every(v => v.nombre.trim().length > 0);
+  }
+
   get puedeGuardar(): boolean {
-    return this.hayCambios && this.pesosCalibrados && this.umbralesValidos && !this.guardando;
+    return this.hayCambios && this.pesosCalibrados && this.umbralesValidos && this.nombresValidos;
+  }
+
+  get motivoNoGuardar(): string {
+    if (!this.hayCambios) return 'No hay cambios para guardar';
+    if (!this.pesosCalibrados) return 'Los pesos deben sumar 100 %';
+    if (!this.umbralesValidos) return 'El score mínimo no puede ser mayor que el máximo';
+    if (!this.nombresValidos) return 'Todas las variables deben tener nombre';
+    return '';
   }
 
   // ==================================================
@@ -194,13 +159,11 @@ export class MotorIaComponent implements OnInit {
   }
 
   quitarVariable(variable: VariableScoring): void {
-    // El backend siempre usa estas 4 variables: "quitar" deja su peso en 0
-    variable.peso = 0;
-    this.mostrarAviso(`"${variable.nombre}" quedó en 0 %. El modelo siempre usa estas 4 variables.`, 'info');
+    this.variables = this.variables.filter(v => v !== variable);
   }
 
   agregarVariable(): void {
-    this.mostrarAviso('Por ahora el modelo solo admite estas 4 variables.', 'info');
+    this.variables = [...this.variables, { id: this.siguienteId++, nombre: '', peso: 0, nueva: true }];
   }
 
   // ==================================================
@@ -218,51 +181,93 @@ export class MotorIaComponent implements OnInit {
   }
 
   // ==================================================
-  // GUARDAR (con confirmación antes de tocar el backend)
+  // GUARDAR: crea una versión nueva y la deja activa
   // ==================================================
 
   pedirConfirmacion(): void {
-    if (this.puedeGuardar) {
-      this.mostrarConfirmacion = true;
-    }
+    if (this.puedeGuardar) this.mostrarConfirmacion = true;
   }
 
   cancelarGuardado(): void {
     this.mostrarConfirmacion = false;
   }
 
+  get siguienteVersion(): string {
+    const [mayor, menor, parche] = this.versiones[0].version.replace('v', '').split('.').map(Number);
+    return `v${mayor}.${menor}.${parche + 1}`;
+  }
+
   confirmarGuardado(): void {
-    if (!this.modelo || !this.puedeGuardar) return;
+    const nueva: VersionModelo = {
+      version: this.siguienteVersion,
+      fecha: new Date(),
+      creador: 'Tú',
+      iniciales: 'TÚ',
+      activo: true,
+      configuracion: this.copiar({ variables: this.variables, umbrales: this.umbrales })
+    };
 
-    this.guardando = true;
-    const version = this.modelo.modelVersion;
+    this.versiones.forEach(v => (v.activo = false));
+    this.versiones = [nueva, ...this.versiones];
+    this.cargarEnPantalla(nueva);
+    this.mostrarConfirmacion = false;
+    this.mostrarAviso(`Se creó la versión ${nueva.version} (vista previa, no se envía al servidor).`, 'exito');
+  }
 
-    const pesos = Object.fromEntries(
-      this.variables.map(v => [v.clave, v.peso / 100])
-    ) as unknown as PesosModelo;
+  // ==================================================
+  // ROLLBACK: volver a una versión anterior
+  // ==================================================
 
-    const umbrales: UmbralBackend[] = this.umbrales.map(u => ({
-      riskLevel: u.nivel,
-      minScore: u.minimo,
-      maxScore: u.maximo
-    }));
+  pedirRollback(version: VersionModelo): void {
+    this.versionARestaurar = version;
+  }
 
-    forkJoin([
-      this.motorIaService.guardarPesos(pesos),
-      this.motorIaService.guardarUmbrales(version, umbrales)
-    ]).subscribe({
-      next: ([modelo]) => {
-        this.modelo = modelo;
-        this.guardando = false;
-        this.mostrarConfirmacion = false;
-        this.copiaOriginal = this.fotoActual();
-        this.mostrarAviso('Cambios guardados correctamente.', 'exito');
-      },
-      error: () => {
-        this.guardando = false;
-        this.mostrarConfirmacion = false;
-        this.mostrarAviso('No fue posible guardar los cambios. Intenta nuevamente.', 'error');
-      }
+  cancelarRollback(): void {
+    this.versionARestaurar = null;
+  }
+
+  confirmarRollback(): void {
+    const version = this.versionARestaurar;
+    if (!version) return;
+
+    this.versiones.forEach(v => (v.activo = v === version));
+    this.cargarEnPantalla(version);
+    this.versionARestaurar = null;
+    this.mostrarAviso(`La versión ${version.version} quedó activa (vista previa).`, 'info');
+  }
+
+  // ==================================================
+  // UTILIDADES
+  // ==================================================
+
+  private crearVersion(version: string, fecha: Date, activo: boolean): VersionModelo {
+    return {
+      version,
+      fecha,
+      creador: 'LuisR.',
+      iniciales: 'AZ',
+      activo,
+      configuracion: this.copiar({ variables: VARIABLES_EJEMPLO, umbrales: UMBRALES_EJEMPLO })
+    };
+  }
+
+  private cargarEnPantalla(version: VersionModelo): void {
+    const copia = this.copiar(version.configuracion);
+    this.variables = copia.variables;
+    this.umbrales = copia.umbrales;
+  }
+
+  private copiar(c: ConfiguracionModelo): ConfiguracionModelo {
+    return {
+      variables: c.variables.map(({ id, nombre, peso }) => ({ id, nombre: nombre.trim(), peso })),
+      umbrales: c.umbrales.map(u => ({ ...u }))
+    };
+  }
+
+  private foto(variables: VariableScoring[], umbrales: UmbralRiesgo[]): string {
+    return JSON.stringify({
+      v: variables.map(({ id, nombre, peso }) => ({ id, nombre: nombre.trim(), peso })),
+      u: umbrales
     });
   }
 
@@ -274,5 +279,9 @@ export class MotorIaComponent implements OnInit {
       this.cdr.markForCheck();
     }, 4000);
     this.cdr.markForCheck();
+  }
+
+  ngOnDestroy(): void {
+    clearTimeout(this.temporizadorAviso);
   }
 }

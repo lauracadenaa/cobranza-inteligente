@@ -11,7 +11,7 @@
     <article class="card kpi">
       <div class="kpi-arriba">
         <span>{{ kpi.titulo }}</span>
-        <i class="bi {{ kpi.icono }} tono-{{ kpi.tono }}" aria-hidden="true"></i>
+        <app-icono [nombre]="kpi.icono" [tamano]="20" class="tono-{{ kpi.tono }}"></app-icono>
       </div>
       <strong>{{ kpi.valor }}</strong>
       <small class="kpi-detalle">{{ kpi.detalle }}</small>
@@ -68,7 +68,7 @@
     </div>
 
     <div class="formula">
-      <i class="bi bi-info-circle" aria-hidden="true"></i>
+      <app-icono nombre="info" [tamano]="16"></app-icono>
       <div>
         <strong>Ocupación relativa = casos activos / capacidad máxima × 100</strong>
         <p>
@@ -92,7 +92,7 @@
     </div>
 
     <p class="vista-previa">
-      <i class="bi bi-eye" aria-hidden="true"></i>
+      <app-icono nombre="eye" [tamano]="16"></app-icono>
       El método de asignación, la capacidad general, el umbral y la redistribución automática son una vista previa:
       el backend todavía no guarda estas reglas.
     </p>
@@ -100,7 +100,7 @@
     <div class="acciones">
       <button type="button" class="btn-primario"
               [disabled]="cargando || redistribuyendo" (click)="pedirRedistribucion()">
-        <i class="bi bi-arrow-repeat" aria-hidden="true"></i>
+        <app-icono nombre="refresh-cw" [tamano]="16"></app-icono>
         Redistribuir casos ahora
       </button>
     </div>

@@ -19,10 +19,12 @@ import { forkJoin, of } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { ContextoCasos, DashboardService } from '../../../../service/dashboard.service';
 
+import { IconoComponent } from '../../../../shared/icono/icono.component';
+
 @Component({
   selector: 'app-casos-kpis',
   standalone: true,
-  imports: [CommonModule],
+  imports: [IconoComponent, CommonModule],
   templateUrl: './casos-kpis.component.html',
   styleUrl: './casos-kpis.component.css'
 })
@@ -37,13 +39,13 @@ export class CasosKpisComponent implements OnInit, OnChanges {
 
   // Tarjetas de la vista general (como en Figma).
   // "etiqueta" es la cajita de color y "descripcion" el texto
-  // que va al lado. "icono" usa Bootstrap Icons.
+  // que va al lado. "icono" es un ícono Lucide en código.
   kpis: KpiCaso[] = [
     {
       titulo: 'Casos activos',
       valor: '—',
-      icono: 'bi-briefcase',
-      color: '#2563EB',
+      icono: 'briefcase-business',
+      color: '#3B82F6',
       etiqueta: 'En gestión',
       tono: 'azul',
       descripcion: 'actualmente',
@@ -52,7 +54,7 @@ export class CasosKpisComponent implements OnInit, OnChanges {
     {
       titulo: 'Sin asignar',
       valor: '—',
-      icono: 'bi-person-plus',
+      icono: 'user-round-plus',
       color: '#F59E0B',
       etiqueta: '',
       tono: 'azul',
@@ -62,8 +64,8 @@ export class CasosKpisComponent implements OnInit, OnChanges {
     {
       titulo: 'Casos críticos',
       valor: '—',
-      icono: 'bi-exclamation-circle',
-      color: '#EF4444',
+      icono: 'shield-alert',
+      color: '#DC2626',
       etiqueta: 'Prioridad',
       tono: 'rojo',
       descripcion: '',
@@ -72,8 +74,8 @@ export class CasosKpisComponent implements OnInit, OnChanges {
     {
       titulo: 'Desbordes IA',
       valor: '—',
-      icono: 'bi-diagram-3',
-      color: '#8B5CF6',
+      icono: 'git-fork',
+      color: '#6D28D9',
       etiqueta: 'Requiere gestión humana',
       tono: 'morado',
       descripcion: '',
@@ -82,7 +84,7 @@ export class CasosKpisComponent implements OnInit, OnChanges {
     {
       titulo: 'Tiempo límite vencido',
       valor: '—',
-      icono: 'bi-clock',
+      icono: 'clock-alert',
       color: '#10B981',
       etiqueta: 'Requiere atención',
       tono: 'azul',
@@ -222,7 +224,7 @@ export class CasosKpisComponent implements OnInit, OnChanges {
       {
         titulo: 'Días de mora',
         valor: caso.diasMora.toLocaleString('es-CO'),
-        icono: 'bi-calendar-x',
+        icono: 'calendar-minus-2',
         color: '#DC2626',
         alt: 'Días de mora',
         etiqueta: mora.etiqueta,
@@ -233,14 +235,14 @@ export class CasosKpisComponent implements OnInit, OnChanges {
         valor: caso.saldoVencido == null
           ? 'Sin información'
           : '$' + Math.round(caso.saldoVencido).toLocaleString('es-CO'),
-        icono: 'bi-cash',
+        icono: 'banknote',
         color: '#15803D',
         alt: 'Saldo total en mora'
       },
       {
         titulo: 'Riesgo',
         valor: caso.riesgo,
-        icono: 'bi-shield-check',
+        icono: 'shield-check',
         color: '#F59E0B',
         alt: 'Riesgo del caso',
         etiqueta: this.score !== null ? 'Score' : undefined,
@@ -250,8 +252,8 @@ export class CasosKpisComponent implements OnInit, OnChanges {
       {
         titulo: 'Tiempo de gestión',
         valor: caso.tiempoLimite || 'Sin información',
-        icono: 'bi-clock',
-        color: '#7C3AED',
+        icono: 'clock',
+        color: '#6D28D9',
         alt: 'Tiempo de gestión',
         etiqueta: caso.tiempoLimite ? (vencido ? 'Vencido' : 'En plazo') : undefined,
         tono: vencido ? 'rojo' : 'azul'
@@ -259,8 +261,8 @@ export class CasosKpisComponent implements OnInit, OnChanges {
       {
         titulo: 'Última gestión',
         valor: caso.ultimaGestion || 'Sin información',
-        icono: 'bi-telephone-outbound',
-        color: '#2563EB',
+        icono: 'phone-call',
+        color: '#3B82F6',
         alt: 'Última gestión',
         etiqueta: caso.ultimaGestionDetalle || undefined,
         tono: 'azul'

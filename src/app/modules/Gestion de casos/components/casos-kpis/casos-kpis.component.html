@@ -3,12 +3,11 @@
   <div class="kpi-card" *ngFor="let kpi of kpis">
 
     <div class="kpi-icon">
-      <i
+      <app-icono
         *ngIf="kpi.icono"
-        class="bi"
-        [ngClass]="kpi.icono"
-        [style.color]="kpi.color"
-        [attr.aria-label]="kpi.alt"></i>
+        [nombre]="kpi.icono"
+        [tamano]="20"
+        [style.color]="kpi.color"></app-icono>
       <img *ngIf="!kpi.icono && kpi.imagen" [src]="kpi.imagen" [alt]="kpi.alt">
     </div>
 

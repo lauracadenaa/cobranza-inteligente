@@ -7,7 +7,7 @@
   <section class="nt-card nt-listado">
 
     <h2 class="nt-titulo">
-      <i class="bi bi-file-earmark-text" aria-hidden="true"></i>
+      <app-icono nombre="file-text" [tamano]="16"></app-icono>
       Notas del caso
     </h2>
 
@@ -15,7 +15,7 @@
     <div class="nt-filtros">
 
       <label class="nt-control nt-buscar">
-        <i class="bi bi-search" aria-hidden="true"></i>
+        <app-icono nombre="search" [tamano]="16"></app-icono>
         <input
           type="text"
           placeholder="Buscar en notas"
@@ -29,7 +29,7 @@
           <option value="Todas">Todas</option>
           <option *ngFor="let categoria of categorias" [value]="categoria">{{ categoria }}</option>
         </select>
-        <i class="bi bi-chevron-down" aria-hidden="true"></i>
+        <app-icono nombre="chevron-down" [tamano]="16"></app-icono>
       </label>
 
       <label class="nt-control nt-select">
@@ -38,11 +38,11 @@
           <option value="Todos">Todos</option>
           <option *ngFor="let autor of autores" [value]="autor">{{ autor }}</option>
         </select>
-        <i class="bi bi-chevron-down" aria-hidden="true"></i>
+        <app-icono nombre="chevron-down" [tamano]="16"></app-icono>
       </label>
 
       <label class="nt-control nt-select nt-periodo">
-        <i class="bi bi-calendar3" aria-hidden="true"></i>
+        <app-icono nombre="calendar-days" [tamano]="16"></app-icono>
         <select [(ngModel)]="periodoFiltro" name="periodoFiltro" aria-label="Filtrar por fecha">
           <option *ngFor="let opcion of opcionesPeriodo" [value]="opcion.valor">{{ opcion.texto }}</option>
         </select>
@@ -83,7 +83,7 @@
             type="button"
             class="nt-archivo"
             (click)="abrirArchivo(nota)">
-            <i class="bi bi-file-earmark-text-fill" aria-hidden="true"></i>
+            <app-icono nombre="file-text" [tamano]="16"></app-icono>
             {{ nota.archivo }}
           </button>
         </div>
@@ -91,7 +91,7 @@
       </article>
 
       <div class="nt-vacio" *ngIf="notasFiltradas.length === 0">
-        <i class="bi bi-journal-text" aria-hidden="true"></i>
+        <app-icono nombre="notebook-text" [tamano]="16"></app-icono>
         <p>{{ notas.length === 0 ? 'Este caso aún no tiene notas.' : 'No se encontraron notas con los filtros seleccionados.' }}</p>
       </div>
 
@@ -106,7 +106,7 @@
   <aside class="nt-card nt-agregar">
 
     <h2 class="nt-titulo">
-      <i class="bi bi-file-earmark-text" aria-hidden="true"></i>
+      <app-icono nombre="file-text" [tamano]="16"></app-icono>
       Agregar nota
     </h2>
 
@@ -123,7 +123,7 @@
           <option value="" disabled>Selecciona una categoría</option>
           <option *ngFor="let categoria of categorias" [value]="categoria">{{ categoria }}</option>
         </select>
-        <i class="bi bi-chevron-down" aria-hidden="true"></i>
+        <app-icono nombre="chevron-down" [tamano]="16"></app-icono>
       </div>
 
       <label for="nuevaNota">Nota</label>
@@ -141,7 +141,7 @@
         type="submit"
         class="nt-guardar"
         [disabled]="guardando || !categoriaSeleccionada || !nuevaNota.trim() || nuevaNota.length > 500">
-        <i class="bi bi-floppy" aria-hidden="true"></i>
+        <app-icono nombre="save" [tamano]="16"></app-icono>
         {{ guardando ? 'Guardando...' : 'Guardar nota' }}
       </button>
 
@@ -162,7 +162,7 @@
 
     <div class="nt-modal-encabezado">
       <h3 id="titulo-detalle-nota">Detalle de la nota</h3>
-      <button type="button" aria-label="Cerrar" (click)="cerrarDetalle()"><i class="bi bi-x-lg"></i></button>
+      <button type="button" aria-label="Cerrar" (click)="cerrarDetalle()"><app-icono nombre="x" [tamano]="16"></app-icono></button>
     </div>
 
     <div class="nt-nota-arriba">
@@ -193,7 +193,7 @@
 
     <div class="nt-modal-encabezado">
       <h3 id="titulo-aclaracion">Agregar aclaración</h3>
-      <button type="button" aria-label="Cerrar" (click)="cerrarAclaracion()"><i class="bi bi-x-lg"></i></button>
+      <button type="button" aria-label="Cerrar" (click)="cerrarAclaracion()"><app-icono nombre="x" [tamano]="16"></app-icono></button>
     </div>
 
     <textarea

@@ -37,22 +37,54 @@
         <span *ngFor="let etiqueta of etiquetasEje">{{ etiqueta }}</span>
       </div>
 
-      <svg viewBox="0 0 630 160" preserveAspectRatio="none">
+      <div class="evolucion-lienzo">
+        <svg viewBox="0 0 630 160" preserveAspectRatio="none">
 
-        <line
-          *ngFor="let y of lineasGuia"
-          x1="0" x2="630"
-          [attr.y1]="y" [attr.y2]="y"
-          class="linea-guia"/>
+          <line
+            *ngFor="let y of lineasGuia"
+            x1="0" x2="630"
+            [attr.y1]="y" [attr.y2]="y"
+            class="linea-guia"/>
 
-        <polyline
-          *ngFor="let serie of seriesEvolucion"
-          [attr.points]="puntosSerie(serie.valores)"
-          [attr.stroke]="serie.color"
-          class="linea-evolucion"
-        />
+          <polyline
+            *ngFor="let serie of seriesEvolucion"
+            [attr.points]="puntosSerie(serie.valores)"
+            [attr.stroke]="serie.color"
+            class="linea-evolucion"
+          />
 
-      </svg>
+        </svg>
+
+        <!-- Una columna por mes: al pasar el mouse sale la línea punteada,
+             los puntos de ese mes levitan y aparece la tarjeta -->
+        <div class="capa-columnas">
+          <div
+            class="columna-hover"
+            *ngFor="let columna of columnasEvolucion"
+            [style.left.%]="columna.x"
+            [style.width.%]="anchoColumna">
+
+            <span class="columna-guia"></span>
+
+            <span
+              class="punto-grafica"
+              *ngFor="let v of columna.valores"
+              [style.top.%]="v.y"
+              [style.color]="v.color"></span>
+
+            <div class="tarjeta-lineas" [class.tarjeta-izquierda]="columna.x > 65">
+              <strong>{{ columna.titulo }}</strong>
+              <span class="tarjeta-fila" *ngFor="let v of columna.valores">
+                <i [style.background]="v.color"></i>
+                {{ v.nombre }}
+                <b>{{ v.texto }}</b>
+              </span>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
 
     </div>
 
@@ -92,11 +124,16 @@
           *ngFor="let fila of concentracionRiesgoMora">
           <span class="matriz-rango">{{ fila.rango }}</span>
           <div
-            class="matriz-celda"
+            class="matriz-celda levitar con-tarjeta"
             *ngFor="let valor of fila.valores; let indice = index"
             [style.background-color]="colorConcentracion(fila.niveles[indice])"
             [style.color]="colorTextoConcentracion(fila.niveles[indice])">
             {{ valor }}
+            <span class="tarjeta-hover" [class.tarjeta-izquierda]="indice >= 2">
+              <strong>{{ fila.rango }}</strong>
+              <span>Riesgo: {{ riesgos[indice] }}</span>
+              <span>Saldo vencido: {{ valor }}</span>
+            </span>
           </div>
         </div>
       </div>
@@ -118,13 +155,18 @@
         <h3 class="analisis-titulo">Antigüedad de mora</h3>
 
         <div class="ranking-lista">
-          <div class="ranking-fila" *ngFor="let dato of antiguedad">
+          <div class="ranking-fila levitar-zona con-tarjeta" *ngFor="let dato of antiguedad">
             <span class="ranking-nombre">{{ dato.rango }}</span>
             <div class="ranking-barra">
-              <span [style.width]="dato.valor + '%'"></span>
+              <span class="levitar" [style.width]="dato.valor + '%'"></span>
             </div>
             <strong>{{ dato.porcentaje }}</strong>
             <small>{{ dato.monto }}</small>
+            <span class="tarjeta-hover">
+              <strong>{{ dato.rango }}</strong>
+              <span>Saldo vencido: {{ dato.monto }}</span>
+              <span>Porcentaje: {{ dato.porcentaje }}</span>
+            </span>
           </div>
         </div>
       </article>

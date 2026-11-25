@@ -39,7 +39,7 @@
     <!-- GRÁFICO DE DONA -->
     <!-- ================================================== -->
 
-    <div class="case-status-pie">
+    <div class="case-status-pie" #dona (mousemove)="moverTooltip($event, dona)">
 
       <svg viewBox="0 0 235 235" class="donut-svg" (mouseleave)="ocultarInfo()">
 
@@ -57,7 +57,7 @@
         <circle
           *ngFor="let segmento of segmentosDona; trackBy: seguirSegmento"
 
-          class="donut-segmento"
+          class="donut-segmento levitar-svg"
 
           cx="117.5"
           cy="117.5"
@@ -97,6 +97,9 @@
       <div
         class="donut-tooltip"
         [class.visible]="mostrarTooltip"
+        [class.tooltip-izquierda]="tooltipALaIzquierda"
+        [style.left.px]="tooltipALaIzquierda ? tooltipX - 14 : tooltipX + 14"
+        [style.top.px]="tooltipY + 14"
       >
 
         <strong class="tooltip-estado">

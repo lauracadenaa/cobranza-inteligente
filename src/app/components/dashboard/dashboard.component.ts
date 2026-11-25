@@ -16,6 +16,8 @@ import { DashboardService } from '../../service/dashboard.service';
 import { ManagedCase } from '../../models/dashboard.models';
 
 
+import { IconoComponent } from '../../shared/icono/icono.component';
+
 @Component({
   selector: 'app-dashboard',
   standalone: true,
@@ -28,7 +30,8 @@ import { ManagedCase } from '../../models/dashboard.models';
     KpiCardsComponent,
     AgingChartComponent,
     CaseStatusChartComponent,
-    SearchCaseComponent
+    SearchCaseComponent,
+    IconoComponent
   ],
 
   templateUrl: './dashboard.component.html',
@@ -617,6 +620,10 @@ export class DashboardComponent implements OnInit {
   // Cargar archivo: la carga batch está en Cartera > Integración de cartera
   irACargarArchivo(): void {
     void this.router.navigateByUrl('/cartera');
+  }
+
+  irACrearLink(): void {
+    void this.router.navigateByUrl('/links-pagos');
   }
 
   irAGenerarReporte(): void {

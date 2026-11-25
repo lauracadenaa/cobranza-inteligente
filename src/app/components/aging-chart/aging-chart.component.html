@@ -24,12 +24,10 @@
           class="asesor-filtro-button"
           (click)="toggleAsesorMenu()"
         >
-          <i class="bi bi-bar-chart-line"></i>
+          <app-icono nombre="chart-column" [tamano]="16"></app-icono>
           {{ nombreMetrica }}
 
-          <span class="asesor-flecha">
-            ⌄
-          </span>
+          <app-icono nombre="chevron-down" [tamano]="16" class="asesor-flecha"></app-icono>
         </button>
 
         <div
@@ -115,14 +113,16 @@
       <div class="aging-bars">
 
         <div
-          class="aging-bar-item"
+          class="aging-bar-item levitar-zona"
           *ngFor="let dato of datosActuales; let i = index"
+          #columna
+          (mousemove)="moverTooltip($event, columna)"
         >
 
           <div
-            class="aging-bar"
+            class="aging-bar levitar"
             [style.height.%]="getBarHeight(dato)"
-            [style.background-color]="getColorBarra(dato)"
+            [style.--color-barra]="getColorBarra(dato)"
           >
             <!-- VALOR ENCIMA DE LA BARRA -->
             <span class="aging-bar-valor">
@@ -134,6 +134,8 @@
           <div
             class="aging-tooltip"
             [class.tooltip-left]="i >= datosActuales.length - 2"
+            [style.left.px]="i >= datosActuales.length - 2 ? tooltipX - 14 : tooltipX + 14"
+            [style.top.px]="tooltipY + 14"
           >
             <strong>{{ dato.rangoMora }}</strong>
             <span>Monto: {{ getFormattedValue(dato.valor) }}</span>

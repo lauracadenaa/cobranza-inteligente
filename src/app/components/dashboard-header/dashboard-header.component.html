@@ -53,12 +53,7 @@
   *ngIf="mostrarBotonActualizar">
 
   <div class="refresh-info">
-    <img
-      src="/imagenes/actualizar.png"
-      alt=""
-      class="refresh-icon"
-      [class.girando]="actualizando"
-    >
+    <app-icono nombre="refresh-cw" [tamano]="20" class="refresh-icon" [class.girando]="actualizando"></app-icono>
 
     <span>{{ textoActualizacion }}</span>
   </div>
@@ -83,11 +78,7 @@
 
   <div class="ia-icon-container">
 
-    <img
-      src="/imagenes/IA.png"
-      class="ia-icon"
-      alt="Motor IA"
-    >
+    <app-icono nombre="sparkles" [tamano]="18" [grosor]="1.5" class="ia-icon"></app-icono>
 
   </div>
 
@@ -96,7 +87,7 @@
     <div class="ia-title">
 
       <span>
-        Motor IA
+        Motor de IA
       </span>
 
       <button
@@ -104,7 +95,7 @@
         class="ia-estado-boton"
         (click)="abrirModalIA()">
 
-        {{ header?.motorIAActivo ? 'ACTIVO' : 'INACTIVO' }}
+        {{ header?.motorIAActivo ? 'Activo' : 'Inactivo' }}
 
       </button>
 
@@ -147,6 +138,7 @@
           [attr.aria-expanded]="menuUsuarioAbierto"
           aria-label="Abrir menú de usuario"
           (click)="alternarMenuUsuario($event)">
+          <app-icono nombre="chevron-down" [tamano]="20"></app-icono>
         </button>
 
       </div>
@@ -156,7 +148,7 @@
           type="button"
           class="user-dropdown-item"
           (click)="pedirCerrarSesion()">
-          <i class="bi bi-box-arrow-right" aria-hidden="true"></i>
+          <app-icono nombre="log-out" [tamano]="18"></app-icono>
           <span>Cerrar sesión</span>
         </button>
       </div>
@@ -182,11 +174,11 @@
     (click)="$event.stopPropagation()">
 
     <button type="button" class="ia-modal-x" aria-label="Cerrar" (click)="cerrarModalIA()">
-      <i class="bi bi-x-lg"></i>
+      <app-icono nombre="x" [tamano]="20"></app-icono>
     </button>
 
     <div class="ia-modal-icono" [class.encender]="!header?.motorIAActivo">
-      <i class="bi bi-gear"></i>
+      <app-icono nombre="settings" [tamano]="28"></app-icono>
     </div>
 
     <ng-container *ngIf="header?.motorIAActivo; else textoActivar">
@@ -240,11 +232,11 @@
     (click)="$event.stopPropagation()">
 
     <button type="button" class="logout-close" aria-label="Cerrar" (click)="cancelarCerrarSesion()">
-      <i class="bi bi-x-lg" aria-hidden="true"></i>
+      <app-icono nombre="x" [tamano]="20"></app-icono>
     </button>
 
     <div class="logout-icon">
-      <i class="bi bi-box-arrow-right" aria-hidden="true"></i>
+      <app-icono nombre="log-out" [tamano]="18"></app-icono>
     </div>
 
     <h2 id="logout-titulo">¿Cerrar sesión?</h2>

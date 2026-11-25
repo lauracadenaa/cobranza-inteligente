@@ -94,3 +94,32 @@ app-caso-resumen {
   min-width: 0;
   margin-top: 16px;
 }
+
+/* ==================================================
+   MEDIDAS DEL FIGMA (igual que el Inicio)
+   Fondo #F4F7FA · contenido con 34 px de margen ·
+   10 px bajo el encabezado y 16 px entre bloques
+================================================== */
+
+.dashboard-layout,
+.dashboard-content {
+  background-color: #F4F7FA;
+}
+
+.dashboard-content {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 10px 34px 34px;
+}
+
+.dashboard-content > app-dashboard-header {
+  margin-bottom: -6px;
+}
+
+.gestion-casos-body {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-top: 0;
+}

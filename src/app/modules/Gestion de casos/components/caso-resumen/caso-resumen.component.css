@@ -2782,3 +2782,147 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* ==================================================
+   MEDIDAS DEL FIGMA (detalle del caso, 1440 x 1278)
+   Columna principal de 743 px y derecha de 365 px, 20 px entre ellas.
+   Tarjetas blancas: esquinas de 16 px, relleno 20 px, 16 px entre partes,
+   borde #E2E8F0.
+================================================== */
+
+.case-navigation button {
+  height: 38px;
+  padding: 0 16px;
+  border-radius: 8px;
+  color: #49454F;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 20px;
+  letter-spacing: 0.1px;
+}
+
+.case-navigation button.active {
+  background-color: #DBEAFE;
+  color: #2563EB;
+}
+
+.case-information-grid {
+  gap: 20px;
+}
+
+.resumen-columna-principal {
+  gap: 20px;
+}
+
+.case-information-card {
+  gap: 16px;
+  padding: 20px;
+  background: #FFFFFF;
+  border: 1px solid #E2E8F0;
+  border-radius: 16px;
+}
+
+.information-card-header h3,
+.contexto-header h3 {
+  color: #0A3B4E;
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 100%;
+}
+
+/* Persona asociada: nombre 18 px Bold, datos 13 px */
+.persona-encabezado h4 {
+  color: #001822;
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 100%;
+}
+
+.persona-chip {
+  color: #64748B;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.persona-datos li {
+  color: #001822;
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 100%;
+}
+
+.persona-preferido {
+  font-weight: 600;
+}
+
+/* Contexto IA: etiqueta del score gris #EEF2F6, esquinas de 6 px */
+.score-chip {
+  padding: 3px 8px;
+  border-radius: 6px;
+  background: #EEF2F6;
+  color: #2563EB;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 100%;
+}
+
+/* Acciones rápidas: título 14 px Bold, botones #F2F5F7 con esquinas de 8 px */
+.acciones-card .information-card-header h3,
+.historial-contactos-card .information-card-header h3 {
+  font-size: 14px;
+}
+
+.quick-action-button {
+  gap: 4px;
+  padding: 12px;
+  border: none;
+  border-radius: 8px;
+  background: #F2F5F7;
+  color: #001822;
+  font-size: 11px;
+  font-weight: 400;
+}
+
+/* Recomendación de IA: título 15 px, tarjetas #F2F5F7 con esquinas de 12 px */
+.recomendacion-title h3,
+.recomendacion-title h4 {
+  color: #0A3B4E;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.recomendacion-info-box {
+  gap: 10px;
+  padding: 14px;
+  border-radius: 12px;
+  background: #F2F5F7;
+}
+
+/* Tipificación: título 15 px Bold, textos 11–12 px */
+.tipificacion-card .information-card-header h3 {
+  font-size: 15px;
+}
+
+/* Botón "Guardar gestión": 40 px, esquinas de 12 px, #2563EB */
+.tipificacion-card button[type='submit'],
+.btn-guardar-gestion {
+  height: 40px;
+  border-radius: 12px;
+  background: #2563EB;
+}
+
+/* 16 px entre pestañas, KPIs y tarjetas (como en el Figma) */
+.case-detail-container {
+  gap: 16px;
+}
+
+.case-detail-container > .kpis-wrapper {
+  margin-top: 0;
+}
+
+.case-navigation {
+  min-height: 50px;
+  padding: 5px 8px;
+  border: 1px solid #E2E8F0;
+  border-radius: 16px;
+}

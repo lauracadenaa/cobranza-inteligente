@@ -4027,3 +4027,217 @@ li.actual .nc-punto {
 .lote-menu-opcion.lote-menu-opcion-peligro {
   color: #EF4444;
 }
+
+/* ==================================================
+   MEDIDAS DEL FIGMA (Cartera › Integración de cartera)
+================================================== */
+
+/* KPIs: 4 tarjetas en 1128 px, igual que las del Inicio */
+.integracion-kpis {
+  gap: 16px;
+  margin-top: 0;
+}
+
+.integracion-kpi {
+  min-height: 102px;
+  padding: 13px 16px;
+  background: #FFFFFF;
+  border: 1px solid #E2E8F0;
+  border-radius: 16px;
+}
+
+.kpi-informacion {
+  gap: 13px;
+}
+
+.kpi-titulo {
+  color: #0A3B4E;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 100%;
+  letter-spacing: 0.44px;
+}
+
+.kpi-valor {
+  color: #0A3B4E;
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 100%;
+  letter-spacing: -0.66px;
+}
+
+.kpi-porcentaje {
+  padding: 3px 8px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 100%;
+}
+
+.kpi-descripcion {
+  color: #64748B;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 100%;
+  letter-spacing: -0.66px;
+}
+
+.kpi-icono {
+  width: 20px;
+  height: 20px;
+}
+
+/* "Nueva carga de cartera": relleno 24 px, 24 px entre partes,
+   esquinas de 16 px, borde #E2E8F0 */
+.nc-panel {
+  gap: 24px;
+  padding: 24px;
+  background: #FFFFFF;
+  border: 1px solid #E2E8F0;
+  border-radius: 16px;
+}
+
+.nc-encabezado h3 {
+  color: #0A3B4E;
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 100%;
+}
+
+/* Pasos: círculo de 28 px; activo #2663EB, pendiente blanco con borde 1.5 px */
+.nc-paso-circulo {
+  width: 28px;
+  height: 28px;
+  border-radius: 14px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.nc-paso-nombre {
+  font-size: 11px;
+  font-weight: 400;
+  line-height: 100%;
+}
+
+/* Botón principal: 40 px de alto, esquinas de 12 px, relleno 10 / 16 px */
+.nc-btn-primario {
+  height: 40px;
+  padding: 10px 16px;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 20px;
+  letter-spacing: 0.1px;
+}
+
+/* Deshabilitado como en el Figma: fondo gris 10 % y texto al 38 % */
+.nc-btn-primario:disabled {
+  background: rgba(14, 14, 14, 0.1);
+  color: rgba(0, 24, 34, 0.38);
+  opacity: 1;
+}
+
+/* Zona para soltar el archivo: punteada 4/4, fondo #F8FAFC,
+   esquinas de 12 px, relleno 32 px, 12 px entre partes */
+.nc-zona {
+  gap: 12px;
+  padding: 32px;
+  background: #F8FAFC;
+  border: 1px dashed #E2E8F0;
+  border-radius: 12px;
+}
+
+.nc-nube {
+  color: #CBD5E1;
+}
+
+.nc-zona-titulo {
+  color: #0A3B4E;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 100%;
+}
+
+.nc-zona-formatos {
+  color: #64748B;
+  font-size: 11px;
+  font-weight: 400;
+  line-height: 100%;
+}
+
+/* "Seleccionar archivo": contorno azul, 40 px de alto, esquinas de 12 px */
+.nc-btn-secundario {
+  height: 40px;
+  padding: 10px 16px;
+  border: 1px solid #2563EB;
+  border-radius: 12px;
+  color: #2563EB;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 20px;
+  letter-spacing: 0.1px;
+}
+
+/* "Descargar plantilla": botón de texto 14 px Medium #2563EB */
+.nc-plantilla {
+  gap: 4px;
+  padding: 6px 12px;
+  color: #2563EB;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 20px;
+  letter-spacing: 0.1px;
+}
+
+/* ===== "Lotes Cargados" ===== */
+
+.lotes-panel {
+  border: 1px solid #E2E8F0;
+  border-radius: 16px;
+}
+
+.lotes-encabezado h3 {
+  color: #001822;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 100%;
+}
+
+.tabla-lotes th {
+  color: #63768A;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 140%;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.tabla-lotes td {
+  height: 52px;
+  color: #001822;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 140%;
+}
+
+.estado-lote {
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 100%;
+}
+
+/* 16 px entre KPIs, "Nueva carga" y "Lotes Cargados" (como en el Figma) */
+:host {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.integracion-kpis,
+.nc-panel,
+.lotes-panel {
+  margin-top: 0;
+  margin-bottom: 0;
+}

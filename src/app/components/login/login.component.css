@@ -38,7 +38,10 @@
   position: relative;
   overflow: hidden;
   color: #fff;
-  background: #001822 url('/imagenes/Mask group.jpg') center / cover no-repeat;
+  /* Antes era una imagen: ahora es un degradado en código (mismo diseño) */
+  background:
+    radial-gradient(circle at 100% 100%, rgba(16, 152, 155, 0.95) 0%, rgba(16, 152, 155, 0) 38%),
+    linear-gradient(160deg, #021723 0%, #0F2440 40%, #1B3A6B 80%, #1F4E85 100%);
 }
 
 .lado-izquierdo > img {
@@ -299,7 +302,10 @@
   height: 65px;
   flex: 0 0 auto;
   border-radius: 9px;
-  background: #1e3a5f url('/imagenes/Vector.svg') center / 39px 39px no-repeat;
+  display: grid;
+  place-items: center;
+  background: #1e3a5f;
+  color: #FFFFFF;
 }
 
 .modal-lado-izquierdo h2 {
@@ -740,8 +746,7 @@
 
 #modalCuartaVentana .cuadro-recuperacion {
   background-color: #dcfce7;
-  background-image: url('/imagenes/badge-check.svg');
-  background-size: 45px;
+  color: #15803d;
 }
 
 #modalCuartaVentana .modal-contenido h2 {
@@ -893,4 +898,27 @@
     flex: 1;
     padding: 0 12px;
   }
+}
+
+/* Decoración del fondo (círculo con cruz), en código */
+.fondo-decoracion {
+  position: absolute;
+  left: -90px;
+  bottom: -70px;
+  width: 560px;
+  height: 560px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.lado-izquierdo > *:not(.fondo-decoracion) {
+  position: relative;
+  z-index: 1;
+}
+
+.fondo-decoracion {
+  left: -110px;
+  bottom: -170px;
+  width: 540px;
+  height: 540px;
 }

@@ -503,3 +503,64 @@
   color: #9CA3AF;
   cursor: not-allowed;
 }
+
+/* ==================================================
+   MEDIDAS DEL FIGMA (tarjetas de reportes)
+   Esquinas de 12 px, relleno 20 / 24 px, 26 px entre partes
+================================================== */
+
+.reportes-grid {
+  gap: 16px;
+}
+
+.reporte-card {
+  gap: 26px;
+  padding: 20px 24px;
+  border: 1px solid #E2E8F0;
+  border-radius: 12px;
+}
+
+/* Caja del ícono: 48 x 56 px, esquinas de 8 px, ícono de 24 px */
+.reporte-card > .reporte-icono {
+  width: 48px;
+  height: 56px;
+  padding: 16px 12px;
+  border-radius: 8px;
+  box-sizing: border-box;
+}
+
+.reporte-card h3 {
+  margin: 0 0 -18px;
+  color: #0E0E0E;
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 125%;
+}
+
+.reporte-card p {
+  margin: 0;
+  color: #475569;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 125%;
+}
+
+/* Colores de cada reporte, como en el Figma */
+.tono-azul { background: #F2F6FF; color: #2764E7; }
+.tono-verde { background: #DCFCE7; color: #059669; }
+.tono-morado { background: #F1EDFF; color: #7C3AED; }
+.tono-naranja { background: #FFEDD5; color: #F97316; }
+.tono-turquesa { background: #E6F7F9; color: #12A7B8; }
+.tono-verde-azulado { background: #E7F6F3; color: #0C8F83; }
+
+/* "Configurar reporte": 40 px, esquinas de 12 px, borde #CBD5E1 */
+.btn-generar {
+  height: 40px;
+  border: 1px solid #CBD5E1;
+  border-radius: 12px;
+  color: #2563EB;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 20px;
+  letter-spacing: 0.1px;
+}

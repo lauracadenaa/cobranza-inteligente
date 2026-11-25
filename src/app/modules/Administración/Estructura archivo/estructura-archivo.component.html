@@ -12,7 +12,7 @@
 
     <!-- En Figma el botón va arriba a la derecha -->
     <button type="button" class="descargar" (click)="descargarPlantilla()">
-      <i class="bi bi-download"></i>
+      <app-icono nombre="download" [tamano]="20"></app-icono>
       Descargar plantilla
     </button>
   </header>
@@ -54,9 +54,9 @@
             <td>{{ campo.tipo }}</td>
             <td>
               @if (campo.obligatorio) {
-                <span class="chip si"><i class="bi bi-check-circle"></i> Sí</span>
+                <span class="chip si"><app-icono nombre="circle-check" [tamano]="14"></app-icono> Sí</span>
               } @else {
-                <span class="chip no"><i class="bi bi-dash-circle"></i> No</span>
+                <span class="chip no"><app-icono nombre="circle-minus" [tamano]="14"></app-icono> No</span>
               }
             </td>
             <td class="descripcion">{{ campo.descripcion }}</td>
@@ -68,7 +68,7 @@
 
   <!-- AVISO -->
   <aside class="importante">
-    <i class="bi bi-info-circle"></i>
+    <app-icono nombre="info" [tamano]="16"></app-icono>
     <div>
       <strong>Importante</strong>
       <p>Esta información es de consulta. Para cargar los datos correctamente, verifica que tu archivo siga esta estructura.</p>

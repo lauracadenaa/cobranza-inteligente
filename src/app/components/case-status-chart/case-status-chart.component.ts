@@ -436,6 +436,19 @@ export class CaseStatusChartComponent implements OnInit {
   // TOOLTIP
   // ==================================================
 
+  // Posición del mouse dentro de la dona (para que la tarjeta lo siga)
+  tooltipX = 0;
+  tooltipY = 0;
+  tooltipALaIzquierda = false;
+
+  moverTooltip(evento: MouseEvent, contenedor: HTMLElement): void {
+    const caja = contenedor.getBoundingClientRect();
+    this.tooltipX = evento.clientX - caja.left;
+    this.tooltipY = evento.clientY - caja.top;
+    // En la mitad derecha la tarjeta sale a la izquierda, para que no se corte
+    this.tooltipALaIzquierda = this.tooltipX > caja.width / 2;
+  }
+
   mostrarInfo(
     estado: string,
     cantidad: number,

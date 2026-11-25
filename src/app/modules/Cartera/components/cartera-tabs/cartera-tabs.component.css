@@ -93,3 +93,43 @@
   outline: 2px solid #2563EB;
   outline-offset: 2px;
 }
+
+/* ==================================================
+   MEDIDAS DEL FIGMA (barra de pestañas de Cartera)
+   1128 x 50 px, esquinas de 16 px, borde #E2E8F0,
+   relleno 5 / 8 px y 4 px entre pestañas
+================================================== */
+
+.cartera-tabs {
+  min-height: 50px;
+  margin-top: 0;
+  padding: 5px 8px;
+  gap: 4px;
+  border-radius: 16px;
+}
+
+/* Pestaña: 38 px de alto, relleno 0 / 16 px, esquinas de 8 px,
+   texto 14 px Medium (M3 title small) */
+.cartera-tabs .tab {
+  height: 38px;
+  padding: 0 16px;
+  border-radius: 8px;
+  color: #49454F;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 20px;
+  letter-spacing: 0.1px;
+}
+
+.cartera-tabs .tab.active {
+  background-color: #DBEAFE;
+  color: #2563EB;
+}
+
+.cartera-tabs .tab:not(.active):hover {
+  color: #2563EB;
+}
+
+.cartera-tabs .tab.active:hover {
+  color: #2563EB;
+}

@@ -40,7 +40,7 @@
 
           <!-- BUSCADOR -->
           <div class="managed-search">
-            <i class="bi bi-search"></i>
+            <app-icono nombre="search" [tamano]="16"></app-icono>
 
             <input
               type="text"
@@ -57,7 +57,7 @@
               class="managed-filter"
               [class.filtros-activos]="mostrarModalFiltros"
               (click)="abrirFiltros()">
-              <img src="imagenes/Filtro.png" alt="">
+              <app-icono nombre="funnel" [tamano]="16"></app-icono>
               <span>Filtros</span>
               <span class="filter-count" *ngIf="cantidadFiltrosActivos > 0">
                 {{ cantidadFiltrosActivos }}
@@ -71,7 +71,7 @@
                   type="button"
                   class="cerrar-filtros"
                   (click)="cerrarFiltros()">
-                  <i class="bi bi-x"></i>
+                  <app-icono nombre="x" [tamano]="16"></app-icono>
                 </button>
               </div>
 
@@ -143,7 +143,7 @@
 
                     </select>
 
-                    <img src="/imagenes/flecha.admin.png" alt="Flecha">
+                    <app-icono nombre="chevron-down" [tamano]="16" class="select-flecha"></app-icono>
 
                   </div>
                 </div>
@@ -170,7 +170,7 @@
 
                     </select>
 
-                    <img src="/imagenes/flecha.admin.png" alt="Flecha">
+                    <app-icono nombre="chevron-down" [tamano]="16" class="select-flecha"></app-icono>
 
                   </div>
                 </div>
@@ -238,7 +238,7 @@
                         [class.con-valor]="filtros.fechaDesde !== ''"
                         [(ngModel)]="filtros.fechaDesde">
 
-                      <i class="bi bi-calendar3"></i>
+                      <app-icono nombre="calendar-days" [tamano]="16"></app-icono>
 
                     </div>
 
@@ -249,7 +249,7 @@
                         [class.con-valor]="filtros.fechaHasta !== ''"
                         [(ngModel)]="filtros.fechaHasta">
 
-                      <i class="bi bi-calendar3"></i>
+                      <app-icono nombre="calendar-days" [tamano]="16"></app-icono>
 
                     </div>
 
@@ -339,7 +339,7 @@
             class="remove-active-filter"
             (click)="quitarFiltro(filtro.clave)"
             aria-label="Quitar filtro">
-            <i class="bi bi-x"></i>
+            <app-icono nombre="x" [tamano]="16"></app-icono>
           </button>
 
         </div>
@@ -441,7 +441,7 @@
             [disabled]="paginaActual === 1 || totalPaginas === 0"
             (click)="paginaAnterior()"
             aria-label="Página anterior">
-            <i class="bi bi-chevron-left"></i>
+            <app-icono nombre="chevron-left" [tamano]="16"></app-icono>
           </button>
 
           <button
@@ -462,7 +462,7 @@
             [disabled]="paginaActual === totalPaginas || totalPaginas === 0"
             (click)="paginaSiguiente()"
             aria-label="Página siguiente">
-            <i class="bi bi-chevron-right"></i>
+            <app-icono nombre="chevron-right" [tamano]="16"></app-icono>
           </button>
 
         </div>
@@ -479,7 +479,7 @@
 
         <button type="button" class="quick-card" (click)="irACargarArchivo()">
           <div class="quick-icon">
-            <img src="imagenes/Cargar-archivo.png" alt="Cargar archivo">
+            <app-icono nombre="upload" [tamano]="20"></app-icono>
           </div>
           <div class="quick-text">
             <span>Cargar archivo</span>
@@ -492,7 +492,7 @@
           class="quick-card"
           (click)="openSearchCase()">
           <div class="quick-icon">
-            <img src="imagenes/Buscar-caso.png" alt="Buscar caso">
+            <app-icono nombre="search" [tamano]="20"></app-icono>
           </div>
           <div class="quick-text">
             <span>Buscar caso</span>
@@ -500,9 +500,19 @@
           </div>
         </button>
 
+        <button type="button" class="quick-card" (click)="irACrearLink()">
+          <div class="quick-icon">
+            <app-icono nombre="link-2" [tamano]="20"></app-icono>
+          </div>
+          <div class="quick-text">
+            <span>Crear link de pago</span>
+            <p>Nuevo link de pago</p>
+          </div>
+        </button>
+
         <button type="button" class="quick-card" (click)="irAGenerarReporte()">
           <div class="quick-icon">
-            <img src="imagenes/Generar-reporte.png" alt="Generar reporte">
+            <app-icono nombre="chart-column" [tamano]="20"></app-icono>
           </div>
           <div class="quick-text">
             <span>Generar reporte</span>

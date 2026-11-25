@@ -3,7 +3,7 @@
   <div class="kpi-card" *ngFor="let kpi of kpisActuales">
 
     <div class="kpi-icon">
-      <img [src]="kpi.imagen" [alt]="kpi.alt">
+      <app-icono [nombre]="kpi.imagen" [tamano]="20" [style.color]="kpi.color"></app-icono>
     </div>
 
     <div class="kpi-title">

@@ -31,10 +31,12 @@ interface Kpi {
   tono: string;
 }
 
+import { IconoComponent } from '../../../shared/icono/icono.component';
+
 @Component({
   selector: 'app-distribucion-cargas',
   standalone: true,
-  imports: [FormsModule],
+  imports: [IconoComponent, FormsModule],
   templateUrl: './distribucion-cargas.component.html',
   styleUrls: ['../admin-comun.css', './distribucion-cargas.component.css']
 })
@@ -154,10 +156,10 @@ export class DistribucionCargasComponent implements OnInit, OnDestroy {
     const valor = (n: number) => (sinDatos ? '—' : n);
 
     return [
-      { titulo: 'Agentes activos', valor: valor(activos.length), detalle: 'Disponibles para operar', icono: 'bi-people', tono: 'verde' },
-      { titulo: 'Con capacidad', valor: valor(conCapacidad.length), detalle: 'Disponibles para recibir casos', icono: 'bi-check-circle', tono: 'azul' },
-      { titulo: 'Casos asignados', valor: valor(casos), detalle: 'Casos activos', icono: 'bi-stack', tono: 'naranja' },
-      { titulo: 'En cola temporal', valor: valor(enCola), detalle: 'Esperando agente con cupo', icono: 'bi-clock', tono: 'morado' }
+      { titulo: 'Agentes activos', valor: valor(activos.length), detalle: 'Disponibles para operar', icono: 'users', tono: 'verde' },
+      { titulo: 'Con capacidad', valor: valor(conCapacidad.length), detalle: 'Disponibles para recibir casos', icono: 'circle-check', tono: 'azul' },
+      { titulo: 'Casos asignados', valor: valor(casos), detalle: 'Casos activos', icono: 'layers', tono: 'naranja' },
+      { titulo: 'En cola temporal', valor: valor(enCola), detalle: 'Esperando agente con cupo', icono: 'clock', tono: 'morado' }
     ];
   }
 

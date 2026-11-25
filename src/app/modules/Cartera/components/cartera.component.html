@@ -27,7 +27,7 @@
         class="btn-sincronizar"
         [disabled]="sincronizando"
         (click)="pedirSincronizacion()">
-        <i class="bi bi-database"></i>
+        <app-icono nombre="database" [tamano]="20"></app-icono>
         {{ sincronizando ? 'Sincronizando...' : 'Sincronizar con CORE' }}
       </button>
 

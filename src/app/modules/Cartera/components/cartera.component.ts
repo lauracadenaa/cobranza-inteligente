@@ -14,6 +14,8 @@ import { PeriodoSeleccionado, SelectorPeriodoComponent } from '../../../componen
 
 const CLAVE_PERIODO = 'cartera.periodoAnalisis';
 
+import { IconoComponent } from '../../../shared/icono/icono.component';
+
 @Component({
   selector: 'app-cartera',
   standalone: true,
@@ -25,7 +27,8 @@ const CLAVE_PERIODO = 'cartera.periodoAnalisis';
     IntegracionCarteraComponent,
     SegmentoCarteraComponent,
     AnalisisCarteraComponent,
-    SelectorPeriodoComponent
+    SelectorPeriodoComponent,
+    IconoComponent
   ],
   templateUrl: './cartera.component.html',
   styleUrl: './cartera.component.css'

@@ -2813,3 +2813,143 @@
 .summary-gestion-fila .propension {
   color: #10B981;
 }
+
+/* ==================================================
+   MEDIDAS DEL FIGMA ("Cola de casos")
+================================================== */
+
+/* Encabezado: 72 px, relleno 16 / 24 px, esquinas superiores de 12 px */
+.cases-panel {
+  border: 1px solid #E2E8F0;
+  border-radius: 12px;
+}
+
+.managed-cases-header {
+  min-height: 72px;
+  padding: 16px 24px;
+  border-radius: 12px 12px 0 0;
+}
+
+.managed-cases-header h2 {
+  color: #1E293B;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 100%;
+}
+
+.contador-casos {
+  margin-left: 8px;
+  color: #64748B;
+  font-size: 14px;
+  font-weight: 400;
+}
+
+/* Títulos de columna: 12 px Medium, mayúscula, #63768A */
+.cases-panel th {
+  color: #63768A;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 140%;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+/* Filas: separador #F1F5F9 */
+.fila-caso td {
+  border-bottom: 1px solid #F1F5F9;
+}
+
+/* Número de caso: 10 px Medium azul */
+.case-id-cell span {
+  color: #2563EB;
+  font-size: 10px;
+  font-weight: 500;
+}
+
+/* Asociado: nombre 11 px #374151 y documento 11 px #94A3B8 */
+.case-person-cell span {
+  color: #374151;
+  font-size: 11px;
+  font-weight: 400;
+}
+
+.case-person-cell small,
+.case-obligation-cell small,
+.case-last-action-cell small {
+  color: #94A3B8;
+  font-size: 11px;
+  font-weight: 400;
+}
+
+.case-obligation-cell span {
+  color: #374151;
+  font-size: 12px;
+  font-weight: 400;
+}
+
+/* Riesgo: etiqueta con esquinas de 4 px, relleno 4 / 8 px, 12 px Bold */
+.riesgo-label {
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 100%;
+}
+
+.case-days-cell {
+  color: #374151;
+  font-size: 11px;
+}
+
+/* Tiempo límite: 10 px SemiBold y barra de 60 x 4 px */
+.case-deadline-cell span:first-child {
+  color: #64748B;
+  font-size: 10px;
+  font-weight: 600;
+}
+
+.deadline-indicator {
+  width: 60px;
+  height: 4px;
+  border-radius: 50px;
+}
+
+/* Asesor: avatar redondo de 24 px, borde y texto #3B82F6 sobre #DBEAFE */
+.advisor-avatar {
+  width: 24px;
+  height: 24px;
+  border: 1px solid #3B82F6;
+  border-radius: 50%;
+  background: #DBEAFE;
+  color: #3B82F6;
+  font-size: 11px;
+  font-weight: 400;
+}
+
+.case-advisor-cell > span:last-child {
+  color: #374151;
+  font-size: 10px;
+}
+
+.case-last-action-cell span {
+  color: #374151;
+  font-size: 11px;
+}
+
+/* Botón de acciones: ícono azul */
+.col-acciones button {
+  color: #2563EB;
+}
+
+.select-flecha {
+  position: absolute;
+  top: 50%;
+  right: 16px;
+  transform: translateY(-50%);
+  color: #64748B;
+  pointer-events: none;
+}
+
+.cases-panel {
+  padding-top: 0;
+}

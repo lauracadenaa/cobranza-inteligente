@@ -30,10 +30,12 @@ const VALORES_INICIALES: TiempoPrioridad[] = [
   { prioridad: 'Crítica', color: '#991B1B', sinAsignar: { valor: 15, unidad: 'minutos' }, primeraGestion: { valor: 1, unidad: 'horas' }, advertencia: 50 }
 ];
 
+import { IconoComponent } from '../../../shared/icono/icono.component';
+
 @Component({
   selector: 'app-tiempos-atencion',
   standalone: true,
-  imports: [FormsModule],
+  imports: [IconoComponent, FormsModule],
   templateUrl: './tiempos-atencion.component.html',
   styleUrls: ['../admin-comun.css', './tiempos-atencion.component.css']
 })
@@ -46,9 +48,9 @@ export class TiemposAtencionComponent implements OnDestroy {
   ];
 
   readonly estados = [
-    { titulo: 'Dentro del tiempo', texto: 'El tiempo transcurrido aún no alcanza el umbral de advertencia', icono: 'bi-check-lg', tono: 'verde' },
-    { titulo: 'Próximo a vencer', texto: 'Desde el umbral hasta el tiempo máximo', icono: 'bi-clock', tono: 'amarillo' },
-    { titulo: 'Vencido', texto: 'Al superar el tiempo máximo', icono: 'bi-exclamation-circle', tono: 'rojo' }
+    { titulo: 'Dentro del tiempo', texto: 'El tiempo transcurrido aún no alcanza el umbral de advertencia', icono: 'check', tono: 'verde' },
+    { titulo: 'Próximo a vencer', texto: 'Desde el umbral hasta el tiempo máximo', icono: 'clock', tono: 'amarillo' },
+    { titulo: 'Vencido', texto: 'Al superar el tiempo máximo', icono: 'circle-alert', tono: 'rojo' }
   ];
 
   tiempos: TiempoPrioridad[] = this.copiar(VALORES_INICIALES);

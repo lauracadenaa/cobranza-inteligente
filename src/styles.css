@@ -24,3 +24,262 @@ app-root {
   display: block;
   min-height: 100vh;
 }
+
+/* ==================================================
+   EFECTO "LEVITAR" EN GRÁFICAS
+   Al pasar el mouse, la pieza sube un poco y le sale una sombra
+   suave debajo, con una transición de 0,5 s (sin forma 3D).
+
+   Cómo se usa:
+   - .levitar          → en una pieza HTML (barra, casilla...).
+   - .levitar-zona     → (opcional) en el contenedor que, al tener
+                          el mouse encima, hace levitar su .levitar.
+   - .levitar-svg      → en una pieza de un dibujo SVG (pedazo de dona).
+   - --levitar-grosor  → cuánto sube la pieza.
+================================================== */
+
+.levitar {
+  --levitar-grosor: 6px;
+  position: relative;
+  transition: transform 0.5s, box-shadow 0.5s;
+}
+
+.levitar:hover,
+.levitar-zona:hover .levitar {
+  z-index: 5;
+  transform: translateY(calc(var(--levitar-grosor) * -1));
+  box-shadow: 0 calc(var(--levitar-grosor) * 1.5) calc(var(--levitar-grosor) * 2.5) rgba(0, 0, 0, 0.25);
+}
+
+/* Versión para dibujos SVG */
+.levitar-svg {
+  cursor: pointer;
+  transition: translate 0.5s, filter 0.5s;
+}
+
+.levitar-svg:hover {
+  translate: 0 -4px;
+  filter: drop-shadow(0 6px 6px rgba(0, 0, 0, 0.25));
+}
+
+/* Si la persona pidió menos animaciones en su equipo, no se mueve */
+@media (prefers-reduced-motion: reduce) {
+  .levitar,
+  .levitar-svg {
+    transition: none;
+  }
+}
+
+/* ==================================================
+   TARJETA DE HOVER (la misma de "Cartera por antigüedad de mora" en Inicio)
+   - .con-tarjeta      → el elemento que, con el mouse encima, muestra la tarjeta.
+   - .tarjeta-hover    → la tarjeta blanca (va dentro de .con-tarjeta).
+   - .tarjeta-izquierda → la tarjeta sale hacia la izquierda (para los del borde derecho).
+   - .tarjeta-arriba    → la tarjeta sale hacia arriba (para los de abajo).
+================================================== */
+
+.con-tarjeta {
+  position: relative;
+}
+
+.con-tarjeta:hover {
+  z-index: 30;
+}
+
+.tarjeta-hover {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: calc(50% + 8px);
+  z-index: 30;
+
+  min-width: 150px;
+  padding: 10px;
+  box-sizing: border-box;
+
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+
+  background: #FFFFFF;
+  border: 1px solid #CBD5E1;
+  border-radius: 5px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+
+  font-family: 'Roboto', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 16px;
+  color: #6B7280;
+  text-align: left;
+  white-space: nowrap;
+
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 0.15s ease, visibility 0.15s ease;
+}
+
+.tarjeta-hover strong {
+  color: #0A3B4E;
+  font-weight: 500;
+}
+
+/* Fila con un puntico de color (para gráficas con varias líneas) */
+.tarjeta-hover .tarjeta-fila {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.tarjeta-hover .tarjeta-fila i {
+  width: 8px;
+  height: 8px;
+  flex-shrink: 0;
+  border-radius: 50%;
+}
+
+.tarjeta-hover.tarjeta-izquierda {
+  left: auto;
+  right: calc(50% + 8px);
+}
+
+.tarjeta-hover.tarjeta-arriba {
+  top: auto;
+  bottom: calc(100% + 6px);
+}
+
+.con-tarjeta:hover > .tarjeta-hover {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* ==================================================
+   GRÁFICAS DE LÍNEAS: PUNTOS, LÍNEA PUNTEADA Y TARJETA
+   Va en una capa encima del dibujo (si los puntos se dibujaran
+   dentro del SVG quedarían aplastados como óvalos).
+   Cada mes (o día) es una columna invisible: al pasar el mouse
+   sale la línea punteada, sus puntos crecen y levitan, y aparece
+   la tarjeta con los valores.
+================================================== */
+
+.capa-columnas {
+  position: absolute;
+  inset: 0;
+}
+
+.columna-hover {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  transform: translateX(-50%);
+  cursor: pointer;
+}
+
+.columna-hover:hover {
+  z-index: 10;
+}
+
+/* Línea punteada vertical */
+.columna-guia {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  border-left: 1px dashed #94A3B8;
+  opacity: 0;
+  transition: opacity 0.15s;
+  pointer-events: none;
+}
+
+/* Punto de cada línea (siempre relleno con el color de su línea) */
+.punto-grafica {
+  position: absolute;
+  left: 50%;
+  width: 7px;
+  height: 7px;
+  margin: -3.5px 0 0 -3.5px;
+  border-radius: 50%;
+  background: currentColor;
+  pointer-events: none;
+  transition: transform 0.5s, box-shadow 0.5s;
+}
+
+.columna-hover:hover .columna-guia {
+  opacity: 1;
+}
+
+/* Los puntos del mes señalado crecen y levitan */
+.columna-hover:hover .punto-grafica {
+  transform: translateY(-2px) scale(1.5);
+  box-shadow: 0 3px 5px rgba(0, 0, 0, 0.25);
+}
+
+/* Tarjeta al lado de la línea punteada */
+.tarjeta-lineas {
+  position: absolute;
+  top: 4px;
+  left: calc(50% + 10px);
+  z-index: 30;
+
+  min-width: 150px;
+  padding: 8px 10px;
+  box-sizing: border-box;
+
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+
+  background: #FFFFFF;
+  border: 1px solid #CBD5E1;
+  border-radius: 5px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+
+  font-family: 'Roboto', sans-serif;
+  font-size: 11px;
+  line-height: 14px;
+  color: #475569;
+  white-space: nowrap;
+
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 0.15s ease, visibility 0.15s ease;
+}
+
+.tarjeta-lineas.tarjeta-izquierda {
+  left: auto;
+  right: calc(50% + 10px);
+}
+
+.tarjeta-lineas strong {
+  margin-bottom: 2px;
+  color: #0A3B4E;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.tarjeta-lineas .tarjeta-fila {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.tarjeta-lineas .tarjeta-fila i {
+  width: 7px;
+  height: 7px;
+  flex-shrink: 0;
+  border-radius: 50%;
+}
+
+/* El valor va a la derecha, en negrita */
+.tarjeta-lineas .tarjeta-fila b {
+  margin-left: auto;
+  padding-left: 14px;
+  color: #0A3B4E;
+  font-weight: 700;
+}
+
+.columna-hover:hover .tarjeta-lineas {
+  opacity: 1;
+  visibility: visible;
+}

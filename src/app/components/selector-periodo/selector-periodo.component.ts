@@ -43,10 +43,12 @@ const NOMBRES_MES = [
   'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
 ];
 
+import { IconoComponent } from '../../shared/icono/icono.component';
+
 @Component({
   selector: 'app-selector-periodo',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, IconoComponent],
   templateUrl: './selector-periodo.component.html',
   styleUrl: './selector-periodo.component.css'
 })

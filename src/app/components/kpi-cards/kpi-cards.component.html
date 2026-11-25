@@ -14,10 +14,7 @@
 
     <!-- IMAGEN EN LA PARTE SUPERIOR DERECHA -->
     <div class="kpi-icon" *ngIf="kpi.image">
-      <img
-        [src]="kpi.image"
-        [alt]="'Icono de ' + kpi.title"
-      >
+      <app-icono [nombre]="kpi.image" [tamano]="20" [style.color]="kpi.iconColor"></app-icono>
     </div>
 
     <!-- VALOR DEL KPI -->

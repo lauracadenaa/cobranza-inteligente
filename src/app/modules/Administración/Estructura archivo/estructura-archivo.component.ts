@@ -26,9 +26,12 @@ interface CampoArchivo {
 // Información fija: NO se consulta el backend.
 // ==================================================
 
+import { IconoComponent } from '../../../shared/icono/icono.component';
+
 @Component({
   selector: 'app-estructura-archivo',
   standalone: true,
+  imports: [IconoComponent],
   templateUrl: './estructura-archivo.component.html',
   styleUrl: './estructura-archivo.component.css'
 })

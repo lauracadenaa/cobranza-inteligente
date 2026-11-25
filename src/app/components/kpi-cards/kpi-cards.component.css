@@ -248,3 +248,79 @@
     grid-template-columns: minmax(0, 1fr);
   }
 }
+
+/* ==================================================
+   MEDIDAS DEL FIGMA (div.stats-grid / Component 7)
+   5 tarjetas repartidas en 1128 px, 102 px de alto,
+   relleno 13 / 16 px, esquinas de 16 px, borde #E2E8F0
+================================================== */
+
+.kpi-container {
+  gap: 19.5px;
+  margin-top: 0;
+}
+
+.kpi-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  gap: 13px;
+  height: 102px;
+  padding: 13px 16px;
+  background-color: #FFFFFF;
+  border: 1px solid #E2E8F0;
+  border-radius: 16px;
+}
+
+.kpi-icon {
+  top: 13px;
+  right: 16px;
+  width: 20px;
+  height: 20px;
+}
+
+/* Nombre del indicador: 11 px SemiBold */
+.kpi-title {
+  color: #0A3B4E;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 100%;
+  letter-spacing: 0.44px;
+}
+
+/* Valor: 20 px SemiBold */
+.kpi-value,
+.kpi-value-recaudo {
+  color: #0A3B4E;
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 100%;
+  letter-spacing: -0.66px;
+}
+
+/* Fila de variación: 5 px debajo del valor */
+.kpi-change {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  margin-top: -8px;
+}
+
+/* Etiqueta del porcentaje: fondo #EFF6FF, esquinas de 12 px, relleno 3 / 8 px */
+.kpi-percentage {
+  padding: 3px 8px;
+  border-radius: 12px;
+  background-color: #EFF6FF;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 100%;
+  letter-spacing: -0.66px;
+}
+
+.kpi-period {
+  color: #64748B;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 100%;
+  letter-spacing: -0.66px;
+}

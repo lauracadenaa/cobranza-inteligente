@@ -138,3 +138,46 @@
   background: #1763F5;
   color: #FFFFFF;
 }
+
+/* ==================================================
+   MEDIDAS DEL FIGMA (igual que el Inicio)
+   Fondo #F4F7FA · contenido desde x=278 con 34 px de margen ·
+   10 px bajo el encabezado y 16 px entre bloques
+================================================== */
+
+.dashboard-layout,
+.dashboard-content {
+  background-color: #F4F7FA;
+}
+
+.dashboard-content {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 10px 34px 34px;
+  overflow-x: hidden;
+}
+
+.dashboard-content > app-dashboard-header {
+  margin-bottom: -6px;
+}
+
+/* "Sincronizar con CORE": botón de texto, 32 px de alto,
+   relleno 6 / 12 px, 4 px entre ícono y texto */
+.btn-sincronizar {
+  height: 32px;
+  gap: 4px;
+  padding: 6px 12px;
+  border: none;
+  border-radius: 100px;
+  background: transparent;
+  color: #2563EB;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 20px;
+  letter-spacing: 0.1px;
+}
+
+.btn-sincronizar:hover:not(:disabled) {
+  background: #EAF1FF;
+}

@@ -12,7 +12,7 @@
 
       <!-- Buscador -->
       <div class="buscador">
-        <i class="bi bi-search" aria-hidden="true"></i>
+        <app-icono nombre="search" [tamano]="16"></app-icono>
         <input
           type="text"
           [(ngModel)]="busqueda"
@@ -20,7 +20,7 @@
           placeholder="Buscar por ID, usuario, acción o descripción..."
           aria-label="Buscar en la bitácora">
         <button type="button" *ngIf="busqueda" aria-label="Limpiar búsqueda" (click)="limpiarBusqueda()">
-          <i class="bi bi-x" aria-hidden="true"></i>
+          <app-icono nombre="x" [tamano]="16"></app-icono>
         </button>
       </div>
 
@@ -33,7 +33,7 @@
           [class.filtros-activos]="mostrarFiltros"
           [attr.aria-expanded]="mostrarFiltros"
           (click)="alternarFiltros($event)">
-          <img src="imagenes/Filtro.png" alt="">
+          <app-icono nombre="funnel" [tamano]="16"></app-icono>
           <span>Filtros</span>
           <span class="filter-count" *ngIf="filtrosActivos > 0">{{ filtrosActivos }}</span>
         </button>
@@ -43,7 +43,7 @@
           <div class="filtros-header">
             <h3>Filtros</h3>
             <button type="button" class="cerrar-filtros" aria-label="Cerrar filtros" (click)="cerrarFiltros()">
-              <i class="bi bi-x"></i>
+              <app-icono nombre="x" [tamano]="16"></app-icono>
             </button>
           </div>
 
@@ -60,7 +60,7 @@
                   <option value="">Todas las acciones</option>
                   <option *ngFor="let opcion of opcionesAccion" [value]="opcion.valor">{{ opcion.texto }}</option>
                 </select>
-                <img src="/imagenes/flecha.admin.png" alt="">
+                <app-icono nombre="chevron-down" [tamano]="16" class="select-flecha"></app-icono>
               </div>
             </div>
 
@@ -102,7 +102,7 @@
     <div class="active-filter-tag" *ngFor="let filtro of filtrosVisibles">
       <span>{{ filtro.texto }}</span>
       <button type="button" class="remove-active-filter" aria-label="Quitar filtro" (click)="quitarFiltro(filtro.clave)">
-        <i class="bi bi-x"></i>
+        <app-icono nombre="x" [tamano]="16"></app-icono>
       </button>
     </div>
   </div>
@@ -155,7 +155,7 @@
 
     <div class="paginacion" *ngIf="paginas > 1">
       <button type="button" aria-label="Página anterior" [disabled]="pagina === 0" (click)="irAPagina(pagina - 1)">
-        <i class="bi bi-chevron-left" aria-hidden="true"></i>
+        <app-icono nombre="chevron-left" [tamano]="16"></app-icono>
       </button>
 
       <ng-container *ngFor="let boton of botonesPagina">
@@ -166,7 +166,7 @@
       </ng-container>
 
       <button type="button" aria-label="Página siguiente" [disabled]="pagina >= paginas - 1" (click)="irAPagina(pagina + 1)">
-        <i class="bi bi-chevron-right" aria-hidden="true"></i>
+        <app-icono nombre="chevron-right" [tamano]="16"></app-icono>
       </button>
     </div>
   </div>

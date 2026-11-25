@@ -225,3 +225,42 @@ td {
   font-size: 12px;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
 }
+
+/* ==================================================
+   MEDIDAS DEL FIGMA (tarjetas de Administración)
+   Esquinas de 16 px, borde #E2E8F0, títulos de 16 px
+================================================== */
+
+.card {
+  border: 1px solid #E2E8F0;
+  border-radius: 16px;
+}
+
+.card-titulo h2 {
+  color: #001822;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+th {
+  color: #63768A;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 140%;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+td {
+  color: #001822;
+  font-size: 14px;
+}
+
+.select-flecha {
+  position: absolute;
+  top: 50%;
+  right: 16px;
+  transform: translateY(-50%);
+  color: #64748B;
+  pointer-events: none;
+}

@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectorRef, Component, OnDestroy, OnInit, inject } from '@angular/core';
+import { ChangeDetectorRef, Component, HostListener, OnDestroy, OnInit, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { HttpErrorResponse } from '@angular/common/http';
@@ -73,10 +73,13 @@ const DIA_MS = 24 * 60 * 60 * 1000;
 //   POST /payments/{id}/cancel     → "Cancelar link"
 // ==================================================
 
+import { IconoComponent } from '../../shared/icono/icono.component';
+
 @Component({
   selector: 'app-links-pagos',
   standalone: true,
   imports: [
+    IconoComponent,
     CommonModule,
     FormsModule,
     SidebarComponent,
@@ -109,12 +112,18 @@ export class LinksPagosComponent implements OnInit, OnDestroy {
   // Buscador y filtros
   busqueda = '';
   mostrarFiltros = false;
-  filtroEstado = 'Todos';
+  // Filtros aplicados y borrador del modal (se aplican con "Aplicar filtros")
+  filtros = this.filtrosVacios();
+  borrador = this.filtrosVacios();
 
   // Indicadores, gráfico y canales (se calculan al cargar)
   kpis: Kpi[] = [];
   canales: CanalResumen[] = [];
   grafico = { lineaLinks: '', areaLinks: '', lineaPagos: '', areaPagos: '', maximo: 0, etiquetasX: [] as string[] };
+
+  // Una columna por día (en % del dibujo): sus 2 puntos y lo que dice la tarjeta
+  columnasGrafico: { x: number; titulo: string; yLinks: number; yPagos: number; links: number; pagos: number }[] = [];
+  anchoColumnaGrafico = 100;
 
   // Mensaje corto abajo a la derecha
   mensaje = '';
@@ -124,6 +133,17 @@ export class LinksPagosComponent implements OnInit, OnDestroy {
   // ==================================================
   // CARGAR DATOS
   // ==================================================
+
+  // Ícono (Lucide, en código) y color de cada indicador, como en el Figma
+  iconoKpi(tipo: string): { nombre: string; color: string } {
+    const iconos: Record<string, { nombre: string; color: string }> = {
+      money: { nombre: 'banknote', color: '#15803D' },
+      send: { nombre: 'send', color: '#3B82F6' },
+      check: { nombre: 'circle-check-big', color: '#F59E0B' },
+      chart: { nombre: 'chart-no-axes-combined', color: '#6D28D9' }
+    };
+    return iconos[tipo] ?? { nombre: 'banknote', color: '#64748B' };
+  }
 
   ngOnInit(): void {
     this.cargar();
@@ -402,6 +422,21 @@ export class LinksPagosComponent implements OnInit, OnDestroy {
       maximo,
       etiquetasX: [0, 7, 14, 21, 29].map(etiqueta)
     };
+
+    // Mismas cuentas que las líneas, en porcentaje (el dibujo mide 500 x 150)
+    const enPorcentaje = (v: number) => ((138 - (v / maximo) * 128) / 150) * 100;
+    this.anchoColumnaGrafico = 100 / (dias - 1);
+    this.columnasGrafico = linksPorDia.map((links, i) => {
+      const d = new Date(inicio + i * DIA_MS);
+      return {
+        x: (i / (dias - 1)) * 100,
+        titulo: `${etiqueta(i)} ${d.getFullYear()}`,
+        yLinks: enPorcentaje(links),
+        yPagos: enPorcentaje(pagosPorDia[i]),
+        links,
+        pagos: pagosPorDia[i]
+      };
+    });
   }
 
   // Marcas del eje Y (de arriba hacia abajo)
@@ -445,9 +480,96 @@ export class LinksPagosComponent implements OnInit, OnDestroy {
 
     return registros.filter(r => {
       const contenido = [r.codigo, r.asociado, r.documento, r.obligacion].join(' ').toLowerCase();
+      const f = this.filtros;
+      const dia = ((this.pestanaActiva === 'pagos' ? r.fecha : r.creado) || '').substring(0, 10);
+
       return (!texto || contenido.includes(texto)) &&
-        (this.filtroEstado === 'Todos' || r.estado === this.filtroEstado);
+        (f.estados.length === 0 || f.estados.includes(r.estado)) &&
+        (!f.canal || r.canal === f.canal) &&
+        (!f.desde || (dia !== '' && dia >= f.desde)) &&
+        (!f.hasta || (dia !== '' && dia <= f.hasta));
     });
+  }
+
+  // ==================================================
+  // FILTROS (igual que Inicio > Casos en gestión)
+  // ==================================================
+
+  private filtrosVacios() {
+    return { estados: [] as string[], canal: '', desde: '', hasta: '' };
+  }
+
+  get canalesDisponibles(): string[] {
+    const lista = this.pestanaActiva === 'pagos' ? this.pagos : this.links;
+    return [...new Set(lista.map(r => r.canal).filter(c => !!c))];
+  }
+
+  alternarFiltros(evento: MouseEvent): void {
+    evento.stopPropagation();
+    if (!this.mostrarFiltros) {
+      this.borrador = { ...this.filtros, estados: [...this.filtros.estados] };
+    }
+    this.mostrarFiltros = !this.mostrarFiltros;
+  }
+
+  cerrarFiltros(): void {
+    this.mostrarFiltros = false;
+  }
+
+  alternarEstadoFiltro(estado: string): void {
+    const lista = this.borrador.estados;
+    this.borrador.estados = lista.includes(estado) ? lista.filter(e => e !== estado) : [...lista, estado];
+  }
+
+  aplicarFiltros(): void {
+    this.filtros = { ...this.borrador, estados: [...this.borrador.estados] };
+    this.mostrarFiltros = false;
+    this.paginaActual = 1;
+  }
+
+  limpiarFiltros(): void {
+    this.filtros = this.filtrosVacios();
+    this.borrador = this.filtrosVacios();
+    this.mostrarFiltros = false;
+    this.paginaActual = 1;
+  }
+
+  // Etiquetas debajo de la barra (como en Inicio)
+  get filtrosVisibles(): { clave: 'estado' | 'canal' | 'desde' | 'hasta'; valor?: string; texto: string }[] {
+    const f = this.filtros;
+    const etiqueta = this.pestanaActiva === 'pagos' ? 'Origen' : 'Canal';
+    const visibles: { clave: 'estado' | 'canal' | 'desde' | 'hasta'; valor?: string; texto: string }[] =
+      f.estados.map(e => ({ clave: 'estado' as const, valor: e, texto: `Estado: ${e}` }));
+    if (f.canal) visibles.push({ clave: 'canal', texto: `${etiqueta}: ${this.nombreCanal(f.canal)}` });
+    if (f.desde) visibles.push({ clave: 'desde', texto: `Desde: ${this.fechaFiltro(f.desde)}` });
+    if (f.hasta) visibles.push({ clave: 'hasta', texto: `Hasta: ${this.fechaFiltro(f.hasta)}` });
+    return visibles;
+  }
+
+  get filtrosActivos(): number {
+    return this.filtrosVisibles.length;
+  }
+
+  quitarFiltro(filtro: { clave: 'estado' | 'canal' | 'desde' | 'hasta'; valor?: string }): void {
+    const f = { ...this.filtros, estados: [...this.filtros.estados] };
+    if (filtro.clave === 'estado') f.estados = f.estados.filter(e => e !== filtro.valor);
+    else f[filtro.clave] = '';
+    this.filtros = f;
+    this.paginaActual = 1;
+  }
+
+  private fechaFiltro(fecha: string): string {
+    const [a, m, d] = fecha.split('-');
+    return `${d}/${m}/${a}`;
+  }
+
+  // Cierra el modal de filtros al hacer clic afuera
+  @HostListener('document:click', ['$event'])
+  cerrarFiltrosAfuera(evento: MouseEvent): void {
+    const objetivo = evento.target as HTMLElement | null;
+    if (this.mostrarFiltros && !objetivo?.closest('.filtros-modal, .managed-filter')) {
+      this.mostrarFiltros = false;
+    }
   }
 
   readonly filasPorPagina = 5;
@@ -503,7 +625,9 @@ export class LinksPagosComponent implements OnInit, OnDestroy {
     this.paginaActual = 1;
     this.registroSeleccionado = null;
     this.busqueda = '';
-    this.filtroEstado = 'Todos';
+    this.filtros = this.filtrosVacios();
+    this.borrador = this.filtrosVacios();
+    this.mostrarFiltros = false;
   }
 
   // ==================================================

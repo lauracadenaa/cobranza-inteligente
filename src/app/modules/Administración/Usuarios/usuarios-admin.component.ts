@@ -54,10 +54,12 @@ const ROLES_OCULTOS = ['ML_ENGINE'];
 // Conectada al backend: /admin/users
 // ==================================================
 
+import { IconoComponent } from '../../../shared/icono/icono.component';
+
 @Component({
   selector: 'app-usuarios-admin',
   standalone: true,
-  imports: [FormsModule],
+  imports: [IconoComponent, FormsModule],
   templateUrl: './usuarios-admin.component.html',
   styleUrl: './usuarios-admin.component.css'
 })

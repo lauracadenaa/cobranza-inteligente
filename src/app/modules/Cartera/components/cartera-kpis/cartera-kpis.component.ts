@@ -6,14 +6,17 @@ interface Kpi {
   valor: string;
   porcentaje: string;
   periodo: string;
-  imagen: string;
+  imagen: string;   // nombre del ícono Lucide (en código)
+  color?: string;
   alt: string;
 }
+
+import { IconoComponent } from '../../../../shared/icono/icono.component';
 
 @Component({
   selector: 'app-cartera-kpis',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, IconoComponent],
   templateUrl: './cartera-kpis.component.html',
   styleUrl: './cartera-kpis.component.css'
 })
@@ -52,7 +55,8 @@ export class CarteraKpisComponent {
       valor: '$326.1 M',
       porcentaje: '+8.6%',
       periodo: 'vs mes anterior',
-      imagen: '/imagenes/Cartera/CarteraTotal.png',
+      imagen: 'wallet',
+      color: '#3B82F6',
       alt: 'Cartera total'
     },
     {
@@ -60,7 +64,8 @@ export class CarteraKpisComponent {
       valor: '8.672',
       porcentaje: '+8.6%',
       periodo: 'vs mes anterior',
-      imagen: '/imagenes/Cartera/Asociados.png',
+      imagen: 'users',
+      color: '#10989B',
       alt: 'Asociados'
     },
     {
@@ -68,7 +73,8 @@ export class CarteraKpisComponent {
       valor: '$226.8 M',
       porcentaje: '+8.6%',
       periodo: 'vs mes anterior',
-      imagen: '/imagenes/Cartera/NombreCartera.png',
+      imagen: 'layers',
+      color: '#3B82F6',
       alt: 'Nombre de cartera'
     },
     {
@@ -76,7 +82,8 @@ export class CarteraKpisComponent {
       valor: '12.531',
       porcentaje: '+8.6%',
       periodo: 'vs mes anterior',
-      imagen: '/imagenes/Cartera/Obligaciones.png',
+      imagen: 'file-text',
+      color: '#10B981',
       alt: 'Obligaciones'
     },
     {
@@ -84,7 +91,8 @@ export class CarteraKpisComponent {
       valor: '76',
       porcentaje: '+3 días',
       periodo: 'vs mes anterior',
-      imagen: '/imagenes/Cartera/PromedioMora.png',
+      imagen: 'clock',
+      color: '#F59E0B',
       alt: 'Días promedio de mora'
     }
   ];
@@ -99,7 +107,8 @@ export class CarteraKpisComponent {
       valor: '—',
       porcentaje: '',
       periodo: '',
-      imagen: '/imagenes/Cartera/Asociados.png',
+      imagen: 'users',
+      color: '#10989B',
       alt: 'Total de asociados'
     },
     {
@@ -107,7 +116,8 @@ export class CarteraKpisComponent {
       valor: '—',
       porcentaje: '',
       periodo: '',
-      imagen: '/imagenes/Cartera/PromedioMora.png',
+      imagen: 'clock',
+      color: '#F59E0B',
       alt: 'Asociados en mora'
     },
     {
@@ -115,7 +125,8 @@ export class CarteraKpisComponent {
       valor: '—',
       porcentaje: '',
       periodo: '',
-      imagen: '/imagenes/Cartera/CarteraTotal.png',
+      imagen: 'wallet',
+      color: '#3B82F6',
       alt: 'Riesgo alto o crítico'
     },
     {
@@ -123,7 +134,8 @@ export class CarteraKpisComponent {
       valor: '—',
       porcentaje: '',
       periodo: '',
-      imagen: '/imagenes/Cartera/Asociados.png',
+      imagen: 'users',
+      color: '#10989B',
       alt: 'Asociados contactables'
     },
     {
@@ -131,7 +143,8 @@ export class CarteraKpisComponent {
       valor: '—',
       porcentaje: '',
       periodo: '',
-      imagen: '/imagenes/Cartera/NombreCartera.png',
+      imagen: 'layers',
+      color: '#3B82F6',
       alt: 'Asociados ilocalizados'
     }
   ];
@@ -146,7 +159,8 @@ export class CarteraKpisComponent {
       valor: '—',
       porcentaje: '',
       periodo: '',
-      imagen: '/imagenes/Cartera/Obligaciones.png',
+      imagen: 'file-text',
+      color: '#10B981',
       alt: 'Obligaciones activas'
     },
     {
@@ -154,7 +168,8 @@ export class CarteraKpisComponent {
       valor: '—',
       porcentaje: '',
       periodo: '',
-      imagen: '/imagenes/Cartera/CarteraTotal.png',
+      imagen: 'wallet',
+      color: '#3B82F6',
       alt: 'Saldo vencido'
     },
     {
@@ -162,7 +177,8 @@ export class CarteraKpisComponent {
       valor: '—',
       porcentaje: '',
       periodo: '',
-      imagen: '/imagenes/Cartera/PromedioMora.png',
+      imagen: 'clock',
+      color: '#F59E0B',
       alt: 'Riesgo alto o crítico'
     },
     {
@@ -170,7 +186,8 @@ export class CarteraKpisComponent {
       valor: '—',
       porcentaje: '',
       periodo: '',
-      imagen: '/imagenes/Cartera/PromedioMora.png',
+      imagen: 'clock',
+      color: '#F59E0B',
       alt: 'Días promedio de mora'
     },
     {
@@ -178,7 +195,8 @@ export class CarteraKpisComponent {
       valor: '—',
       porcentaje: '',
       periodo: '',
-      imagen: '/imagenes/Cartera/Asociados.png',
+      imagen: 'users',
+      color: '#10989B',
       alt: 'Pagos asociados'
     }
   ];
@@ -193,7 +211,8 @@ export class CarteraKpisComponent {
       valor: '—',
       porcentaje: '',
       periodo: '',
-      imagen: '/imagenes/Cartera/Asociados.png',
+      imagen: 'layers',
+      color: '#3B82F6',
       alt: 'Segmentos activos'
     },
     {
@@ -201,7 +220,8 @@ export class CarteraKpisComponent {
       valor: '—',
       porcentaje: '',
       periodo: '',
-      imagen: '/imagenes/Cartera/Asociados.png',
+      imagen: 'trending-up',
+      color: '#059669',
       alt: 'Segmento con mayor saldo'
     },
     {
@@ -209,7 +229,8 @@ export class CarteraKpisComponent {
       valor: '—',
       porcentaje: '',
       periodo: '',
-      imagen: '/imagenes/Cartera/CarteraTotal.png',
+      imagen: 'triangle-alert',
+      color: '#DC2626',
       alt: 'Segmento con mayor mora'
     },
     {
@@ -217,7 +238,8 @@ export class CarteraKpisComponent {
       valor: '—',
       porcentaje: '',
       periodo: '',
-      imagen: '/imagenes/Cartera/NombreCartera.png',
+      imagen: 'users',
+      color: '#10989B',
       alt: 'Asociados segmentados'
     },
     {
@@ -225,7 +247,8 @@ export class CarteraKpisComponent {
       valor: '—',
       porcentaje: '',
       periodo: '',
-      imagen: '/imagenes/Cartera/PromedioMora.png',
+      imagen: 'percent',
+      color: '#15803D',
       alt: 'Tasa de recuperación'
     }
   ];

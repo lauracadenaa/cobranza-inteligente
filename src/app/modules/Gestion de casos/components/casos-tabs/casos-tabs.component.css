@@ -73,3 +73,28 @@
 .casos-tab:hover:not(.activa) {
   background-color: #F1F5F9;
 }
+
+/* ==================================================
+   MEDIDAS DEL FIGMA (mismas pestañas de Cartera)
+   38 px de alto, relleno 0 / 16 px, esquinas de 8 px, texto 14 px Medium
+================================================== */
+
+.casos-tab {
+  height: 38px;
+  padding: 0 16px;
+  border-radius: 8px;
+  color: #49454F;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 20px;
+  letter-spacing: 0.1px;
+}
+
+.casos-tab.activa {
+  background-color: #DBEAFE;
+  color: #2563EB;
+}
+
+.casos-tab:not(.activa):hover {
+  color: #2563EB;
+}

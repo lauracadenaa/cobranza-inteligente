@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, OnDestroy, OnInit, inject } from '@angular/core';
+import { ChangeDetectorRef, Component, HostListener, OnDestroy, OnInit, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { HttpErrorResponse } from '@angular/common/http';
 
@@ -39,10 +39,12 @@ const A_BACKEND: Record<EstadoOperativo, EstadoAsesorBackend> = {
   'Inactivo': 'INACTIVE'
 };
 
+import { IconoComponent } from '../../../shared/icono/icono.component';
+
 @Component({
   selector: 'app-capacidad-agente',
   standalone: true,
-  imports: [FormsModule],
+  imports: [IconoComponent, FormsModule],
   templateUrl: './capacidad-agente.component.html',
   styleUrls: ['../admin-comun.css', './capacidad-agente.component.css']
 })
@@ -72,11 +74,75 @@ export class CapacidadAgenteComponent implements OnInit, OnDestroy {
   // Buscador y filtro
   busqueda = '';
   mostrarFiltros = false;
-  filtroEstado: EstadoOperativo | '' = '';
+
+  // Filtros (igual que Inicio > Casos en gestión)
+  readonly opcionesOcupacion = ['Con espacio (menos de 80%)', 'Cerca del límite (80% a 99%)', 'Al límite (100%)', 'Sin tope'];
+  filtros = { estados: [] as EstadoOperativo[], ocupacion: '' };
+  borrador = { estados: [] as EstadoOperativo[], ocupacion: '' };
+
+  alternarFiltros(evento: MouseEvent): void {
+    evento.stopPropagation();
+    if (!this.mostrarFiltros) {
+      this.borrador = { ...this.filtros, estados: [...this.filtros.estados] };
+    }
+    this.mostrarFiltros = !this.mostrarFiltros;
+  }
+
+  alternarEstadoFiltro(estado: EstadoOperativo): void {
+    const lista = this.borrador.estados;
+    this.borrador.estados = lista.includes(estado) ? lista.filter(e => e !== estado) : [...lista, estado];
+  }
+
+  aplicarFiltros(): void {
+    this.filtros = { ...this.borrador, estados: [...this.borrador.estados] };
+    this.mostrarFiltros = false;
+  }
+
+  limpiarFiltros(): void {
+    this.filtros = { estados: [], ocupacion: '' };
+    this.borrador = { estados: [], ocupacion: '' };
+    this.mostrarFiltros = false;
+  }
+
+  get chipsFiltro(): { clave: 'estado' | 'ocupacion'; valor?: EstadoOperativo; texto: string }[] {
+    const chips: { clave: 'estado' | 'ocupacion'; valor?: EstadoOperativo; texto: string }[] =
+      this.filtros.estados.map(e => ({ clave: 'estado' as const, valor: e, texto: `Estado: ${e}` }));
+    if (this.filtros.ocupacion) chips.push({ clave: 'ocupacion', texto: `Ocupación: ${this.filtros.ocupacion}` });
+    return chips;
+  }
+
+  quitarFiltro(chip: { clave: 'estado' | 'ocupacion'; valor?: EstadoOperativo }): void {
+    this.filtros = chip.clave === 'estado'
+      ? { ...this.filtros, estados: this.filtros.estados.filter(e => e !== chip.valor) }
+      : { ...this.filtros, ocupacion: '' };
+  }
+
+  private cumpleOcupacion(agente: Agente): boolean {
+    const o = this.filtros.ocupacion;
+    if (!o) return true;
+    const valor = this.ocupacion(agente);
+    if (o === 'Sin tope') return valor === null;
+    if (valor === null) return false;
+    if (o.startsWith('Con espacio')) return valor < 80;
+    if (o.startsWith('Cerca')) return valor >= 80 && valor < 100;
+    return valor >= 100;
+  }
+
+  @HostListener('document:click', ['$event'])
+  cerrarFiltrosAfuera(evento: MouseEvent): void {
+    const objetivo = evento.target as HTMLElement | null;
+    if (this.mostrarFiltros && !objetivo?.closest('.filtros-modal, .managed-filter')) {
+      this.mostrarFiltros = false;
+    }
+  }
 
   // Ventana "Ver configuración"
   agenteEnEdicion: Agente | null = null;
   formulario = { estado: 'Activo' as EstadoOperativo, usarGeneral: true, capacidadMaxima: null as number | null };
+
+  // Solo diseño (Figma): el backend no maneja colas ni especialidades por agente
+  readonly colasDisenio = ['General', 'Casos críticos', 'Prejurídico'];
+  readonly especialidadesDisenio = ['Riesgo alto', 'Producto'];
   guardando = false;
   errorFormulario = '';
 
@@ -142,7 +208,8 @@ export class CapacidadAgenteComponent implements OnInit, OnDestroy {
     const texto = this.busqueda.trim().toLowerCase();
     return this.agentes.filter(a =>
       (!texto || a.nombre.toLowerCase().includes(texto)) &&
-      (!this.filtroEstado || a.estado === this.filtroEstado)
+      (this.filtros.estados.length === 0 || this.filtros.estados.includes(a.estado)) &&
+      this.cumpleOcupacion(a)
     );
   }
 

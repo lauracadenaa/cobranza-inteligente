@@ -102,6 +102,17 @@ export class AnalisisCarteraComponent implements OnInit, OnChanges, OnDestroy {
 
   etiquetasEje = ['400M', '300M', '200M', '100M', '0'];
 
+  // Una columna por mes (en % del dibujo): sus puntos y lo que dice la tarjeta
+  columnasEvolucion: {
+    x: number;
+    titulo: string;
+    valores: { nombre: string; color: string; y: number; texto: string }[];
+  }[] = [];
+  anchoColumna = 100;
+
+  // Título de la tarjeta de cada punto (ej. "Jul 2026")
+  private titulosPuntos: string[] = [];
+
   get lineasGuia(): number[] {
     return [0, 1, 2, 3, 4].map(i =>
       this.margenArriba + i * (this.altoGrafico - 2 * this.margenArriba) / 4
@@ -127,6 +138,7 @@ export class AnalisisCarteraComponent implements OnInit, OnChanges, OnDestroy {
 
     const puntos = this.calcularPuntos();
     this.meses = puntos.map(p => p.etiqueta);
+    this.titulosPuntos = puntos.map(p => `${p.etiqueta} ${p.inicio.getFullYear()}`);
 
     const obligaciones = this.datos?.obligaciones ?? [];
     const millones = (valor: number) => valor / 1_000_000;
@@ -161,7 +173,31 @@ export class AnalisisCarteraComponent implements OnInit, OnChanges, OnDestroy {
     const paso = this.pasoBonito(maximo / 4);
     this.maximoEje = paso * 4;
     this.etiquetasEje = [4, 3, 2, 1, 0].map(i => i === 0 ? '0' : this.formatoEje(paso * i));
+    this.armarPuntos();
   }
+
+  // Mismas cuentas que puntosSerie(), pero en porcentaje para la capa de puntos
+  private armarPuntos(): void {
+    const alto = this.altoGrafico - 2 * this.margenArriba;
+    const cantidad = this.meses.length;
+    this.anchoColumna = cantidad > 1 ? 100 / (cantidad - 1) : 100;
+
+    this.columnasEvolucion = this.meses.map((_, i) => ({
+      x: cantidad > 1 ? (i / (cantidad - 1)) * 100 : 0,
+      titulo: this.titulosPuntos[i] ?? this.meses[i],
+      valores: this.seriesEvolucion.map(serie => {
+        const valor = serie.valores[i] ?? 0;
+        return {
+          nombre: serie.nombre,
+          color: serie.color,
+          y: ((this.margenArriba + alto - (valor / this.maximoEje) * alto) / this.altoGrafico) * 100,
+          texto: valor.toLocaleString('es-CO', { minimumFractionDigits: 1, maximumFractionDigits: 1 }) + ' M'
+        };
+      })
+    }));
+  }
+
+
 
   // Un punto por mes (periodos largos) o por semana (hasta ~45 días)
   private calcularPuntos(): PuntoEvolucion[] {

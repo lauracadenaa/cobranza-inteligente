@@ -16,10 +16,12 @@ interface NotaCaso {
   archivoUrl?: string;
 }
 
+import { IconoComponent } from '../../../../shared/icono/icono.component';
+
 @Component({
   selector: 'app-notas-resumen',
   standalone: true,
-  imports: [
+  imports: [IconoComponent, 
     CommonModule,
     FormsModule
   ],

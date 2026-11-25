@@ -124,3 +124,47 @@
     padding: 0 10px;
   }
 }
+
+/* ==================================================
+   MEDIDAS DEL FIGMA (Administración)
+================================================== */
+
+.dashboard-layout,
+.dashboard-content {
+  background: #F4F7FA;
+}
+
+.dashboard-content {
+  padding: 10px 34px 34px;
+}
+
+.admin-header-container {
+  margin-bottom: -6px;
+}
+
+/* Pestañas: como las de Cartera (barra de 50 px, esquinas de 16 px) */
+.admin-tabs {
+  gap: 4px;
+  min-height: 50px;
+  height: auto;
+  padding: 5px 8px;
+  border: 1px solid #E2E8F0;
+  border-radius: 16px;
+  box-sizing: border-box;
+}
+
+.admin-tabs button {
+  height: 38px;
+  padding: 0 16px;
+  border-radius: 8px;
+  color: #49454F;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 20px;
+  letter-spacing: 0.1px;
+}
+
+.admin-tabs button.activo {
+  background: #DBEAFE;
+  color: #2563EB;
+}

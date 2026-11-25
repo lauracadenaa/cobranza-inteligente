@@ -1760,3 +1760,207 @@ tbody tr:hover {
   border-color: transparent;
   color: #64748B;
 }
+
+/* ==================================================
+   MEDIDAS DEL FIGMA (marco "Home", 1440 px)
+   Menú 244 px · contenido desde x=278 (34 px de margen)
+   Encabezado 81 px · 10 px · KPIs · 16 px entre bloques
+================================================== */
+
+.dashboard-layout,
+.dashboard-content {
+  background-color: #F4F7FA;
+}
+
+.dashboard-content {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 10px 34px 34px;
+}
+
+/* Entre el encabezado y los KPIs hay 10 px */
+.dashboard-content > app-dashboard-header {
+  margin-bottom: -6px;
+}
+
+/* Gráficos: 2 tarjetas de 552 px con 24 px entre ellas */
+.dashboard-charts {
+  gap: 24px;
+}
+
+.managed-cases,
+.quick-actions {
+  margin-top: 0;
+}
+
+/* ===== Tabla "Casos en gestión" ===== */
+
+.managed-cases-header h2 {
+  color: #1E293B;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 100%;
+}
+
+.managed-cases-table th {
+  color: #63768A;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 140%;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.managed-cases-table td {
+  height: 52px;
+  color: #173042;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 140%;
+  border-bottom: 1px solid #E2E8F0;
+}
+
+.managed-cases-table .celda-caso,
+.managed-cases-table .celda-caso a {
+  color: #2764E7;
+  text-decoration: underline;
+}
+
+.risk-badge {
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 100%;
+}
+
+.case-action {
+  color: #2563EB;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 20px;
+  letter-spacing: 0.1px;
+}
+
+.pagination-info {
+  color: #63768A;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 140%;
+}
+
+.pagination-button {
+  display: inline-grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.pagination-button.active {
+  background-color: #2764E7;
+  color: #FFFFFF;
+}
+
+/* Íconos en código dentro del buscador, filtros y listas */
+.managed-search app-icono {
+  color: #94A3B8;
+}
+
+.managed-filter app-icono {
+  color: currentColor;
+}
+
+.filtro-select .select-flecha {
+  position: absolute;
+  top: 50%;
+  right: 16px;
+  transform: translateY(-50%);
+  color: #64748B;
+  pointer-events: none;
+  z-index: 5;
+}
+
+/* ===== Acciones rápidas (quick-access) =====
+   Relleno 13 px, 13 px entre título y tarjetas, esquinas de 16 px */
+
+.quick-actions {
+  height: auto;
+  padding: 13px;
+  gap: 13px;
+  border: 1px solid #E2E8F0;
+  border-radius: 16px;
+}
+
+.quick-actions h2 {
+  color: #0F172A;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 100%;
+}
+
+/* 4 tarjetas con 11 px entre ellas */
+.quick-actions-grid {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 11px;
+}
+
+/* Tarjeta: 67 px de alto, relleno 16 / 12 px, esquinas de 8 px */
+.quick-card {
+  height: 67px;
+  padding: 16px 12px;
+  gap: 8px;
+  border: 1px solid #E2E8F0;
+  border-radius: 8px;
+}
+
+.quick-card:nth-child(1),
+.quick-card:nth-child(2) {
+  background: #EFF6FF;
+  border-color: #E2E8F0;
+}
+
+.quick-card:nth-child(3) {
+  background: #F1F5F9;
+  border-color: #E2E8F0;
+}
+
+.quick-card:nth-child(4) {
+  background: #E9F8F4;
+  border-color: #E2E8F0;
+}
+
+.quick-icon {
+  width: 20px;
+  height: 20px;
+  color: #2563EB;
+}
+
+.quick-card:nth-child(3) .quick-icon {
+  color: #475569;
+}
+
+.quick-card:nth-child(4) .quick-icon {
+  color: #10989B;
+}
+
+.quick-text {
+  gap: 4px;
+}
+
+.quick-text span {
+  color: #0F172A;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 100%;
+}
+
+.quick-text p {
+  color: #64748B;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 100%;
+}

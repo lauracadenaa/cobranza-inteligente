@@ -1,4 +1,5 @@
 
+import { CarteraService } from '../../service/cartera.service';
 import { ChangeDetectorRef, Component, OnDestroy, OnInit, Input, Output, EventEmitter, ElementRef, HostListener, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
@@ -7,12 +8,15 @@ import { DashboardService, UsuarioActual } from '../../service/dashboard.service
 import { CaseService } from '../../service/case.service';
 import { DashboardHeader, ManagedCase } from '../../models/dashboard.models';
 
+import { IconoComponent } from '../../shared/icono/icono.component';
+
 @Component({
   selector: 'app-dashboard-header',
   standalone: true,
 
   imports: [
-    CommonModule
+    CommonModule,
+    IconoComponent
   ],
 
   templateUrl: './dashboard-header.component.html',
@@ -47,6 +51,8 @@ export class DashboardHeaderComponent implements OnInit, OnDestroy {
 
   // Ventana "¿Cerrar sesión?" (diseño Figma)
   modalCerrarSesionAbierto = false;
+
+  private readonly carteraService = inject(CarteraService);
 
   constructor(
     private dashboardService: DashboardService,
@@ -174,6 +180,7 @@ export class DashboardHeaderComponent implements OnInit, OnDestroy {
     this.dashboardService.limpiarCache();
     sessionStorage.removeItem('token');
     sessionStorage.removeItem('refreshToken');
+    this.carteraService.limpiarErroresCargas();
     void this.router.navigateByUrl('/login');
   }
 

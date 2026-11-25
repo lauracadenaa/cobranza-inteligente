@@ -1219,3 +1219,75 @@ app-selector-periodo ::ng-deep .periodo-cerrar {
 app-selector-periodo ::ng-deep .periodo-cerrar {
   width: 40px;
 }
+
+/* ==================================================
+   MEDIDAS DEL FIGMA (Bitácora de auditoría)
+================================================== */
+
+.auditoria-card {
+  border: 1px solid #E2E8F0;
+  border-radius: 12px;
+}
+
+/* Encabezado: 72 px, relleno 16 / 24 px */
+.auditoria-encabezado {
+  min-height: 72px;
+  padding: 16px 24px;
+}
+
+.auditoria-encabezado h2,
+.auditoria-encabezado h3 {
+  color: #1E293B;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 100%;
+}
+
+.auditoria-encabezado small,
+.auditoria-encabezado span.contador {
+  color: #64748B;
+  font-size: 14px;
+  font-weight: 400;
+}
+
+/* Columnas en mayúscula de 12 px y celdas de 14 px */
+th {
+  color: #63768A;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 140%;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+td {
+  color: #001822;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 140%;
+}
+
+/* Acción: azul, 14 px Medium */
+td.accion {
+  color: #2563EB;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 20px;
+  letter-spacing: 0.1px;
+}
+
+.select-flecha {
+  position: absolute;
+  top: 50%;
+  right: 16px;
+  transform: translateY(-50%);
+  color: #64748B;
+  pointer-events: none;
+}
+
+.auditoria-encabezado h2 span {
+  margin-left: 8px;
+  color: #64748B;
+  font-size: 14px;
+  font-weight: 400;
+}

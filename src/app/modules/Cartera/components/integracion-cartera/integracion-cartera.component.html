@@ -35,25 +35,7 @@
     </div>
 
     <div class="kpi-icono">
-      <img
-        *ngIf="kpi.icono === 'lotes'"
-        src="/imagenes/Cartera/Lotes-procesados.png"
-        alt="Lotes procesados">
-
-      <img
-        *ngIf="kpi.icono === 'casos'"
-        src="/imagenes/Cartera/Casos-creados.png"
-        alt="Casos creados">
-
-      <img
-        *ngIf="kpi.icono === 'rechazados'"
-        src="/imagenes/Cartera/Registros-rechazados.png"
-        alt="Registros rechazados">
-
-      <img
-        *ngIf="kpi.icono === 'fecha'"
-        src="/imagenes/Cartera/Ultima-carga.png"
-        alt="Fecha">
+      <app-icono [nombre]="iconoKpi(kpi.icono).nombre" [tamano]="20" [style.color]="iconoKpi(kpi.icono).color"></app-icono>
     </div>
 
   </article>
@@ -119,7 +101,7 @@
         [class.activo]="pasoActual === paso.numero"
         [class.completo]="pasoActual > paso.numero">
         <span class="nc-paso-circulo">
-          <i *ngIf="pasoActual > paso.numero" class="bi bi-check-lg" aria-hidden="true"></i>
+          <app-icono *ngIf="pasoActual > paso.numero" nombre="check" [tamano]="16"></app-icono>
           <ng-container *ngIf="pasoActual <= paso.numero">{{ paso.numero }}</ng-container>
         </span>
         <span class="nc-paso-nombre">{{ paso.numero === 1 ? 'Subir archivo' : paso.nombre }}</span>
@@ -159,11 +141,7 @@
       (drop)="soltarArchivo($event)">
 
       <ng-container *ngIf="!archivoSeleccionado">
-        <svg class="nc-nube" viewBox="0 0 32 32" aria-hidden="true">
-          <path d="M22.5 24h3a5.5 5.5 0 0 0 .4-11 9.5 9.5 0 0 0-18.2 2.4A4.5 4.5 0 0 0 8.5 24h2"></path>
-          <path d="M16 28V17"></path>
-          <path d="m12 21 4-4 4 4"></path>
-        </svg>
+        <app-icono nombre="cloud-upload" [tamano]="48" class="nc-nube"></app-icono>
 
         <p class="nc-zona-titulo">Arrastra y suelta tu archivo aquí</p>
         <p class="nc-zona-o">o</p>
@@ -177,7 +155,7 @@
 
       <div class="nc-archivo" *ngIf="archivoSeleccionado">
         <div class="nc-archivo-fila">
-          <span class="nc-archivo-icono"><i class="bi bi-file-earmark-text" aria-hidden="true"></i></span>
+          <span class="nc-archivo-icono"><app-icono nombre="file-text" [tamano]="16"></app-icono></span>
 
           <div class="nc-archivo-datos">
             <strong>{{ archivoSeleccionado.name }}</strong>
@@ -188,13 +166,13 @@
           </div>
 
           <span class="nc-listo">
-            <i class="bi bi-check-circle" aria-hidden="true"></i>
+            <app-icono nombre="circle-check-big" [tamano]="16"></app-icono>
             Archivo listo para validar
           </span>
         </div>
 
         <button type="button" class="nc-eliminar" (click)="quitarArchivo(inputArchivo)">
-          <i class="bi bi-trash3" aria-hidden="true"></i>
+          <app-icono nombre="trash-2" [tamano]="16"></app-icono>
           Eliminar archivo
         </button>
       </div>
@@ -203,7 +181,7 @@
     </div>
 
     <button type="button" class="nc-plantilla" (click)="descargarPlantilla()">
-      <i class="bi bi-download" aria-hidden="true"></i>
+      <app-icono nombre="download" [tamano]="16"></app-icono>
       Descargar plantilla
     </button>
 
@@ -217,7 +195,7 @@
 
     <div class="nc-caja nc-validacion-progreso">
       <div class="nc-archivo-fila">
-        <span class="nc-archivo-icono"><i class="bi bi-file-earmark-text" aria-hidden="true"></i></span>
+        <span class="nc-archivo-icono"><app-icono nombre="file-text" [tamano]="16"></app-icono></span>
         <strong class="nc-archivo-nombre">{{ archivoSeleccionado?.name }}</strong>
       </div>
 
@@ -265,7 +243,7 @@
           [class.hecha]="estadoEtapaValidacion(etapa.numero) === 'Completado'"
           [class.actual]="estadoEtapaValidacion(etapa.numero) === 'En proceso'">
           <span class="nc-punto">
-            <i *ngIf="estadoEtapaValidacion(etapa.numero) === 'Completado'" class="bi bi-check" aria-hidden="true"></i>
+            <app-icono *ngIf="estadoEtapaValidacion(etapa.numero) === 'Completado'" nombre="check" [tamano]="16"></app-icono>
           </span>
           {{ etapa.nombre }}
         </li>
@@ -367,18 +345,11 @@
       <div class="nc-dato"><span>Tasa de éxito</span><strong>{{ tasaExito }}</strong></div>
     </div>
 
-    <p class="nc-resultado-mensaje">
-      {{
-        cargaFallida ? (mensajeResultado || errorCarga || 'No fue posible procesar el archivo.') :
-        resumenValidacion.registrosRechazados > 0
-          ? 'Algunos registros no pudieron procesarse. Descarga el archivo de errores para corregirlos y volver a cargarlos.'
-          : 'Todos los registros fueron procesados correctamente.'
-      }}
-    </p>
+    <p class="nc-resultado-mensaje" *ngIf="mensajeFinal">{{ mensajeFinal }}</p>
 
     <div class="nc-resultado-botones">
       <button
-        *ngIf="resumenValidacion.registrosRechazados > 0 && loteIdActual !== null"
+        *ngIf="resumenValidacion.registrosRechazados > 0"
         type="button"
         class="nc-btn-primario"
         (click)="subirCorrecciones(inputCorreccion)">
@@ -394,13 +365,12 @@
       </button>
 
       <button
-        *ngIf="resumenValidacion.registrosRechazados > 0 && loteIdActual !== null"
+        *ngIf="hayErrores"
         type="button"
         class="nc-plantilla"
-        [disabled]="descargandoErrores"
         (click)="descargarErroresResultado()">
-        <i class="bi bi-download" aria-hidden="true"></i>
-        {{ descargandoErrores ? 'Descargando...' : 'Descargar archivo de errores' }}
+        <app-icono nombre="download" [tamano]="16"></app-icono>
+        Descargar archivo de errores
       </button>
     </div>
 
@@ -530,7 +500,7 @@
             [class.filtros-activos]="mostrarFiltrosLotes"
             [attr.aria-expanded]="mostrarFiltrosLotes"
             (click)="abrirFiltrosLotes($event)">
-            <img src="imagenes/Filtro.png" alt="">
+            <app-icono nombre="funnel" [tamano]="16"></app-icono>
             <span>Filtros</span>
             <span class="filter-count" *ngIf="cantidadFiltrosLotes > 0">
               {{ cantidadFiltrosLotes }}
@@ -541,7 +511,7 @@
             <div class="filtros-header">
               <h3>Filtros</h3>
               <button type="button" class="cerrar-filtros" aria-label="Cerrar filtros" (click)="mostrarFiltrosLotes = false">
-                <i class="bi bi-x"></i>
+                <app-icono nombre="x" [tamano]="16"></app-icono>
               </button>
             </div>
 
@@ -640,7 +610,7 @@
           class="remove-active-filter"
           aria-label="Quitar filtro"
           (click)="quitarFiltroLote(filtro.clave)">
-          <i class="bi bi-x"></i>
+          <app-icono nombre="x" [tamano]="16"></app-icono>
         </button>
       </div>
       <div class="active-filter-tag filtros-restantes" *ngIf="filtrosLotesVisibles.length > 3">
@@ -719,7 +689,7 @@
           [class.abierto]="loteMenuAbierto === lote.batchId"
           (click)="alternarMenuLote(lote.batchId, $event)">
           <span *ngIf="loteMenuAbierto !== lote.batchId" aria-hidden="true">⋮</span>
-          <i *ngIf="loteMenuAbierto === lote.batchId" class="bi bi-x-lg" aria-hidden="true"></i>
+          <app-icono *ngIf="loteMenuAbierto === lote.batchId" nombre="x" [tamano]="16"></app-icono>
         </button>
 
         <div
@@ -736,6 +706,7 @@
             type="button"
             class="lote-menu-opcion"
             role="menuitem"
+            [disabled]="!tieneErrores(lote) || descargandoErrores"
             (click)="descargarErroresLote(lote)">
 
             <svg viewBox="0 0 24 24" aria-hidden="true">

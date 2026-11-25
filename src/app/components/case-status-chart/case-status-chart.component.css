@@ -193,11 +193,6 @@
 
 .donut-segmento {
   cursor: pointer;
-  transition: opacity 0.15s;
-}
-
-.donut-segmento:hover {
-  opacity: 0.8;
 }
 
 /* ================================================== */
@@ -207,10 +202,11 @@
 .donut-tooltip {
   position: absolute;
 
-  top: 5px;
-  left: 50%;
+  /* La posición la pone el código según dónde esté el mouse */
+  top: 0;
+  left: 0;
 
-  transform: translate(-50%, 4px);
+  transform: none;
 
   width: 150px;
   min-height: 84px;
@@ -243,6 +239,10 @@
 
   z-index: 5;
   pointer-events: none;
+}
+
+.donut-tooltip.tooltip-izquierda {
+  transform: translateX(-100%);
 }
 
 .donut-tooltip.visible {
@@ -489,4 +489,62 @@
     max-width: 100%;
     gap: 14px;
   }
+}
+
+/* ==================================================
+   MEDIDAS DEL FIGMA ("Casos por estado")
+   552 x 390 px, esquinas de 12 px, borde #D9E3EA, relleno de 20 px
+================================================== */
+
+.case-status-chart {
+  height: 390px;
+  padding: 20px;
+  background: #FFFFFF;
+  border: 1px solid #D9E3EA;
+  border-radius: 12px;
+}
+
+/* Título: 16 px SemiBold #0F172A */
+.case-status-header h2 {
+  color: #0F172A;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 100%;
+}
+
+/* "Ir a gestión de casos": 14 px Medium #2563EB */
+.btn-gestion {
+  color: #2563EB;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 20px;
+  letter-spacing: 0.1px;
+}
+
+/* Leyenda: nombre 11 px Regular, valor 12 px SemiBold */
+.legend-item span:not(.legend-dot):not(.legend-value):not(.legend-percent) {
+  color: #374151;
+  font-size: 11px;
+  font-weight: 400;
+  line-height: 100%;
+}
+
+.legend-value,
+.legend-percent {
+  color: #0F172A;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 100%;
+}
+
+/* Número del centro: 32 px Regular */
+.pie-total {
+  color: #001822;
+  font-size: 32px;
+  font-weight: 400;
+  line-height: 100%;
+}
+
+.case-status-chart {
+  margin-top: 0;
 }

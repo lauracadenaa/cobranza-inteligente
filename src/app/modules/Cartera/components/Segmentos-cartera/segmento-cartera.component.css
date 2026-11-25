@@ -488,3 +488,149 @@
     padding: 14px;
   }
 }
+
+/* ==================================================
+   MEDIDAS DEL FIGMA (Cartera › Segmentos)
+================================================== */
+
+.segmentos-container {
+  gap: 16px;
+}
+
+/* "Distribución por segmento": esquinas de 12 px, relleno 20 px, 20 px entre partes */
+.panel-segmentos {
+  gap: 20px;
+  padding: 20px;
+  background: #FFFFFF;
+  border: 1px solid #E2E8F0;
+  border-radius: 12px;
+}
+
+.panel-segmentos h3 {
+  margin: 0;
+  color: #001822;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 100%;
+}
+
+/* Barras de 8 px de grosor y nombre 13 px SemiBold */
+.linea-segmento {
+  height: 8px;
+  border-radius: 4px;
+}
+
+.barra-segmento span {
+  color: #64748B;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 100%;
+}
+
+/* Tarjetas de cada segmento: fondo #F8FAFC, esquinas de 8 px,
+   relleno 16 px, 12 px entre filas; 20 px entre tarjetas */
+.segmentos-distribucion {
+  gap: 20px;
+}
+
+.tarjeta-segmento {
+  padding: 16px;
+  background: #F8FAFC;
+  border: 1px solid #E2E8F0;
+  border-radius: 8px;
+}
+
+.tarjeta-segmento-contenido {
+  gap: 12px;
+}
+
+.tarjeta-segmento-contenido h4 {
+  color: #0A3B4E;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 100%;
+}
+
+.dato-segmento span {
+  color: #64748B;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 100%;
+}
+
+.dato-segmento strong {
+  color: #001822;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 100%;
+}
+
+/* "Análisis comparativo": esquinas de 8 px, relleno 16 px, 22 px entre partes */
+.panel-comparativo {
+  gap: 22px;
+  padding: 16px;
+  background: #FFFFFF;
+  border: 1px solid #E2E8F0;
+  border-radius: 8px;
+}
+
+.panel-comparativo h3 {
+  margin: 0;
+  color: #001822;
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 100%;
+}
+
+.tabla-contenedor th {
+  color: #64748B;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 100%;
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+.tabla-contenedor td {
+  color: #001822;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 100%;
+}
+
+.nombre-segmento {
+  font-weight: 500;
+}
+
+.tabla-contenedor td.saldo-vencido,
+.tabla-contenedor td.tasa-recuperacion {
+  font-weight: 600;
+}
+
+.tabla-contenedor td.tasa-recuperacion {
+  color: #10B981;
+}
+
+/* Nota final: fondo #F8FAFC, esquinas de 6 px, relleno 12 px, ícono info 16 px */
+.nota-segmentos {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px;
+  background: #F8FAFC;
+  border: 1px solid #E2E8F0;
+  border-radius: 6px;
+  color: #64748B;
+  font-size: 11px;
+  font-weight: 400;
+  line-height: 100%;
+}
+
+:host {
+  display: block;
+}
+
+.segmentos-container,
+.analisis-cartera-container {
+  margin-top: 0;
+}

@@ -1,5 +1,5 @@
 
-import { Component, EventEmitter, Output } from '@angular/core';
+import { Component, EventEmitter, Output, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
@@ -74,10 +74,12 @@ interface FiltrosObligaciones {
 // COMPONENTE
 // =============================================
 
+import { IconoComponent } from '../../../../shared/icono/icono.component';
+
 @Component({
   selector: 'app-explorador-cartera',
   standalone: true,
-  imports: [
+  imports: [IconoComponent, 
     CommonModule,
     FormsModule,
     CarteraKpisComponent
@@ -279,8 +281,10 @@ export class ExploradorCarteraComponent {
 
   asociadosSeleccionados: string[] = [];
   busquedaAsociados = '';
-  filtroSegmentoAsociados = '';
-  filtroRiesgoAsociados = '';
+  // Filtros de Asociados (igual que Inicio > Casos en gestión)
+  readonly riesgosFiltro = ['Bajo', 'Medio', 'Alto', 'Crítico'];
+  filtrosAsociados = { riesgos: [] as string[], segmento: '' };
+  borradorAsociados = { riesgos: [] as string[], segmento: '' };
   mostrarFiltrosAsociados = false;
   paginaAsociados = 0;
   readonly tamanioPaginaAsociados = 7;
@@ -374,11 +378,11 @@ export class ExploradorCarteraComponent {
       ].map(dato => this.normalizar(dato)).join(' ');
 
       const coincideBusqueda = !termino || datosBusqueda.includes(termino);
-      const coincideSegmento = !this.filtroSegmentoAsociados ||
-        asociado.segmento === this.filtroSegmentoAsociados;
-      const coincideRiesgo = !this.filtroRiesgoAsociados ||
-        this.normalizar(this.obtenerNivelRiesgo(asociado.casos)) ===
-        this.normalizar(this.filtroRiesgoAsociados);
+      const f = this.filtrosAsociados;
+      const coincideSegmento = !f.segmento || asociado.segmento === f.segmento;
+      const riesgo = this.normalizar(this.obtenerNivelRiesgo(asociado.casos));
+      const coincideRiesgo = f.riesgos.length === 0 ||
+        f.riesgos.some(r => this.normalizar(r) === riesgo);
 
       return coincideBusqueda && coincideSegmento && coincideRiesgo;
     });
@@ -430,17 +434,56 @@ export class ExploradorCarteraComponent {
     }
   }
 
-  actualizarFiltroSegmentoAsociados(event: Event): void {
-    if (event.target instanceof HTMLSelectElement) {
-      this.filtroSegmentoAsociados = event.target.value;
-      this.paginaAsociados = 0;
+  alternarFiltrosAsociados(evento: MouseEvent): void {
+    evento.stopPropagation();
+    if (!this.mostrarFiltrosAsociados) {
+      this.borradorAsociados = { ...this.filtrosAsociados, riesgos: [...this.filtrosAsociados.riesgos] };
     }
+    this.mostrarFiltrosAsociados = !this.mostrarFiltrosAsociados;
   }
 
-  actualizarFiltroRiesgoAsociados(event: Event): void {
-    if (event.target instanceof HTMLSelectElement) {
-      this.filtroRiesgoAsociados = event.target.value;
-      this.paginaAsociados = 0;
+  alternarRiesgoAsociados(riesgo: string): void {
+    const lista = this.borradorAsociados.riesgos;
+    this.borradorAsociados.riesgos = lista.includes(riesgo)
+      ? lista.filter(r => r !== riesgo)
+      : [...lista, riesgo];
+  }
+
+  aplicarFiltrosAsociados(): void {
+    this.filtrosAsociados = { ...this.borradorAsociados, riesgos: [...this.borradorAsociados.riesgos] };
+    this.mostrarFiltrosAsociados = false;
+    this.paginaAsociados = 0;
+  }
+
+  limpiarFiltrosAsociados(): void {
+    this.filtrosAsociados = { riesgos: [], segmento: '' };
+    this.borradorAsociados = { riesgos: [], segmento: '' };
+    this.mostrarFiltrosAsociados = false;
+    this.paginaAsociados = 0;
+  }
+
+  get filtrosVisiblesAsociados(): { clave: 'riesgo' | 'segmento'; valor?: string; texto: string }[] {
+    const f = this.filtrosAsociados;
+    const visibles: { clave: 'riesgo' | 'segmento'; valor?: string; texto: string }[] =
+      f.riesgos.map(r => ({ clave: 'riesgo' as const, valor: r, texto: `Riesgo: ${r}` }));
+    if (f.segmento) visibles.push({ clave: 'segmento', texto: `Segmento: ${f.segmento}` });
+    return visibles;
+  }
+
+  quitarFiltroAsociados(filtro: { clave: 'riesgo' | 'segmento'; valor?: string }): void {
+    this.filtrosAsociados = filtro.clave === 'riesgo'
+      ? { ...this.filtrosAsociados, riesgos: this.filtrosAsociados.riesgos.filter(r => r !== filtro.valor) }
+      : { ...this.filtrosAsociados, segmento: '' };
+    this.paginaAsociados = 0;
+  }
+
+  // Cierra el panel de filtros de Asociados al hacer clic afuera
+  @HostListener('document:click', ['$event'])
+  cerrarFiltrosAsociadosAfuera(evento: MouseEvent): void {
+    const objetivo = evento.target as HTMLElement | null;
+    if (this.mostrarFiltrosAsociados &&
+        !objetivo?.closest('.filtros-modal-asociados, .obligaciones-filtro')) {
+      this.mostrarFiltrosAsociados = false;
     }
   }
 

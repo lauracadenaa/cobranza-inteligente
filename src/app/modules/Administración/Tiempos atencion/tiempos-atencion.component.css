@@ -138,3 +138,44 @@ select.campo {
     grid-template-columns: 1fr;
   }
 }
+
+/* ==================================================
+   ESTADOS (Figma): ícono en círculo de 36 px a la izquierda
+================================================== */
+
+.estado {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 14px 16px;
+  border-radius: 8px;
+}
+
+.estado-circulo {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
+  border-radius: 50%;
+}
+
+.estado-texto strong {
+  display: block;
+  margin-bottom: 4px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.estado-texto p {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.tono-verde { background: #ECFDF5; color: #065F46; }
+.tono-verde .estado-circulo { background: #D1FAE5; color: #059669; }
+.tono-amarillo { background: #FFFBEB; color: #78350F; }
+.tono-amarillo .estado-circulo { background: #FDE68A; color: #92400E; }
+.tono-rojo { background: #FEE2E2; color: #7F1D1D; }
+.tono-rojo .estado-circulo { background: #FECACA; color: #B91C1C; }

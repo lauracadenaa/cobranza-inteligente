@@ -6,12 +6,13 @@
 
   <div class="estados">
     @for (e of estados; track e.titulo) {
+      <!-- Como en Figma: ícono en un círculo y, a su lado, título y texto -->
       <div class="estado tono-{{ e.tono }}">
-        <div class="estado-titulo">
-          <i class="bi {{ e.icono }}" aria-hidden="true"></i>
+        <span class="estado-circulo"><app-icono [nombre]="e.icono" [tamano]="20"></app-icono></span>
+        <div class="estado-texto">
           <strong>{{ e.titulo }}</strong>
+          <p>{{ e.texto }}</p>
         </div>
-        <p>{{ e.texto }}</p>
       </div>
     }
   </div>

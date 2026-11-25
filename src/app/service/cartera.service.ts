@@ -10,6 +10,12 @@ import {
 import { Observable } from 'rxjs';
 
 import { API_CONFIG } from '../core/config/api.config';
+import { ErrorCarga } from '../shared/validador-carga';
+
+const CLAVE_ERRORES_CARGAS = 'cartera.erroresCargas';
+const CLAVE_RECHAZADAS = 'cartera.cargasRechazadas';
+const CLAVE_CONTEOS_CARGAS = 'cartera.leidosCargas';
+const MAXIMO_ERRORES_GUARDADOS = 1000;
 
 // ==================================================
 // ERRORES POR FILA
@@ -78,6 +84,20 @@ export interface BatchDetailResponse {
   progressMessage: string;
   processedAt: string | null;
   message: string;
+}
+
+// ==================================================
+// REGISTROS RECHAZADOS DE UN LOTE
+// ==================================================
+
+export interface BatchRejectedRecord {
+  recordNumber: number | null;
+  status: string;
+  errorCode: string | null;
+  errorDetails: string | null;
+  documentType: string | null;
+  documentNumber: string | null;
+  obligationId: string | null;
 }
 
 // ==================================================
@@ -373,7 +393,94 @@ export class CarteraService {
   // mientras la sesión esté abierta) para mostrarlas en la tabla.
   // ==================================================
 
-  cargasRechazadasLocales: any[] = [];
+  private rechazadas: any[] | null = null;
+
+  get cargasRechazadasLocales(): any[] {
+    return this.rechazadas ??= (this.leerGuardado<any[]>(sessionStorage, CLAVE_RECHAZADAS)['lista'] ?? []);
+  }
+
+  set cargasRechazadasLocales(lista: any[]) {
+    this.rechazadas = lista;
+    const recortada = lista.map(item => ({ ...item, errores: item.errores.slice(0, MAXIMO_ERRORES_GUARDADOS) }));
+    this.guardar(sessionStorage, CLAVE_RECHAZADAS, { lista: recortada });
+  }
+
+  // Al cerrar sesión no queda ningún dato de las cargas
+  limpiarErroresCargas(): void {
+    this.rechazadas = [];
+    sessionStorage.removeItem(CLAVE_RECHAZADAS);
+    sessionStorage.removeItem(CLAVE_ERRORES_CARGAS);
+  }
+
+  // ==================================================
+  // LO QUE SE ENCONTRÓ AL REVISAR CADA ARCHIVO
+  // El backend no cuenta las filas con errores de formato.
+  // - Registros leídos por lote: en localStorage (solo números)
+  // - Errores con sus datos: en sessionStorage (se borran al cerrar
+  //   la pestaña o la sesión)
+  // ==================================================
+
+  private conteos: Record<string, number> | null = null;
+
+  registrosLeidos(numeroLote: string): number | undefined {
+    this.conteos ??= this.leerGuardado<number>(localStorage, CLAVE_CONTEOS_CARGAS);
+    return this.conteos[numeroLote];
+  }
+
+  erroresGuardados(numeroLote: string): ErrorCarga[] {
+    return this.leerGuardado<ErrorCarga[]>(sessionStorage, CLAVE_ERRORES_CARGAS)[numeroLote] ?? [];
+  }
+
+  guardarRevision(numeroLote: string, leidos: number | null, errores: ErrorCarga[]): void {
+    if (leidos !== null) {
+      this.registrosLeidos(numeroLote);
+      this.conteos = { ...this.conteos, [numeroLote]: leidos };
+      this.guardar(localStorage, CLAVE_CONTEOS_CARGAS, this.conteos);
+    }
+
+    const todos = this.leerGuardado<ErrorCarga[]>(sessionStorage, CLAVE_ERRORES_CARGAS);
+    const guardados = errores.slice(0, MAXIMO_ERRORES_GUARDADOS);
+    if (errores.length > guardados.length) {
+      guardados.push({
+        fila: null, campo: 'Archivo', valor: '', esperado: '', codigo: '',
+        error: `Hay ${errores.length} errores en total; aquí solo quedaron guardados los primeros ${MAXIMO_ERRORES_GUARDADOS}.`
+      });
+    }
+    todos[numeroLote] = guardados;
+
+    // Si ya no hay espacio, se deja solo el de esta carga
+    if (!this.guardar(sessionStorage, CLAVE_ERRORES_CARGAS, todos)) {
+      this.guardar(sessionStorage, CLAVE_ERRORES_CARGAS, { [numeroLote]: guardados });
+    }
+  }
+
+  private leerGuardado<T>(lugar: Storage, clave: string): Record<string, T> {
+    try {
+      return JSON.parse(lugar.getItem(clave) || '{}') ?? {};
+    } catch {
+      return {};
+    }
+  }
+
+  private guardar(lugar: Storage, clave: string, valor: unknown): boolean {
+    try {
+      lugar.setItem(clave, JSON.stringify(valor));
+      return true;
+    } catch {
+      return false;   // el navegador no dejó guardar
+    }
+  }
+
+  // ==================================================
+  // REGISTROS RECHAZADOS DE UN LOTE
+  // GET /integration/batches/{id}/rejected-records
+  // ==================================================
+
+  getRejectedRecords(id: number): Observable<BatchRejectedRecord[]> {
+    return this.http.get<BatchRejectedRecord[]>(
+      `${this.baseUrl}/integration/batches/${id}/rejected-records`
+    );
+  }
 
   // ==================================================
   // CARGAR ARCHIVO CSV

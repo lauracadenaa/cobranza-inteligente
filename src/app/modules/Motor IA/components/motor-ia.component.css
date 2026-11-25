@@ -232,6 +232,28 @@ app-dashboard-header {
   font-weight: 500;
 }
 
+.variable-nombre-input {
+  width: 100%;
+  max-width: 260px;
+  height: 32px;
+  padding: 0 10px;
+  box-sizing: border-box;
+  border: 1px solid #DCE5EA;
+  border-radius: 6px;
+  color: #0A3B4E;
+  font-size: 12px;
+  outline: none;
+}
+
+.variable-nombre-input:focus {
+  border-color: #1763F5;
+  box-shadow: 0 0 0 2px rgba(23, 99, 245, 0.12);
+}
+
+.variable-nombre-input.invalido {
+  border-color: #FCA5A5;
+}
+
 /* Barra deslizante azul con relleno */
 .variable-slider {
   --avance: 0%;
@@ -376,7 +398,12 @@ app-dashboard-header {
   cursor: pointer;
 }
 
-.contador button:hover {
+.contador button:disabled {
+  color: #CBD5E1;
+  cursor: default;
+}
+
+.contador button:hover:not(:disabled) {
   background: #EFF6FF;
 }
 
@@ -441,7 +468,9 @@ app-dashboard-header {
 }
 
 .historial-card td {
-  padding: 11px 20px;
+  padding: 6px 20px;
+  height: 36px;
+  line-height: 1.2;
   color: #334155;
   border-bottom: 1px solid #EEF2F5;
 }
@@ -472,8 +501,8 @@ app-dashboard-header {
 .estado {
   padding: 2px 8px;
   border-radius: 4px;
-  background: #E2E8F0;
-  color: #475569;
+  background: #CBD5E1;
+  color: #334155;
   font-size: 10px;
   font-weight: 600;
 }
@@ -483,8 +512,28 @@ app-dashboard-header {
   color: #15803D;
 }
 
-.sin-accion {
-  color: #CBD5E1;
+.historial-card .col-estado {
+  text-align: center;
+}
+
+.btn-rollback {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 28px;
+  padding: 0 12px;
+  border: 1px solid #DCE5EA;
+  border-radius: 8px;
+  background: #FFFFFF;
+  color: #2563EB;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.btn-rollback:hover {
+  background: #EFF6FF;
+  border-color: #BFDBFE;
 }
 
 .historial-pie {
@@ -631,4 +680,228 @@ app-dashboard-header {
   .umbral-titulos {
     display: none;
   }
+}
+
+/* ==================================================
+   MEDIDAS DEL FIGMA (Motor IA y Scoring)
+================================================== */
+
+/* Página: igual que el Inicio */
+.dashboard-layout,
+.dashboard-content {
+  background-color: #F4F7FA;
+}
+
+.dashboard-content {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 10px 34px 34px;
+}
+
+.dashboard-content > app-dashboard-header {
+  margin-bottom: -6px;
+}
+
+.motor-body {
+  gap: 16px;
+  margin-top: 0;
+}
+
+/* Tarjetas: esquinas de 12 px, relleno 20 / 24 px, borde #E2E8F0 */
+.motor-card {
+  padding: 20px 24px;
+  background: #FFFFFF;
+  border: 1px solid #E2E8F0;
+  border-radius: 12px;
+}
+
+/* Cabecera del modelo: 72 px de alto, relleno 10 / 20 px, esquinas de 16 px */
+.modelo-card {
+  gap: 20px;
+  padding: 10px 20px;
+  border-radius: 16px;
+}
+
+/* Ícono brain-cog de 30 px en caja #F5F3FF con esquinas de 8 px */
+.modelo-icono {
+  width: 46px;
+  height: 52px;
+  padding: 11px 8px;
+  border-radius: 8px;
+  background: #F5F3FF;
+  color: #7C3AED;
+  box-sizing: border-box;
+}
+
+.modelo-nombre h2 {
+  color: #0A3B4E;
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 100%;
+}
+
+.etiqueta-activo {
+  padding: 4px 8px;
+  border-radius: 4px;
+  background: #DCFCE7;
+  color: #059669;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 100%;
+}
+
+.modelo-info p {
+  color: #63768A;
+  font-size: 12px;
+  font-weight: 400;
+}
+
+.modelo-info p strong {
+  font-size: 13px;
+  font-weight: 700;
+}
+
+/* "Guardar cambios": 44 px, esquinas de 12 px; deshabilitado gris 10 % */
+.btn-guardar {
+  height: 44px;
+  gap: 8px;
+  padding: 0 24px;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 20px;
+  letter-spacing: 0.1px;
+}
+
+.btn-guardar:disabled {
+  background: rgba(14, 14, 14, 0.1);
+  color: rgba(0, 24, 34, 0.38);
+  opacity: 1;
+}
+
+/* Títulos de tarjeta: 16 px */
+.card-encabezado h3 {
+  color: #001822;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 100%;
+}
+
+.card-encabezado p {
+  color: #64748B;
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 100%;
+}
+
+/* "100 % Calibrado": fondo #DCFCE7, esquinas de 4 px, texto 14 px Bold */
+.etiqueta-calibrado {
+  gap: 8px;
+  padding: 4px;
+  border-radius: 4px;
+  background: #DCFCE7;
+  color: #18A673;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 100%;
+}
+
+/* Variables: nombre 14 px Medium; barra de 6 px; perilla 26 x 16 px */
+.variable-nombre {
+  color: #001822;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.variable-slider {
+  accent-color: #2563EB;
+  height: 6px;
+}
+
+/* Caja del valor: 52 px de alto, fondo #F5F5F5, esquinas de 8 px */
+.variable-valor {
+  height: 52px;
+  padding: 6px 16px;
+  border: 1px solid #E2E8F0;
+  border-radius: 8px;
+  background: #F5F5F5;
+  color: #334155;
+  font-size: 15px;
+  font-weight: 400;
+  box-sizing: border-box;
+}
+
+.btn-icono-eliminar,
+.btn-agregar {
+  color: #2563EB;
+}
+
+.btn-agregar {
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 20px;
+  letter-spacing: 0.1px;
+}
+
+/* Umbrales: nombre 14 px Medium; valor en caja #F4F7FA de 100 x 40 px */
+.umbral-nombre {
+  color: #001822;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.umbral-fila input[type='number'] {
+  width: 100px;
+  height: 40px;
+  padding: 12px;
+  border: 1px solid #D9E3EA;
+  border-radius: 6px;
+  background: #F4F7FA;
+  color: #173042;
+  font-size: 14px;
+  font-weight: 600;
+  text-align: center;
+  box-sizing: border-box;
+}
+
+.umbral-fila button {
+  color: #2563EB;
+}
+
+/* Histórico: título 16 px y columnas en mayúscula de 12 px */
+.historial-titulo {
+  color: #001822;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.tabla-contenedor th {
+  color: #63768A;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 140%;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.btn-rollback {
+  gap: 4px;
+  color: #2563EB;
+}
+
+/* La caja del valor deja ver los 3 dígitos (sin flechas del navegador) */
+.variable-valor {
+  width: 52px;
+  min-width: 52px;
+  padding: 6px 4px;
+  text-align: center;
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+
+.variable-valor::-webkit-outer-spin-button,
+.variable-valor::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
 }

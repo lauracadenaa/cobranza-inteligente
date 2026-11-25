@@ -419,7 +419,11 @@
   box-sizing: border-box;
 
   border-radius: 6px 6px 2px 2px;
-  background: #2563EB;
+
+  /* Quieta: un tono claro de su color. Con el mouse encima: su color completo. */
+  --color-barra: #2563EB;
+  background: color-mix(in srgb, var(--color-barra) 22%, #FFFFFF);
+  transition: background-color 0.3s, transform 0.5s, box-shadow 0.5s;
 
   opacity: 1;
   cursor: pointer;
@@ -440,7 +444,7 @@
 }
 
 .aging-bar-item:hover .aging-bar {
-  filter: brightness(1.15);
+  background: var(--color-barra);
   z-index: 21;
 }
 
@@ -552,7 +556,8 @@
   top: 40px;
   left: calc(50% + 8px);
 
-  transform: translateY(4px);
+  /* La posición la pone el código según dónde esté el mouse */
+  transform: none;
 
   width: 150px;
   min-height: 84px;
@@ -591,9 +596,10 @@
   font-weight: 500;
 }
 
+/* En las últimas barras la tarjeta sale a la izquierda del mouse */
 .aging-tooltip.tooltip-left {
-  right: calc(50% + 8px);
-  left: auto;
+  right: auto;
+  transform: translateX(-100%);
 }
 
 .aging-bar-item:hover .aging-tooltip {
@@ -683,4 +689,78 @@
     line-height: 16.8px;
     letter-spacing: 0;
   }
+}
+
+/* ==================================================
+   MEDIDAS DEL FIGMA (Dashboard / Portfolio Distribution)
+   552 x 390 px, esquinas de 12 px, borde #D9E3EA,
+   relleno de 20 px y 10 px entre partes
+================================================== */
+
+.aging-chart {
+  height: 390px;
+  gap: 10px;
+  padding: 20px;
+  background: #FFFFFF;
+  border: 1px solid #D9E3EA;
+  border-radius: 12px;
+}
+
+/* Título: 16 px Bold, alto de línea 22 px */
+.aging-header h2 {
+  color: #001822;
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 22px;
+  letter-spacing: 0;
+}
+
+.aging-title-row {
+  gap: 16px;
+}
+
+/* Pestañas: 14 px Medium (M3 title small) */
+.aging-options button {
+  color: #64748B;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 20px;
+  letter-spacing: 0.1px;
+}
+
+.aging-options button.active {
+  color: #2563EB;
+}
+
+/* Eje: 12 px Regular #63768A */
+.aging-y-axis-title,
+.aging-y-values,
+.aging-label {
+  color: #63768A;
+  font-size: 12px;
+  font-weight: 400;
+}
+
+.aging-y-axis-title {
+  line-height: 16px;
+}
+
+.aging-label {
+  line-height: 13px;
+}
+
+/* Valor encima de cada barra: 12 px Medium #475569 */
+.aging-bar-valor {
+  color: #475569;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 16px;
+}
+
+.asesor-flecha {
+  color: #64748B;
+}
+
+.aging-chart {
+  margin-top: 0;
 }

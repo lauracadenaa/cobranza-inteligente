@@ -115,10 +115,12 @@ function separarCategoria(contenido: string): { categoria: string; texto: string
     : { categoria: '', texto: contenido || '' };
 }
 
+import { IconoComponent } from '../../../../shared/icono/icono.component';
+
 @Component({
   selector: 'app-caso-resumen',
   standalone: true,
-  imports: [
+  imports: [IconoComponent, 
     CommonModule,
     FormsModule,
     CasosKpisComponent,
@@ -1238,7 +1240,7 @@ export class CasoResumenComponent implements OnChanges, OnDestroy {
   }
 
   // =========================================
-  // OBTENER ICONO SEGÚN EL CANAL
+  // OBTENER ICONO SEGÚN EL CANAL (nombre de ícono Lucide)
   // =========================================
 
   obtenerIconoHistorial(canal: string): string {
@@ -1248,20 +1250,20 @@ export class CasoResumenComponent implements OnChanges, OnDestroy {
       case 'CALL':
       case 'PHONE':
       case 'LLAMADA':
-        return '/imagenes/Gestioncasos/Llamar.png';
+        return 'phone';
 
       case 'WHATSAPP':
-        return '/imagenes/Gestioncasos/WhatsApp-enviado.png';
+        return 'message-circle';
 
       case 'SMS':
-        return '/imagenes/Gestioncasos/Enviar-SMS.png';
+        return 'message-square';
 
       case 'EMAIL':
       case 'CORREO':
-        return '/imagenes/Gestioncasos/Email-enviar.png';
+        return 'mail';
 
       default:
-        return '/imagenes/Gestioncasos/Llamar.png';
+        return 'phone';
 
     }
 

@@ -71,48 +71,89 @@
                 (input)="actualizarBusquedaAsociados($event)">
             </label>
 
-            <div class="asociados-filtro-contenedor">
+            <div class="filtros-container">
               <button
                 type="button"
-                class="asociados-filtro-boton"
-                [class.activo]="mostrarFiltrosAsociados"
+                class="obligaciones-filtro"
+                [class.filtros-activos]="mostrarFiltrosAsociados"
                 [attr.aria-expanded]="mostrarFiltrosAsociados"
-                (click)="mostrarFiltrosAsociados = !mostrarFiltrosAsociados">
-                <span aria-hidden="true">▽</span>
-                Filtros
+                aria-haspopup="dialog"
+                (click)="alternarFiltrosAsociados($event)">
+                <app-icono nombre="funnel" [tamano]="16"></app-icono>
+                <span>Filtros</span>
+                <span class="filter-count" *ngIf="filtrosVisiblesAsociados.length > 0">
+                  {{ filtrosVisiblesAsociados.length }}
+                </span>
               </button>
 
-              <div class="asociados-filtros" *ngIf="mostrarFiltrosAsociados">
-                <label for="filtro-segmento-asociados">
-                  Segmento
-                  <select
-                    id="filtro-segmento-asociados"
-                    [value]="filtroSegmentoAsociados"
-                    (change)="actualizarFiltroSegmentoAsociados($event)">
-                    <option value="">Todos</option>
-                    <option
-                      *ngFor="let segmento of segmentosAsociados"
-                      [value]="segmento">
-                      {{ segmento }}
-                    </option>
-                  </select>
-                </label>
+              <div
+                class="filtros-modal filtros-modal-asociados"
+                role="dialog"
+                aria-label="Filtros de asociados"
+                *ngIf="mostrarFiltrosAsociados"
+                (click)="$event.stopPropagation()">
 
-                <label for="filtro-riesgo-asociados">
-                  Riesgo
-                  <select
-                    id="filtro-riesgo-asociados"
-                    [value]="filtroRiesgoAsociados"
-                    (change)="actualizarFiltroRiesgoAsociados($event)">
-                    <option value="">Todos</option>
-                    <option value="Bajo">Bajo</option>
-                    <option value="Medio">Medio</option>
-                    <option value="Alto">Alto</option>
-                    <option value="Crítico">Crítico</option>
-                  </select>
-                </label>
+                <div class="filtros-header">
+                  <h3>Filtros</h3>
+                  <button type="button" class="cerrar-filtros" aria-label="Cerrar filtros"
+                    (click)="mostrarFiltrosAsociados = false">
+                    <i class="bi bi-x"></i>
+                  </button>
+                </div>
+
+                <div class="filtros-body">
+
+                  <!-- RIESGO -->
+                  <div class="filtro-grupo filtro-riesgo">
+                    <label>Riesgo</label>
+                    <div class="filtro-riesgos">
+                      <button
+                        *ngFor="let riesgo of riesgosFiltro"
+                        type="button"
+                        class="btn-riesgo"
+                        [class.seleccionado]="borradorAsociados.riesgos.includes(riesgo)"
+                        [attr.aria-pressed]="borradorAsociados.riesgos.includes(riesgo)"
+                        (click)="alternarRiesgoAsociados(riesgo)">
+                        {{ riesgo }}
+                      </button>
+                    </div>
+                  </div>
+
+                  <!-- SEGMENTO -->
+                  <div class="filtro-grupo">
+                    <label for="filtro-segmento-asociados">Segmento</label>
+                    <div class="filtro-select">
+                      <select
+                        id="filtro-segmento-asociados"
+                        [class.con-valor]="borradorAsociados.segmento !== ''"
+                        [(ngModel)]="borradorAsociados.segmento">
+                        <option value="">Todos los segmentos</option>
+                        <option *ngFor="let segmento of segmentosAsociados" [value]="segmento">{{ segmento }}</option>
+                      </select>
+                      <app-icono nombre="chevron-down" [tamano]="16" class="select-flecha"></app-icono>
+                    </div>
+                  </div>
+
+                </div>
+
+                <div class="filtros-footer">
+                  <button type="button" class="btn-limpiar-filtros" (click)="limpiarFiltrosAsociados()">Limpiar</button>
+                  <button type="button" class="btn-aplicar-filtros" (click)="aplicarFiltrosAsociados()">Aplicar filtros</button>
+                </div>
+
               </div>
             </div>
+          </div>
+        </div>
+
+        <!-- FILTROS ACTIVOS -->
+        <div class="managed-active-filters filtros-activos-asociados" *ngIf="filtrosVisiblesAsociados.length > 0">
+          <div class="active-filter-tag" *ngFor="let filtro of filtrosVisiblesAsociados">
+            <span>{{ filtro.texto }}</span>
+            <button type="button" class="remove-active-filter" aria-label="Quitar filtro"
+              (click)="quitarFiltroAsociados(filtro)">
+              <i class="bi bi-x"></i>
+            </button>
           </div>
         </div>
 
@@ -393,9 +434,7 @@
           <div class="obligaciones-buscador">
 
             <span class="buscador-icono">
-              <img
-                src="/imagenes/Cartera/Buscar.png"
-                alt="">
+              <app-icono nombre="search" [tamano]="16"></app-icono>
             </span>
 
             <input
@@ -415,7 +454,7 @@
               [attr.aria-expanded]="mostrarFiltroObligaciones"
               aria-haspopup="dialog"
               (click)="mostrarFiltroObligaciones = !mostrarFiltroObligaciones">
-              <img src="imagenes/Filtro.png" alt="">
+              <app-icono nombre="funnel" [tamano]="16"></app-icono>
               <span>Filtros</span>
               <span
                 class="filter-count"
@@ -511,9 +550,7 @@
 
                     </select>
 
-                    <img
-                      src="/imagenes/flecha.admin.png"
-                      alt="Flecha">
+                    <app-icono nombre="chevron-down" [tamano]="16" class="select-flecha"></app-icono>
 
                   </div>
 

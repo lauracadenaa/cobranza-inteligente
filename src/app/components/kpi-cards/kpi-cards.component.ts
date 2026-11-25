@@ -5,13 +5,15 @@ import { CommonModule } from '@angular/common';
 
 import { DashboardService } from '../../service/dashboard.service';
 import { MetricCard } from '../../models/dashboard.models';
+import { IconoComponent } from '../../shared/icono/icono.component';
 
 @Component({
   selector: 'app-kpi-cards',
   standalone: true,
 
   imports: [
-    CommonModule
+    CommonModule,
+    IconoComponent
   ],
 
   templateUrl: './kpi-cards.component.html',
@@ -24,7 +26,7 @@ export class KpiCardsComponent implements OnInit {
   // LISTA DE INDICADORES
   // ==================================================
 
-  kpis: MetricCard[] = [];
+  kpis: (MetricCard & { iconColor?: string })[] = [];
 
   // ==================================================
   // CONSTRUCTOR
@@ -55,19 +57,19 @@ export class KpiCardsComponent implements OnInit {
 
     this.dashboardService.getKPIs().subscribe(data => {
 
-      // Imágenes correspondientes a cada tarjeta
-      const imagenes = [
-        '/imagenes/Kpi-total-mora.png',
-        '/imagenes/Kpi-casos-activos.png',
-        '/imagenes/Kpi-casos-criticos.png',
-        '/imagenes/Kpi-recaudo.png',
-        '/imagenes/Kpi-tasa-recuperacion.png',
+      // Ícono (Lucide, en código) y color de cada tarjeta, como en el Figma
+      const iconos = [
+        { nombre: 'wallet', color: '#3B82F6' },
+        { nombre: 'file-text', color: '#10989B' },
+        { nombre: 'triangle-alert', color: '#F59E0B' },
+        { nombre: 'trending-up', color: '#10B981' },
+        { nombre: 'bot', color: '#8B5CF6' }
       ];
 
-      // Recibimos los datos y asignamos las imágenes
       this.kpis = data.map((kpi, index) => ({
         ...kpi,
-        image: imagenes[index] ?? ''
+        image: iconos[index]?.nombre ?? '',
+        iconColor: iconos[index]?.color ?? '#64748B'
       }));
 
       this.changeDetectorRef.markForCheck();

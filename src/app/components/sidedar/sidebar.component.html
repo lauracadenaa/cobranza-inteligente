@@ -19,13 +19,7 @@
       [attr.aria-label]="sidebarContraido ? 'Expandir menú' : 'Contraer menú'"
       [title]="sidebarContraido ? 'Expandir menú' : 'Contraer menú'"
     >
-      <img
-        [src]="sidebarContraido
-          ? 'imagenes/Sildedar/Expandir.png'
-          : 'imagenes/Sildedar/Contraer.png'"
-        alt="Contraer o expandir menú"
-        class="toggle-icon"
-      />
+<app-icono [nombre]="sidebarContraido ? 'chevron-right' : 'panel-left'" [tamano]="18" class="toggle-icon"></app-icono>
     </button>
 
     <div class="logo">
@@ -59,11 +53,7 @@
       title="Inicio"
       (click)="seleccionarOpcion('Inicio'); $event.preventDefault()"
     >
-      <img
-        src="imagenes/Sildedar/Inicio.png"
-        alt="Inicio"
-        class="menu-icon"
-      />
+      <app-icono nombre="house" [tamano]="18" class="menu-icon"></app-icono>
       <span *ngIf="!sidebarContraido">Inicio</span>
     </a>
 
@@ -76,11 +66,7 @@
       title="Cartera"
       (click)="seleccionarOpcion('Cartera'); $event.preventDefault()"
     >
-      <img
-        src="imagenes/Sildedar/Cartera.png"
-        alt="Cartera"
-        class="menu-icon"
-      />
+      <app-icono nombre="wallet-minimal" [tamano]="18" class="menu-icon"></app-icono>
       <span *ngIf="!sidebarContraido">Cartera</span>
     </a>
 
@@ -93,11 +79,7 @@
       title="Gestión de casos"
       (click)="seleccionarOpcion('Gestión de casos'); $event.preventDefault()"
     >
-      <img
-        src="imagenes/Sildedar/Gestion caso.png"
-        alt="Gestión de casos"
-        class="menu-icon"
-      />
+      <app-icono nombre="clipboard-list" [tamano]="18" class="menu-icon"></app-icono>
       <span *ngIf="!sidebarContraido">Gestión de casos</span>
     </a>
 
@@ -111,11 +93,7 @@
   title="Motor IA y Scoring"
   (click)="seleccionarOpcion('Motor IA y Scoring'); $event.preventDefault()"
 >
-  <img
-    src="imagenes/Sildedar/Motor IA.png"
-    alt="Motor IA"
-    class="menu-icon"
-  />
+  <app-icono nombre="sparkles" [tamano]="18" class="menu-icon"></app-icono>
 
   <span *ngIf="!sidebarContraido">
     Motor IA y Scoring
@@ -131,11 +109,7 @@
       title="Estrategias"
       (click)="seleccionarOpcion('Estrategias'); $event.preventDefault()"
     >
-      <img
-        src="imagenes/Sildedar/Estrategias.png"
-        alt="Estrategias"
-        class="menu-icon"
-      />
+      <app-icono nombre="sliders-horizontal" [tamano]="18" class="menu-icon"></app-icono>
       <span *ngIf="!sidebarContraido">Estrategias</span>
     </a>
 
@@ -148,11 +122,7 @@
       title="Links y pagos"
       (click)="seleccionarOpcion('Pagos y recaudos'); $event.preventDefault()"
     >
-      <img
-        src="imagenes/Sildedar/Pagos-recaudo.png"
-        alt="Links y pagos"
-        class="menu-icon"
-      />
+      <app-icono nombre="hand-coins" [tamano]="18" class="menu-icon"></app-icono>
 
       <span *ngIf="!sidebarContraido">
         Links y pagos
@@ -167,11 +137,7 @@
       title="Reportes y auditoría"
       (click)="seleccionarOpcion('Reportes y auditoría'); $event.preventDefault()"
     >
-      <img
-        src="imagenes/Sildedar/Reportes-auditoria.png"
-        alt="Reportes y auditoría"
-        class="menu-icon"
-      />
+      <app-icono nombre="chart-column-big" [tamano]="18" class="menu-icon"></app-icono>
 
       <span *ngIf="!sidebarContraido">
         Reportes y auditoría
@@ -187,11 +153,7 @@
       title="Administración"
       (click)="seleccionarOpcion('Administración'); $event.preventDefault()"
     >
-      <img
-        src="imagenes/Sildedar/Administracion.png"
-        alt="Administración"
-        class="menu-icon"
-      />
+      <app-icono nombre="settings" [tamano]="18" class="menu-icon"></app-icono>
       <span *ngIf="!sidebarContraido">Administración</span>
     </a>
 

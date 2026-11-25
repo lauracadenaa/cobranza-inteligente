@@ -4,14 +4,14 @@
   <article class="reporte-card" *ngFor="let reporte of reportes">
 
     <div class="reporte-icono" [ngClass]="'tono-' + reporte.tono">
-      <i class="bi" [ngClass]="reporte.icono" aria-hidden="true"></i>
+      <app-icono [nombre]="reporte.icono" [tamano]="24"></app-icono>
     </div>
 
     <h3>{{ reporte.titulo }}</h3>
     <p>{{ reporte.descripcion }}</p>
 
     <button type="button" class="btn-generar" (click)="abrir(reporte)">
-      <i class="bi bi-sliders" aria-hidden="true"></i>
+      <app-icono nombre="sliders-horizontal" [tamano]="20"></app-icono>
       Configurar reporte
     </button>
 
@@ -26,14 +26,14 @@
 
     <div class="modal-encabezado">
       <div class="reporte-icono" [ngClass]="'tono-' + reporte.tono">
-        <i class="bi" [ngClass]="reporte.icono" aria-hidden="true"></i>
+        <app-icono [nombre]="reporte.icono" [tamano]="24"></app-icono>
       </div>
       <div>
         <h3>{{ reporte.titulo }}</h3>
         <p>Configura los parámetros del reporte</p>
       </div>
       <button type="button" class="btn-cerrar" aria-label="Cerrar" (click)="cerrar()">
-        <i class="bi bi-x-lg" aria-hidden="true"></i>
+        <app-icono nombre="x" [tamano]="20"></app-icono>
       </button>
     </div>
 
@@ -50,7 +50,7 @@
             <button type="button" class="caja-fecha" [class.activa]="calendarioAbierto && !hasta"
               [attr.aria-expanded]="calendarioAbierto" (click)="alternarCalendario()">
               <span [class.vacia]="!desde">{{ textoFecha(desde) }}</span>
-              <i class="bi bi-calendar3" aria-hidden="true"></i>
+              <app-icono nombre="calendar-days" [tamano]="16"></app-icono>
             </button>
           </div>
           <div class="campo-fecha">
@@ -58,7 +58,7 @@
             <button type="button" class="caja-fecha" [class.activa]="calendarioAbierto && !!desde && !hasta"
               [attr.aria-expanded]="calendarioAbierto" (click)="alternarCalendario()">
               <span [class.vacia]="!hasta">{{ textoFecha(hasta) }}</span>
-              <i class="bi bi-calendar3" aria-hidden="true"></i>
+              <app-icono nombre="calendar-days" [tamano]="16"></app-icono>
             </button>
           </div>
         </div>
@@ -89,20 +89,20 @@
       <span class="campo-titulo">Formato</span>
       <div class="formatos">
         <button type="button" [class.activo]="formato === 'EXCEL'" (click)="formato = 'EXCEL'">
-          <i class="bi bi-file-earmark-excel" aria-hidden="true"></i> Excel
+          <app-icono nombre="file-spreadsheet" [tamano]="16"></app-icono> Excel
         </button>
         <button type="button" [class.activo]="formato === 'PDF'" (click)="formato = 'PDF'">
-          <i class="bi bi-file-earmark-pdf" aria-hidden="true"></i> PDF
+          <app-icono nombre="file-text" [tamano]="16"></app-icono> PDF
         </button>
       </div>
 
       <p class="mensaje-error" *ngIf="estado === 'error'">
-        <i class="bi bi-exclamation-circle" aria-hidden="true"></i>
+        <app-icono nombre="circle-alert" [tamano]="16"></app-icono>
         {{ mensajeError }}
       </p>
 
       <button type="button" class="btn-generar-reporte" [disabled]="!fechasValidas || !formato" (click)="generar()">
-        <i class="bi bi-file-earmark-arrow-down" aria-hidden="true"></i>
+        <app-icono nombre="download" [tamano]="20"></app-icono>
         Generar reporte
       </button>
 
@@ -117,7 +117,7 @@
 
     <!-- 3. Listo -->
     <div class="estado-listo" *ngIf="estado === 'listo'">
-      <i class="bi bi-check-circle-fill" aria-hidden="true"></i>
+      <app-icono nombre="circle-check-big" [tamano]="48"></app-icono>
       <strong>¡Reporte listo!</strong>
       <span>La descarga empezó automáticamente.</span>
       <div class="modal-acciones">

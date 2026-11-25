@@ -50,10 +50,12 @@ interface Segmento {
 // COMPONENTE
 // ==================================================
 
+import { IconoComponent } from '../../../../shared/icono/icono.component';
+
 @Component({
   selector: 'app-segmento-cartera',
   standalone: true,
-  imports: [
+  imports: [IconoComponent, 
     CommonModule,
     CarteraKpisComponent
   ],

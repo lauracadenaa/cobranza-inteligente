@@ -8,7 +8,7 @@
     </div>
 
     <button type="button" class="btn-primario" (click)="abrirCrear()" [disabled]="cargando || !!errorCarga">
-      <i class="bi bi-person-plus"></i>
+      <app-icono nombre="user-plus" [tamano]="20"></app-icono>
       Crear usuario
     </button>
   </header>
@@ -81,30 +81,19 @@
                   [attr.aria-label]="(menuAbiertoId === u.id ? 'Cerrar acciones de ' : 'Acciones de ') + u.nombre"
                   [disabled]="procesandoId === u.id"
                   (click)="alternarMenu(u, $event)">
-                  <i class="bi" [class.bi-three-dots-vertical]="menuAbiertoId !== u.id" [class.bi-x-lg]="menuAbiertoId === u.id" aria-hidden="true"></i>
+                  <app-icono [nombre]="menuAbiertoId === u.id ? 'x' : 'ellipsis-vertical'" [tamano]="20"></app-icono>
                 </button>
 
                 @if (menuAbiertoId === u.id) {
                   <div class="menu-desplegable" role="menu" (click)="$event.stopPropagation()">
                     <button type="button" role="menuitem" (click)="cerrarMenu(); abrirEditar(u)">
-                      <i class="bi bi-person-gear" aria-hidden="true"></i>
+                      <app-icono nombre="user-cog" [tamano]="18"></app-icono>
                       Editar usuario
                     </button>
                     <button type="button" role="menuitem" (click)="cerrarMenu(); pedirRestablecer(u)">
-                      <i class="bi bi-arrow-counterclockwise" aria-hidden="true"></i>
+                      <app-icono nombre="rotate-ccw" [tamano]="18"></app-icono>
                       Restablecer acceso
                     </button>
-                    @if (u.estado !== 'INACTIVE') {
-                      <button type="button" role="menuitem" class="peligro" (click)="cerrarMenu(); pedirEliminar(u)">
-                        <i class="bi bi-person-x" aria-hidden="true"></i>
-                        Desactivar usuario
-                      </button>
-                    } @else {
-                      <button type="button" role="menuitem" (click)="cerrarMenu(); pedirActivar(u)">
-                        <i class="bi bi-person-check" aria-hidden="true"></i>
-                        Activar usuario
-                      </button>
-                    }
                   </div>
                 }
               </div>
@@ -131,7 +120,7 @@
 
       <div class="modal-cabecera">
         <span class="modal-icono azul" aria-hidden="true">
-          <i class="bi" [class.bi-person-plus]="!usuarioEnEdicion" [class.bi-person-gear]="!!usuarioEnEdicion"></i>
+          <app-icono [nombre]="usuarioEnEdicion ? 'user-cog' : 'user-plus'" [tamano]="24"></app-icono>
         </span>
         <div>
           <h3 id="titulo-form-usuario">{{ usuarioEnEdicion ? 'Editar usuario' : 'Nuevo Usuario' }}</h3>
@@ -140,7 +129,7 @@
       </div>
 
       <button type="button" class="modal-cerrar" aria-label="Cerrar" [disabled]="guardando" (click)="cerrarFormulario()">
-        <i class="bi bi-x-lg" aria-hidden="true"></i>
+        <app-icono nombre="x" [tamano]="20"></app-icono>
       </button>
 
       <label>
@@ -177,13 +166,13 @@
               <option [ngValue]="r.id">{{ nombreRol(r.name) }}</option>
             }
           </select>
-          <i class="bi bi-chevron-down" aria-hidden="true"></i>
+          <app-icono nombre="chevron-down" [tamano]="16"></app-icono>
         </span>
       </label>
 
       @if (!usuarioEnEdicion) {
         <div class="info-clave">
-          <span class="info-clave-icono" aria-hidden="true"><i class="bi bi-shield-check"></i></span>
+          <span class="info-clave-icono" aria-hidden="true"><app-icono nombre="shield-check" [tamano]="20"></app-icono></span>
           <div>
             <strong>Contraseña temporal</strong>
             <p>El sistema generará una contraseña temporal y te la mostrará al crear el usuario para que se la compartas. El usuario deberá cambiarla al iniciar sesión.</p>
@@ -213,10 +202,10 @@
       (click)="$event.stopPropagation()">
 
       <button type="button" class="modal-cerrar" aria-label="Cerrar" [disabled]="procesandoId !== null" (click)="cancelarRestablecer()">
-        <i class="bi bi-x-lg" aria-hidden="true"></i>
+        <app-icono nombre="x" [tamano]="20"></app-icono>
       </button>
 
-      <span class="modal-icono amarillo" aria-hidden="true"><i class="bi bi-exclamation-triangle"></i></span>
+      <span class="modal-icono amarillo" aria-hidden="true"><app-icono nombre="triangle-alert" [tamano]="26"></app-icono></span>
 
       <h3 id="titulo-restablecer">Restablecer acceso</h3>
       <p>
@@ -241,10 +230,10 @@
       (click)="$event.stopPropagation()">
 
       <button type="button" class="modal-cerrar" aria-label="Cerrar" [disabled]="guardando" (click)="cancelarEliminar()">
-        <i class="bi bi-x-lg" aria-hidden="true"></i>
+        <app-icono nombre="x" [tamano]="20"></app-icono>
       </button>
 
-      <span class="modal-icono rojo" aria-hidden="true"><i class="bi bi-person-x"></i></span>
+      <span class="modal-icono rojo" aria-hidden="true"><app-icono nombre="user-x" [tamano]="26"></app-icono></span>
 
       <h3 id="titulo-desactivar">¿Confirmas la desactivación del usuario?</h3>
       <p>
@@ -269,10 +258,10 @@
       (click)="$event.stopPropagation()">
 
       <button type="button" class="modal-cerrar" aria-label="Cerrar" [disabled]="procesandoId !== null" (click)="cancelarActivar()">
-        <i class="bi bi-x-lg" aria-hidden="true"></i>
+        <app-icono nombre="x" [tamano]="20"></app-icono>
       </button>
 
-      <span class="modal-icono verde" aria-hidden="true"><i class="bi bi-person-check"></i></span>
+      <span class="modal-icono verde" aria-hidden="true"><app-icono nombre="user-check" [tamano]="26"></app-icono></span>
 
       <h3 id="titulo-activar">¿Confirmas la activación del usuario?</h3>
       <p>
@@ -295,7 +284,7 @@
   <div class="fondo">
     <div class="modal modal-aviso" role="dialog" aria-modal="true" aria-labelledby="titulo-clave">
 
-      <span class="modal-icono verde" aria-hidden="true"><i class="bi bi-shield-check"></i></span>
+      <span class="modal-icono verde" aria-hidden="true"><app-icono nombre="shield-check" [tamano]="20"></app-icono></span>
 
       <h3 id="titulo-clave">{{ claveTemporal.titulo }}</h3>
       <p>
@@ -305,7 +294,7 @@
       <div class="clave">
         <code>{{ claveTemporal.clave }}</code>
         <button type="button" class="btn-contorno btn-chico" (click)="copiarClave()">
-          <i class="bi" [class.bi-clipboard]="!claveCopiada" [class.bi-check2]="claveCopiada"></i>
+          <app-icono [nombre]="claveCopiada ? 'check' : 'clipboard'" [tamano]="16"></app-icono>
           {{ claveCopiada ? 'Copiada' : 'Copiar' }}
         </button>
       </div>

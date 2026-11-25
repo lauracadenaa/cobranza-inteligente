@@ -21,10 +21,12 @@ import {
   takeUntil
 } from 'rxjs/operators';
 
+import { IconoComponent } from '../../shared/icono/icono.component';
+
 @Component({
   selector: 'app-search-case',
   standalone: true,
-  imports: [
+  imports: [IconoComponent, 
     CommonModule,
     FormsModule
   ],

@@ -158,3 +158,104 @@
   font-family: Roboto, sans-serif;
   font-size: 11px;
 }
+
+/* ==================================================
+   MEDIDAS DEL FIGMA (mismas tarjetas KPI del Inicio)
+   102 px de alto, relleno 13 / 16 px, esquinas de 16 px, borde #E2E8F0
+================================================== */
+
+.kpi-container {
+  gap: 16px;
+  margin-top: 0;
+}
+
+.kpi-card {
+  display: flex;
+  flex-direction: column;
+  gap: 13px;
+  height: 102px;
+  padding: 13px 16px;
+  background: #FFFFFF;
+  border: 1px solid #E2E8F0;
+  border-radius: 16px;
+}
+
+.kpi-icon {
+  top: 13px;
+  right: 16px;
+  width: 20px;
+  height: 20px;
+}
+
+.kpi-title {
+  color: #0A3B4E;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 100%;
+  letter-spacing: 0.44px;
+}
+
+.kpi-value {
+  color: #0A3B4E;
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 100%;
+  letter-spacing: -0.66px;
+}
+
+.kpi-detalle {
+  gap: 3px;
+  margin-top: -8px;
+}
+
+/* Etiquetas de color del Figma */
+.kpi-etiqueta {
+  padding: 3px 8px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 100%;
+}
+
+.kpi-etiqueta.tono-azul { background: #EFF6FF; color: #3B82F6; }
+.kpi-etiqueta.tono-rojo { background: #FEE2E2; color: #DC2626; }
+.kpi-etiqueta.tono-morado { background: #F5F3FF; color: #7C3AED; }
+
+.kpi-descripcion {
+  color: #64748B;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 100%;
+}
+
+/* El contenido de la tarjeta va de arriba hacia abajo, sin alturas fijas */
+.kpi-card {
+  justify-content: flex-start;
+}
+
+.kpi-title,
+.kpi-value {
+  height: auto;
+  min-height: 0;
+  margin: 0;
+  padding: 0;
+}
+
+.kpi-title {
+  padding-right: 28px;
+}
+
+.kpi-title,
+.kpi-value,
+.kpi-detalle {
+  transform: none;
+}
+
+.kpi-detalle {
+  margin: 0;
+  padding: 0;
+}
+
+.kpi-card .kpi-detalle {
+  margin-top: -8px;
+}

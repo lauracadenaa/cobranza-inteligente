@@ -220,3 +220,68 @@
   white-space: nowrap;
   box-sizing: border-box;
 }
+
+/* ==================================================
+   MEDIDAS DEL FIGMA (mismas tarjetas KPI del Inicio)
+   102 px de alto, relleno 13 / 16 px, esquinas de 16 px, borde #E2E8F0
+================================================== */
+
+.kpi-container {
+  gap: 16px;
+  margin-top: 0;
+}
+
+.kpi-card {
+  display: flex;
+  flex-direction: column;
+  gap: 13px;
+  height: 102px;
+  padding: 13px 16px;
+  border: 1px solid #E2E8F0;
+  border-radius: 16px;
+}
+
+.kpi-icon {
+  top: 13px;
+  right: 16px;
+  width: 20px;
+  height: 20px;
+}
+
+.kpi-title {
+  color: #0A3B4E;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 100%;
+  letter-spacing: 0.44px;
+}
+
+.kpi-value {
+  color: #0A3B4E;
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 100%;
+  letter-spacing: -0.66px;
+}
+
+.kpi-change {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  margin-top: -8px;
+}
+
+.kpi-percentage {
+  padding: 3px 8px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 100%;
+}
+
+.kpi-period {
+  color: #64748B;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 100%;
+}

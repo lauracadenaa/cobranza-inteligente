@@ -49,7 +49,7 @@
 
     <div class="search-case-input">
 
-      <i class="bi bi-search"></i>
+      <app-icono nombre="search" [tamano]="16"></app-icono>
 
       <input
         type="text"
@@ -276,7 +276,7 @@
           *ngIf="filteredCases.length === 0 && !searchError && !isLoading"
         >
           <div class="no-results-icon">
-            <i class="bi bi-x-lg"></i>
+            <app-icono nombre="x" [tamano]="20"></app-icono>
           </div>
           <h3>No encontramos casos</h3>
           <p>{{ getSearchDescription() }}</p>
@@ -303,7 +303,7 @@
           *ngIf="searchError"
         >
           <div class="no-results-icon error-icon">
-            <i class="bi bi-exclamation-circle"></i>
+            <app-icono nombre="circle-alert" [tamano]="16"></app-icono>
           </div>
           <h3>No pudimos realizar la búsqueda</h3>
           <p>Intenta nuevamente.</p>

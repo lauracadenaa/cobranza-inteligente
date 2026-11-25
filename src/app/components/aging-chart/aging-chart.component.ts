@@ -8,11 +8,14 @@ import { AgingData } from '../../models/dashboard.models';
 type VistaGrafico = 'antiguedad' | 'segmento' | 'riesgo';
 type MetricaGrafico = 'saldo' | 'obligaciones' | 'asociados';
 
+import { IconoComponent } from '../../shared/icono/icono.component';
+
 @Component({
   selector: 'app-aging-chart',
   standalone: true,
   imports: [
-    CommonModule
+    CommonModule,
+    IconoComponent
   ],
   templateUrl: './aging-chart.component.html',
   styleUrl: './aging-chart.component.css'
@@ -39,6 +42,16 @@ export class AgingChartComponent implements OnInit {
 
   // Menú desplegable del selector
   asesorMenuAbierto = false;
+
+  // Posición del mouse dentro de la barra señalada (para que la tarjeta lo siga)
+  tooltipX = 0;
+  tooltipY = 0;
+
+  moverTooltip(evento: MouseEvent, contenedor: HTMLElement): void {
+    const caja = contenedor.getBoundingClientRect();
+    this.tooltipX = evento.clientX - caja.left;
+    this.tooltipY = evento.clientY - caja.top;
+  }
 
   // Colores por nivel de riesgo
   private readonly coloresRiesgo: Record<string, string> = {

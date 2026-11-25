@@ -4,13 +4,14 @@ import { Router, NavigationEnd } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { filter, Subject, takeUntil } from 'rxjs';
 import { CaseService } from '../../service/case.service';
+import { IconoComponent } from '../../shared/icono/icono.component';
 
 @Component({
   selector: 'app-sidebar',
   standalone: true,
   templateUrl: './sidebar.component.html',
   styleUrl: './sidebar.component.css',
-  imports: [CommonModule],
+  imports: [CommonModule, IconoComponent],
 })
 export class SidebarComponent implements OnDestroy {
 

@@ -2233,3 +2233,12 @@
     min-width: 560px;
   }
 }
+
+/* Filtros de Asociados: mismo panel que Obligaciones (Inicio) */
+.filtros-modal-asociados {
+  height: auto;
+}
+
+.filtros-activos-asociados {
+  padding: 0 20px 12px;
+}

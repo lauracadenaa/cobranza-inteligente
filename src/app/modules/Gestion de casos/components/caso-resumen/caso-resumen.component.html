@@ -34,7 +34,7 @@
         type="button"
         class="btn-back"
         (click)="regresarACola()">
-        <i class="bi bi-chevron-left"></i>
+        <app-icono nombre="chevron-left" [tamano]="16"></app-icono>
         Volver a la cola
       </button>
 
@@ -47,7 +47,7 @@
           aria-haspopup="menu"
           [attr.aria-expanded]="mostrarAcciones"
           (click)="abrirAcciones()">
-          <i class="bi" [class.bi-chevron-down]="!mostrarAcciones" [class.bi-chevron-up]="mostrarAcciones"></i>
+          <app-icono [nombre]="mostrarAcciones ? 'chevron-up' : 'chevron-down'" [tamano]="20"></app-icono>
           Acciones
         </button>
 
@@ -61,9 +61,9 @@
               [class.activo]="submenuEstadoAbierto"
               [attr.aria-expanded]="submenuEstadoAbierto"
               (click)="submenuEstadoAbierto = !submenuEstadoAbierto">
-              <i class="bi bi-arrow-left-right"></i>
+              <app-icono nombre="arrow-left-right" [tamano]="16"></app-icono>
               <span>Cambiar estado</span>
-              <i class="bi bi-chevron-right flecha"></i>
+              <app-icono nombre="chevron-right" [tamano]="16" class="flecha"></app-icono>
             </button>
 
             <div class="submenu-estados" role="menu" *ngIf="submenuEstadoAbierto">
@@ -76,32 +76,32 @@
                 [attr.aria-checked]="esEstadoActual(estado.valor)"
                 (click)="cambiarEstadoCaso(estado)">
                 <span>{{ estado.texto }}</span>
-                <i *ngIf="esEstadoActual(estado.valor)" class="bi bi-check-lg flecha"></i>
+                <app-icono *ngIf="esEstadoActual(estado.valor)" nombre="check" [tamano]="16" class="flecha"></app-icono>
               </button>
             </div>
           </div>
 
           <button type="button" role="menuitem" class="menu-item" (click)="accionAsignarAsesor()">
-            <i class="bi bi-person-gear"></i>
+            <app-icono nombre="user-cog" [tamano]="16"></app-icono>
             <span>Asignar asesor</span>
           </button>
 
           <button type="button" role="menuitem" class="menu-item" (click)="accionEnviarLink()">
-            <i class="bi bi-cash-coin"></i>
+            <app-icono nombre="hand-coins" [tamano]="16"></app-icono>
             <span>Enviar link de pago</span>
           </button>
 
           <hr>
 
           <button type="button" role="menuitem" class="menu-item" (click)="accionAgregarNota()">
-            <i class="bi bi-file-earmark"></i>
+            <app-icono nombre="file" [tamano]="16"></app-icono>
             <span>Agregar nota</span>
           </button>
 
           <hr>
 
           <button type="button" role="menuitem" class="menu-item peligro" (click)="accionCerrarCaso()">
-            <i class="bi bi-check-circle"></i>
+            <app-icono nombre="circle-check-big" [tamano]="16"></app-icono>
             <span>Cerrar caso</span>
           </button>
 
@@ -144,7 +144,7 @@
 
       <!-- Nombre con la etiqueta "Asociado" (como en Figma) -->
       <div class="persona-encabezado">
-        <i class="bi bi-person persona-icono" aria-hidden="true"></i>
+        <app-icono nombre="user" [tamano]="20" class="persona-icono"></app-icono>
         <h4>
           {{
             cargandoCliente
@@ -159,7 +159,7 @@
 
       <ul class="persona-datos" *ngIf="!cargandoCliente">
         <li>
-          <i class="bi bi-credit-card-2-front" aria-hidden="true"></i>
+          <app-icono nombre="credit-card" [tamano]="20"></app-icono>
           <span>
             {{
               clienteDetalle
@@ -169,15 +169,15 @@
           </span>
         </li>
         <li>
-          <i class="bi bi-telephone" aria-hidden="true"></i>
+          <app-icono nombre="phone" [tamano]="20"></app-icono>
           <span>{{ clienteDetalle?.mobile || clienteDetalle?.phone || casoActual.celular || 'Celular no disponible' }}</span>
         </li>
         <li>
-          <i class="bi bi-envelope" aria-hidden="true"></i>
+          <app-icono nombre="mail" [tamano]="20"></app-icono>
           <span>{{ clienteDetalle?.email || casoActual.correoElectronico || 'Correo no disponible' }}</span>
         </li>
         <li>
-          <i class="bi bi-chat-square persona-preferido-icono" aria-hidden="true"></i>
+          <app-icono nombre="message-square" [tamano]="20" class="persona-preferido-icono"></app-icono>
           <span>Contacto preferido: <strong class="persona-preferido">{{ contactoPreferido }}</strong></span>
         </li>
       </ul>
@@ -244,7 +244,7 @@
       <div class="recomendacion-header">
 
         <div class="recomendacion-title">
-          <i class="bi bi-cpu recomendacion-icono" aria-hidden="true"></i>
+          <app-icono nombre="cpu" [tamano]="18" class="recomendacion-icono"></app-icono>
           <h3>Contexto y recomendación de IA</h3>
         </div>
 
@@ -301,7 +301,7 @@
 
           <div class="recomendacion-info-box">
 
-            <h4><i class="bi bi-exclamation-circle titulo-icono rojo" aria-hidden="true"></i> Motivo de desborde</h4>
+            <h4><app-icono nombre="circle-alert" [tamano]="16" class="titulo-icono rojo"></app-icono> Motivo de desborde</h4>
 
             <p class="motivo-desborde-text" [class.texto-rojo]="desborde?.triggered">
               {{
@@ -320,7 +320,7 @@
 
           <div class="recomendacion-info-box">
 
-            <h4><i class="bi bi-graph-up-arrow titulo-icono" aria-hidden="true"></i> Mejor siguiente acción</h4>
+            <h4><app-icono nombre="trending-up" [tamano]="16" class="titulo-icono"></app-icono> Mejor siguiente acción</h4>
 
             <p class="motivo-desborde-text">
               {{
@@ -440,7 +440,7 @@
             class="btn-tipificacion-guardar"
             [disabled]="guardandoTipificacion || !tipificacion.resultado || !tipificacion.proximaAccion"
             (click)="guardarGestion()">
-            <i class="bi bi-floppy" aria-hidden="true"></i>
+            <app-icono nombre="save" [tamano]="16"></app-icono>
             {{ guardandoTipificacion ? 'Guardando...' : 'Guardar gestión' }}
           </button>
 
@@ -469,22 +469,22 @@
       <div class="quick-actions-grid quick-actions-4">
 
         <button type="button" class="quick-action-button" (click)="contactarWhatsApp()">
-          <i class="bi bi-chat-square quick-icono whatsapp" aria-hidden="true"></i>
+          <app-icono nombre="message-circle" [tamano]="16" class="quick-icono whatsapp"></app-icono>
           <span>WhatsApp</span>
         </button>
 
         <button type="button" class="quick-action-button" (click)="llamarAsociado()">
-          <i class="bi bi-telephone quick-icono llamar" aria-hidden="true"></i>
+          <app-icono nombre="phone" [tamano]="16" class="quick-icono llamar"></app-icono>
           <span>Llamar</span>
         </button>
 
         <button type="button" class="quick-action-button" (click)="enviarEmail()">
-          <i class="bi bi-envelope quick-icono" aria-hidden="true"></i>
+          <app-icono nombre="mail" [tamano]="16" class="quick-icono"></app-icono>
           <span>Enviar Email</span>
         </button>
 
         <button type="button" class="quick-action-button" (click)="enviarSMS()">
-          <i class="bi bi-chat-left-text quick-icono" aria-hidden="true"></i>
+          <app-icono nombre="message-square" [tamano]="16" class="quick-icono"></app-icono>
           <span>Enviar SMS</span>
         </button>
 
@@ -805,9 +805,7 @@
         <div class="payment-modal-title">
 
           <div class="payment-modal-icon" *ngIf="!linkPagoGenerado">
-            <img
-              src="/imagenes/Gestioncasos/Generar- link.png"
-              alt="Generar enlace de pago">
+            <app-icono nombre="link-2" [tamano]="24"></app-icono>
           </div>
 
           <div>
@@ -895,10 +893,7 @@
           class="payment-success-panel"
           *ngIf="linkPagoGenerado">
 
-          <img
-            src="/imagenes/Gestioncasos/Generar-link.png"
-            alt="Link enviado"
-            class="payment-success-image">
+          <app-icono nombre="circle-check-big" [tamano]="48" class="payment-success-image"></app-icono>
 
           <h3>{{ linkEnviado ? 'Link enviado' : 'Link generado' }}</h3>
 
@@ -1263,7 +1258,7 @@
           ventanaAccion === 'asignar' ? 'Asignar asesor' : 'Cerrar caso'
         }}
       </h3>
-      <button type="button" aria-label="Cerrar" (click)="cerrarVentanaAccion()"><i class="bi bi-x-lg"></i></button>
+      <button type="button" aria-label="Cerrar" (click)="cerrarVentanaAccion()"><app-icono nombre="x" [tamano]="16"></app-icono></button>
     </div>
 
     <p class="accion-caso">{{ caso?.id }} · {{ caso?.asociado }}</p>

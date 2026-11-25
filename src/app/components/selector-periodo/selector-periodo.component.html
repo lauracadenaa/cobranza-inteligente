@@ -6,9 +6,9 @@
   aria-haspopup="true"
   [attr.aria-expanded]="abierto"
   (click)="alternar()">
-  <i class="bi bi-calendar3" aria-hidden="true"></i>
+  <app-icono nombre="calendar-days" [tamano]="20"></app-icono>
   <span>{{ aplicado.etiqueta }}</span>
-  <i class="bi bi-chevron-down" aria-hidden="true"></i>
+  <app-icono nombre="chevron-down" [tamano]="16"></app-icono>
 </button>
 
 <button
@@ -17,7 +17,7 @@
   class="periodo-cerrar"
   aria-label="Cerrar selector de periodo"
   (click)="cerrar()">
-  <i class="bi bi-x-lg" aria-hidden="true"></i>
+  <app-icono nombre="x" [tamano]="18"></app-icono>
 </button>
 
 <!-- MENÚ -->
@@ -49,14 +49,14 @@
         Desde
         <span class="periodo-fecha" [class.vacia]="!desdeTemporal">
           {{ textoFecha(desdeTemporal) || 'DD/MM/AAAA' }}
-          <i class="bi bi-calendar3" aria-hidden="true"></i>
+          <app-icono nombre="calendar-days" [tamano]="16"></app-icono>
         </span>
       </label>
       <label>
         Hasta
         <span class="periodo-fecha" [class.vacia]="!hastaTemporal">
           {{ textoFecha(hastaTemporal) || 'DD/MM/AAAA' }}
-          <i class="bi bi-calendar3" aria-hidden="true"></i>
+          <app-icono nombre="calendar-days" [tamano]="16"></app-icono>
         </span>
       </label>
     </div>

@@ -23,12 +23,7 @@
           <span>{{ kpi.titulo }}</span>
 
           <span class="kpi-icon" [ngClass]="'icon-' + kpi.icono">
-            <ng-container [ngSwitch]="kpi.icono">
-              <i *ngSwitchCase="'money'" class="bi bi-cash" aria-hidden="true"></i>
-              <i *ngSwitchCase="'send'" class="bi bi-send" aria-hidden="true"></i>
-              <i *ngSwitchCase="'check'" class="bi bi-check-circle" aria-hidden="true"></i>
-              <i *ngSwitchCase="'chart'" class="bi bi-bar-chart-line" aria-hidden="true"></i>
-            </ng-container>
+            <app-icono [nombre]="iconoKpi(kpi.icono).nombre" [tamano]="20" [style.color]="iconoKpi(kpi.icono).color"></app-icono>
           </span>
         </div>
 
@@ -76,36 +71,60 @@
 
           <div class="chart-content">
 
-            <svg viewBox="0 0 500 150" preserveAspectRatio="none">
+            <div class="chart-lienzo">
+              <svg viewBox="0 0 500 150" preserveAspectRatio="none">
 
-              <defs>
-                <linearGradient id="blueGradient" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stop-color="#2864F0" stop-opacity=".30"/>
-                  <stop offset="100%" stop-color="#2864F0" stop-opacity="0"/>
-                </linearGradient>
+                <defs>
+                  <linearGradient id="blueGradient" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stop-color="#2864F0" stop-opacity=".30"/>
+                    <stop offset="100%" stop-color="#2864F0" stop-opacity="0"/>
+                  </linearGradient>
 
-                <linearGradient id="greenGradient" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stop-color="#10B981" stop-opacity=".30"/>
-                  <stop offset="100%" stop-color="#10B981" stop-opacity="0"/>
-                </linearGradient>
-              </defs>
+                  <linearGradient id="greenGradient" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stop-color="#10B981" stop-opacity=".30"/>
+                    <stop offset="100%" stop-color="#10B981" stop-opacity="0"/>
+                  </linearGradient>
+                </defs>
 
-              <g class="chart-grid-lines">
-                <line x1="0" y1="10" x2="500" y2="10"/>
-                <line x1="0" y1="42" x2="500" y2="42"/>
-                <line x1="0" y1="74" x2="500" y2="74"/>
-                <line x1="0" y1="106" x2="500" y2="106"/>
-                <line x1="0" y1="138" x2="500" y2="138"/>
-              </g>
+                <g class="chart-grid-lines">
+                  <line x1="0" y1="10" x2="500" y2="10"/>
+                  <line x1="0" y1="42" x2="500" y2="42"/>
+                  <line x1="0" y1="74" x2="500" y2="74"/>
+                  <line x1="0" y1="106" x2="500" y2="106"/>
+                  <line x1="0" y1="138" x2="500" y2="138"/>
+                </g>
 
-              <ng-container *ngIf="grafico.lineaLinks">
-                <path [attr.d]="grafico.areaLinks" fill="url(#blueGradient)"/>
-                <path [attr.d]="grafico.areaPagos" fill="url(#greenGradient)"/>
-                <path [attr.d]="grafico.lineaLinks" class="blue-line"/>
-                <path [attr.d]="grafico.lineaPagos" class="green-line"/>
-              </ng-container>
+                <ng-container *ngIf="grafico.lineaLinks">
+                  <path [attr.d]="grafico.areaLinks" fill="url(#blueGradient)"/>
+                  <path [attr.d]="grafico.areaPagos" fill="url(#greenGradient)"/>
+                  <path [attr.d]="grafico.lineaLinks" class="blue-line"/>
+                  <path [attr.d]="grafico.lineaPagos" class="green-line"/>
+                </ng-container>
 
-            </svg>
+              </svg>
+
+              <!-- Una columna por día: al pasar el mouse sale la línea punteada,
+                   los puntos de ese día levitan y aparece la tarjeta -->
+              <div class="capa-columnas" *ngIf="grafico.lineaLinks">
+                <div
+                  class="columna-hover"
+                  *ngFor="let columna of columnasGrafico"
+                  [style.left.%]="columna.x"
+                  [style.width.%]="anchoColumnaGrafico">
+
+                  <span class="columna-guia"></span>
+                  <span class="punto-grafica" [style.top.%]="columna.yLinks" style="color:#2864F0"></span>
+                  <span class="punto-grafica" [style.top.%]="columna.yPagos" style="color:#10B981"></span>
+
+                  <div class="tarjeta-lineas" [class.tarjeta-izquierda]="columna.x > 65">
+                    <strong>{{ columna.titulo }}</strong>
+                    <span class="tarjeta-fila"><i style="background:#2864F0"></i>Links enviados<b>{{ columna.links }}</b></span>
+                    <span class="tarjeta-fila"><i style="background:#10B981"></i>Pagos realizados<b>{{ columna.pagos }}</b></span>
+                  </div>
+
+                </div>
+              </div>
+            </div>
 
             <div class="chart-x-labels">
               <span *ngFor="let etiqueta of grafico.etiquetasX">{{ etiqueta }}</span>
@@ -127,13 +146,13 @@
 
         <div class="channel-list">
 
-          <div class="channel-item" *ngFor="let canal of canales">
+          <div class="channel-item levitar-zona con-tarjeta" *ngFor="let canal of canales">
 
             <div class="channel-name">{{ canal.nombre }}</div>
 
             <div class="channel-data">
               <div class="progress-track">
-                <div class="progress-value" [style.width.%]="canal.porcentaje"></div>
+                <div class="progress-value levitar" [style.width.%]="canal.porcentaje"></div>
               </div>
 
               <div class="channel-details">
@@ -141,6 +160,13 @@
                 <span>{{ canal.pagados }} pagados de {{ canal.enviados }} enviados</span>
               </div>
             </div>
+
+            <span class="tarjeta-hover">
+              <strong>{{ canal.nombre }}</strong>
+              <span>Links enviados: {{ canal.enviados }}</span>
+              <span>Pagados: {{ canal.pagados }}</span>
+              <span>Efectividad: {{ canal.porcentaje }}%</span>
+            </span>
 
           </div>
 
@@ -158,7 +184,7 @@
         <h3>Estado de pasarela</h3>
 
         <div class="gateway-name">
-          <div class="gateway-icon"><i class="bi bi-bank" aria-hidden="true"></i></div>
+          <div class="gateway-icon"><app-icono nombre="landmark" [tamano]="20"></app-icono></div>
           <strong>PSE</strong>
         </div>
 
@@ -206,8 +232,8 @@
             Pagos
           </button>
 
-          <button class="create-button" *ngIf="!registroSeleccionado" (click)="abrirModalCrear()">
-            <i class="bi bi-plus-lg" aria-hidden="true"></i> Crear link de pago
+          <button class="create-button" *ngIf="!registroSeleccionado && pestanaActiva === 'links'" (click)="abrirModalCrear()">
+            <app-icono nombre="plus" [tamano]="20"></app-icono> Crear link de pago
           </button>
 
         </div>
@@ -220,7 +246,7 @@
         <div class="toolbar-left">
 
           <div class="search-box">
-            <i class="bi bi-search" aria-hidden="true"></i>
+            <app-icono nombre="search" [tamano]="16"></app-icono>
             <input
               type="text"
               [(ngModel)]="busqueda"
@@ -228,9 +254,96 @@
               [placeholder]="registroSeleccionado ? 'Buscar...' : 'Buscar por link, asociado, documento u obligación...'">
           </div>
 
-          <button class="filter-button" (click)="mostrarFiltros = !mostrarFiltros">
-            <i class="bi bi-funnel" aria-hidden="true"></i> Filtros
-          </button>
+          <!-- FILTROS (igual que Inicio > Casos en gestión) -->
+          <div class="filtros-contenedor">
+            <button
+              type="button"
+              class="managed-filter"
+              [class.filtros-activos]="mostrarFiltros"
+              [attr.aria-expanded]="mostrarFiltros"
+              (click)="alternarFiltros($event)">
+              <app-icono nombre="funnel" [tamano]="16"></app-icono>
+              <span>Filtros</span>
+              <span class="filter-count" *ngIf="filtrosActivos > 0">{{ filtrosActivos }}</span>
+            </button>
+
+            <div class="filtros-modal" *ngIf="mostrarFiltros" (click)="$event.stopPropagation()">
+
+              <div class="filtros-header">
+                <h3>Filtros</h3>
+                <button type="button" class="cerrar-filtros" aria-label="Cerrar filtros" (click)="cerrarFiltros()">
+                  <app-icono nombre="x" [tamano]="16"></app-icono>
+                </button>
+              </div>
+
+              <div class="filtros-body">
+
+                <!-- ESTADO -->
+                <div class="filtro-grupo filtro-riesgo">
+                  <label>Estado</label>
+                  <div class="filtro-riesgos">
+                    <button
+                      *ngFor="let estado of estadosDisponibles"
+                      type="button"
+                      class="btn-riesgo"
+                      [class.seleccionado]="borrador.estados.includes(estado)"
+                      [attr.aria-pressed]="borrador.estados.includes(estado)"
+                      (click)="alternarEstadoFiltro(estado)">
+                      {{ estado }}
+                    </button>
+                    <span class="sin-opciones" *ngIf="estadosDisponibles.length === 0">Sin registros</span>
+                  </div>
+                </div>
+
+                <!-- CANAL / ORIGEN -->
+                <div class="filtro-grupo">
+                  <label for="filtro-canal">{{ pestanaActiva === 'pagos' ? 'Origen' : 'Canal' }}</label>
+                  <div class="filtro-select">
+                    <select
+                      id="filtro-canal"
+                      [class.con-valor]="borrador.canal !== ''"
+                      [(ngModel)]="borrador.canal">
+                      <option value="">{{ pestanaActiva === 'pagos' ? 'Todos los orígenes' : 'Todos los canales' }}</option>
+                      <option *ngFor="let canal of canalesDisponibles" [value]="canal">{{ nombreCanal(canal) }}</option>
+                    </select>
+                    <app-icono nombre="chevron-down" [tamano]="16" class="select-flecha"></app-icono>
+                  </div>
+                </div>
+
+                <!-- FECHA -->
+                <div class="filtro-grupo filtro-fechas">
+                  <label>{{ pestanaActiva === 'pagos' ? 'Fecha de pago' : 'Fecha de envío' }}</label>
+                  <div class="filtro-fechas-contenedor">
+                    <div class="campo-fecha">
+                      <input
+                        type="date"
+                        aria-label="Desde"
+                        [max]="borrador.hasta || null"
+                        [class.con-valor]="borrador.desde !== ''"
+                        [(ngModel)]="borrador.desde">
+                      <app-icono nombre="calendar-days" [tamano]="16"></app-icono>
+                    </div>
+                    <div class="campo-fecha">
+                      <input
+                        type="date"
+                        aria-label="Hasta"
+                        [min]="borrador.desde || null"
+                        [class.con-valor]="borrador.hasta !== ''"
+                        [(ngModel)]="borrador.hasta">
+                      <app-icono nombre="calendar-days" [tamano]="16"></app-icono>
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+
+              <div class="filtros-footer">
+                <button type="button" class="btn-limpiar-filtros" (click)="limpiarFiltros()">Limpiar</button>
+                <button type="button" class="btn-aplicar-filtros" (click)="aplicarFiltros()">Aplicar filtros</button>
+              </div>
+
+            </div>
+          </div>
 
         </div>
 
@@ -238,25 +351,20 @@
           <span class="update-label">{{ textoActualizado }}</span>
           <button type="button" class="refresh-button" title="Actualizar"
             [disabled]="cargando" (click)="refrescar()">
-            <i class="bi bi-arrow-repeat" aria-hidden="true"></i>
+            <app-icono nombre="refresh-cw" [tamano]="20"></app-icono>
           </button>
         </div>
 
       </div>
 
-      <!-- FILTROS -->
-      <div class="filter-content" *ngIf="mostrarFiltros">
-
-        <label>
-          Estado
-          <select [(ngModel)]="filtroEstado" (ngModelChange)="paginaActual = 1">
-            <option value="Todos">Todos</option>
-            <option *ngFor="let estado of estadosDisponibles" [value]="estado">{{ estado }}</option>
-          </select>
-        </label>
-
-        <button (click)="filtroEstado = 'Todos'; paginaActual = 1">Limpiar filtros</button>
-
+      <!-- FILTROS ACTIVOS -->
+      <div class="managed-active-filters" *ngIf="filtrosVisibles.length > 0">
+        <div class="active-filter-tag" *ngFor="let filtro of filtrosVisibles">
+          <span>{{ filtro.texto }}</span>
+          <button type="button" class="remove-active-filter" aria-label="Quitar filtro" (click)="quitarFiltro(filtro)">
+            <app-icono nombre="x" [tamano]="16"></app-icono>
+          </button>
+        </div>
       </div>
 
       <!-- TABLA -->
@@ -326,7 +434,7 @@
 
             <tr *ngIf="!cargando && !errorCarga && registrosFiltrados.length === 0">
               <td [attr.colspan]="registroSeleccionado ? 6 : 8" class="empty-state">
-                {{ busqueda || filtroEstado !== 'Todos' ? 'No hay resultados con esa búsqueda.' : 'Todavía no hay registros.' }}
+                {{ busqueda || filtrosActivos > 0 ? 'No hay resultados con esa búsqueda.' : 'Todavía no hay registros.' }}
               </td>
             </tr>
 
@@ -342,7 +450,7 @@
         <nav class="pagination" aria-label="Paginación">
           <button type="button" class="page-arrow" title="Página anterior"
             [disabled]="paginaActual <= 1" (click)="irAPagina(paginaActual - 1)">
-            <i class="bi bi-chevron-left" aria-hidden="true"></i>
+            <app-icono nombre="chevron-left" [tamano]="16"></app-icono>
           </button>
 
           <ng-container *ngFor="let pagina of paginas">
@@ -355,7 +463,7 @@
 
           <button type="button" class="page-arrow" title="Página siguiente"
             [disabled]="paginaActual >= totalPaginas" (click)="irAPagina(paginaActual + 1)">
-            <i class="bi bi-chevron-right" aria-hidden="true"></i>
+            <app-icono nombre="chevron-right" [tamano]="16"></app-icono>
           </button>
         </nav>
       </div>
@@ -371,7 +479,7 @@
       <div class="detail-top">
         <h3>Detalle del pago</h3>
         <button type="button" class="detail-close" title="Cerrar" (click)="cerrarDetalle()">
-          <i class="bi bi-x-lg" aria-hidden="true"></i>
+          <app-icono nombre="x" [tamano]="20"></app-icono>
         </button>
       </div>
 
@@ -445,7 +553,7 @@
       <div class="detail-top">
         <h3>Detalle del link</h3>
         <button type="button" class="detail-close" title="Cerrar" (click)="cerrarDetalle()">
-          <i class="bi bi-dash-lg" aria-hidden="true"></i>
+          <app-icono nombre="minus" [tamano]="16"></app-icono>
         </button>
       </div>
 

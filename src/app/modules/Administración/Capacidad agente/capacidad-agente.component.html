@@ -14,7 +14,8 @@
   </div>
 </section>
 
-<!-- TABLA DE AGENTES -->
+<!-- TABLA DE AGENTES + PANEL DE CONFIGURACIÓN (como en Figma) -->
+<div class="agentes-layout" [class.con-panel]="!!agenteEnEdicion">
 <section class="card agentes">
 
   <div class="agentes-encabezado">
@@ -24,33 +25,92 @@
 
     <div class="controles">
       <div class="buscador">
-        <i class="bi bi-search" aria-hidden="true"></i>
+        <app-icono nombre="search" [tamano]="16"></app-icono>
         <input type="text" [(ngModel)]="busqueda" placeholder="Buscar agente..." aria-label="Buscar agente">
       </div>
 
-      <div class="con-menu">
-        <button type="button" class="btn-filtros" [class.activo]="filtroEstado"
-                (click)="mostrarFiltros = !mostrarFiltros">
-          <i class="bi bi-sliders" aria-hidden="true"></i>
-          Filtros
+      <!-- FILTROS (igual que Inicio > Casos en gestión) -->
+      <div class="filtros-contenedor">
+        <button
+          type="button"
+          class="managed-filter"
+          [class.filtros-activos]="mostrarFiltros"
+          [attr.aria-expanded]="mostrarFiltros"
+          (click)="alternarFiltros($event)">
+          <app-icono nombre="funnel" [tamano]="16"></app-icono>
+          <span>Filtros</span>
+          @if (chipsFiltro.length > 0) {
+            <span class="filter-count">{{ chipsFiltro.length }}</span>
+          }
         </button>
 
         @if (mostrarFiltros) {
-          <div class="menu">
-            <label>
-              Estado operativo
-              <select class="campo" [(ngModel)]="filtroEstado" (ngModelChange)="mostrarFiltros = false">
-                <option value="">Todos</option>
-                @for (e of estados; track e) {
-                  <option [value]="e">{{ e }}</option>
-                }
-              </select>
-            </label>
+          <div class="filtros-modal" (click)="$event.stopPropagation()">
+            <div class="filtros-header">
+              <h3>Filtros</h3>
+              <button type="button" class="cerrar-filtros" aria-label="Cerrar filtros" (click)="mostrarFiltros = false">
+                <app-icono nombre="x" [tamano]="16"></app-icono>
+              </button>
+            </div>
+
+            <div class="filtros-body">
+
+              <!-- ESTADO OPERATIVO -->
+              <div class="filtro-grupo filtro-riesgo">
+                <label>Estado operativo</label>
+                <div class="filtro-riesgos">
+                  @for (e of estados; track e) {
+                    <button
+                      type="button"
+                      class="btn-riesgo"
+                      [class.seleccionado]="borrador.estados.includes(e)"
+                      [attr.aria-pressed]="borrador.estados.includes(e)"
+                      (click)="alternarEstadoFiltro(e)">
+                      {{ e }}
+                    </button>
+                  }
+                </div>
+              </div>
+
+              <!-- OCUPACIÓN -->
+              <div class="filtro-grupo">
+                <label for="filtro-ocupacion">Ocupación</label>
+                <div class="filtro-select">
+                  <select id="filtro-ocupacion" [class.con-valor]="borrador.ocupacion !== ''" [(ngModel)]="borrador.ocupacion">
+                    <option value="">Todas</option>
+                    @for (o of opcionesOcupacion; track o) {
+                      <option [value]="o">{{ o }}</option>
+                    }
+                  </select>
+                  <app-icono nombre="chevron-down" [tamano]="16" class="select-flecha"></app-icono>
+                </div>
+              </div>
+
+            </div>
+
+            <div class="filtros-footer">
+              <button type="button" class="btn-limpiar-filtros" (click)="limpiarFiltros()">Limpiar</button>
+              <button type="button" class="btn-aplicar-filtros" (click)="aplicarFiltros()">Aplicar filtros</button>
+            </div>
           </div>
         }
       </div>
     </div>
   </div>
+
+  <!-- FILTROS ACTIVOS -->
+  @if (chipsFiltro.length > 0) {
+    <div class="managed-active-filters">
+      @for (chip of chipsFiltro; track chip.texto) {
+        <div class="active-filter-tag">
+          <span>{{ chip.texto }}</span>
+          <button type="button" class="remove-active-filter" aria-label="Quitar filtro" (click)="quitarFiltro(chip)">
+            <app-icono nombre="x" [tamano]="16"></app-icono>
+          </button>
+        </div>
+      }
+    </div>
+  }
 
   <div class="tabla-scroll">
     <table>
@@ -59,7 +119,7 @@
           <th>Agente</th>
           <th>Estado operativo</th>
           <th>Casos activos</th>
-          <th>Capacidad máxima</th>
+          @if (!agenteEnEdicion) { <th>Capacidad máxima</th> }
           <th>Ocupación</th>
           <th>Disponibilidad</th>
           <th>Acciones</th>
@@ -77,16 +137,18 @@
           </tr>
         } @else {
         @for (a of agentesFiltrados; track a.id) {
-          <tr>
+          <tr [class.fila-activa]="agenteEnEdicion?.id === a.id">
             <td class="nombre">{{ a.nombre }}</td>
             <td>{{ a.estado }}</td>
             <td>{{ a.casosActivos }} casos</td>
-            <td>
-              {{ a.capacidadMaxima !== null ? a.capacidadMaxima + ' máximo' : 'Sin tope' }}
-              @if (a.personalizada) {
-                <span class="personalizada" title="Capacidad personalizada">Personalizada</span>
-              }
-            </td>
+            @if (!agenteEnEdicion) {
+              <td>
+                {{ a.capacidadMaxima !== null ? a.capacidadMaxima + ' máximo' : 'Sin tope' }}
+                @if (a.personalizada) {
+                  <span class="personalizada" title="Capacidad personalizada">Personalizada</span>
+                }
+              </td>
+            }
             <td [class.llena]="a.llena">{{ formatoPorcentaje(ocupacion(a)) }}</td>
             <td>{{ disponibilidad(a) }}</td>
             <td>
@@ -111,6 +173,105 @@
 
 </section>
 
+@if (agenteEnEdicion; as agente) {
+  <aside class="card panel-config" aria-labelledby="titulo-config">
+    <form (ngSubmit)="guardarConfiguracion()">
+
+      <div class="pc-encabezado">
+        <h3 id="titulo-config">Configuración del agente</h3>
+        <button type="button" class="pc-cerrar" aria-label="Cerrar" [disabled]="guardando" (click)="cerrarConfiguracion()">
+          <app-icono nombre="x" [tamano]="20"></app-icono>
+        </button>
+      </div>
+
+      <div class="pc-agente">
+        <strong>{{ agente.nombre }}</strong>
+        <small>
+          {{ agente.casosActivos }} casos activos · Capacidad actual:
+          {{ agente.capacidadMaxima !== null ? agente.capacidadMaxima + ' casos' : 'sin tope' }}
+        </small>
+      </div>
+
+      <!-- CAPACIDAD -->
+      <div class="pc-seccion">
+        <h4>Capacidad</h4>
+
+        <label class="pc-radio">
+          <input type="radio" name="tipoCapacidad" [value]="true" [(ngModel)]="formulario.usarGeneral" [disabled]="guardando">
+          <span>Usar capacidad general: {{ capacidadGeneral !== null ? capacidadGeneral + ' casos' : 'sin tope' }}</span>
+        </label>
+
+        <label class="pc-radio">
+          <input type="radio" name="tipoCapacidad" [value]="false" [(ngModel)]="formulario.usarGeneral" [disabled]="guardando">
+          <span>Definir capacidad propia</span>
+        </label>
+
+        @if (!formulario.usarGeneral) {
+          <label class="pc-campo">
+            Capacidad máxima (casos)
+            <input type="number" min="1" name="capacidad"
+                   [class.invalido]="!formularioValido"
+                   [(ngModel)]="formulario.capacidadMaxima" [disabled]="guardando">
+          </label>
+
+          @if (formulario.capacidadMaxima && agente.casosActivos > formulario.capacidadMaxima) {
+            <p class="pc-alerta">
+              La persona tiene {{ agente.casosActivos }} casos activos. No recibirá nuevas asignaciones
+              hasta quedar por debajo del nuevo límite.
+            </p>
+          }
+        }
+
+        <small class="pc-nota">Los casos actuales se conservan; no se quitan automáticamente.</small>
+      </div>
+
+      <!-- DISPONIBILIDAD -->
+      <div class="pc-seccion">
+        <h4>Disponibilidad</h4>
+        @for (e of descripcionEstados; track e.nombre) {
+          <label class="pc-radio pc-radio-doble">
+            <input type="radio" name="estado" [value]="e.nombre" [(ngModel)]="formulario.estado" [disabled]="guardando">
+            <span>
+              {{ e.nombre }}
+              <small>{{ e.texto }}</small>
+            </span>
+          </label>
+        }
+      </div>
+
+      <!-- COLAS (el backend aún no las maneja) -->
+      <div class="pc-seccion pc-sin-backend">
+        <h4>Colas</h4>
+        @for (c of colasDisenio; track c) {
+          <label class="pc-check"><input type="checkbox" disabled> <span>{{ c }}</span></label>
+        }
+      </div>
+
+      <!-- ESPECIALIDADES (el backend aún no las maneja) -->
+      <div class="pc-seccion pc-sin-backend">
+        <h4>Especialidades</h4>
+        @for (e of especialidadesDisenio; track e) {
+          <label class="pc-check"><input type="checkbox" disabled> <span>{{ e }}</span></label>
+        }
+        <small class="pc-nota">Colas y especialidades todavía no se pueden guardar: el servidor no las maneja.</small>
+      </div>
+
+      @if (errorFormulario) {
+        <small class="error">{{ errorFormulario }}</small>
+      }
+
+      <div class="pc-botones">
+        <button type="button" class="pc-btn-contorno" [disabled]="guardando" (click)="cerrarConfiguracion()">Cancelar</button>
+        <button type="submit" class="pc-btn-azul" [disabled]="!formularioValido || guardando">
+          {{ guardando ? 'Guardando...' : 'Guardar configuración' }}
+        </button>
+      </div>
+
+    </form>
+  </aside>
+}
+</div>
+
 <!-- ESTADOS OPERATIVOS -->
 <section class="card">
   <div class="card-titulo">
@@ -127,7 +288,7 @@
 </section>
 
 <div class="banner">
-  <i class="bi bi-info-circle" aria-hidden="true"></i>
+  <app-icono nombre="info" [tamano]="16"></app-icono>
   <div>
     <strong>Estados operativos</strong>
     <p>
@@ -136,55 +297,6 @@
     </p>
   </div>
 </div>
-
-<!-- VENTANA: CONFIGURACIÓN DEL AGENTE -->
-@if (agenteEnEdicion; as agente) {
-  <div class="fondo" (click)="cerrarConfiguracion()">
-    <form class="modal" (click)="$event.stopPropagation()" (ngSubmit)="guardarConfiguracion()">
-
-      <h3>Configuración de {{ agente.nombre }}</h3>
-
-      <label>
-        Estado operativo
-        <select class="campo" name="estado" [(ngModel)]="formulario.estado" [disabled]="guardando">
-          @for (e of estados; track e) {
-            <option [value]="e">{{ e }}</option>
-          }
-        </select>
-      </label>
-
-      <label class="opcion">
-        <input type="checkbox" name="usarGeneral" [(ngModel)]="formulario.usarGeneral" [disabled]="guardando">
-        Usar la capacidad general{{ capacidadGeneral !== null ? ' (' + capacidadGeneral + ' casos)' : '' }}
-      </label>
-
-      @if (!formulario.usarGeneral) {
-        <label>
-          Capacidad máxima propia (casos)
-          <input class="campo" type="number" min="1" name="capacidad"
-                 [class.invalido]="!formularioValido"
-                 [(ngModel)]="formulario.capacidadMaxima" [disabled]="guardando">
-        </label>
-      }
-
-      <p class="nota-modal">
-        Al guardar, el sistema redistribuye los casos automáticamente según la nueva configuración.
-      </p>
-
-      @if (errorFormulario) {
-        <small class="error">{{ errorFormulario }}</small>
-      }
-
-      <div class="modal-botones">
-        <button type="button" class="btn-secundario" [disabled]="guardando" (click)="cerrarConfiguracion()">Cancelar</button>
-        <button type="submit" class="btn-primario" [disabled]="!formularioValido || guardando">
-          {{ guardando ? 'Guardando...' : 'Guardar' }}
-        </button>
-      </div>
-
-    </form>
-  </div>
-}
 
 @if (mensaje) {
   <div class="aviso" role="status">{{ mensaje }}</div>

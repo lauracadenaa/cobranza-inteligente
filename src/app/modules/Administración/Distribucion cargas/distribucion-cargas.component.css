@@ -313,3 +313,9 @@
   font-size: 13px;
   line-height: 1.5;
 }
+
+/* Colores de los íconos de los indicadores (Figma) */
+app-icono.tono-verde { color: #15803D; }
+app-icono.tono-azul { color: #2563EB; }
+app-icono.tono-naranja { color: #F59E0B; }
+app-icono.tono-morado { color: #6D28D9; }

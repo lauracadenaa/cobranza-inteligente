@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, OnDestroy, inject } from '@angular/core';
+import { ChangeDetectorRef, Component, HostListener, OnDestroy, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
@@ -69,10 +69,12 @@ export interface FilaPlantilla {
 //   - Estrategias y Contacto y orquestación
 // ==================================================
 
+import { IconoComponent } from '../../shared/icono/icono.component';
+
 @Component({
   selector: 'app-estrategias',
   standalone: true,
-  imports: [FormsModule, SidebarComponent, DashboardHeaderComponent],
+  imports: [FormsModule, IconoComponent, SidebarComponent, DashboardHeaderComponent],
   templateUrl: './estrategias.component.html',
   styleUrl: './estrategias.component.css'
 })
@@ -85,13 +87,16 @@ export class EstrategiasComponent implements OnDestroy {
   private cdr = inject(ChangeDetectorRef);
 
   // Pestaña que se está viendo
-  seccionActiva: SeccionEstrategias = 'estrategias';
+  // Como se pidió: sin la pestaña "Estrategias"; se abre en "Segmentación"
+  seccionActiva: SeccionEstrategias = 'segmentacion';
 
-  // El texto bajo el título cambia según la pestaña (así está en Figma)
+  constructor() {
+    this.cargarSegmentos();
+  }
+
+  // Texto bajo el título: el mismo en las 3 pestañas (así está en Figma)
   get descripcion(): string {
-    return this.seccionActiva === 'plantillas'
-      ? 'Administración de estrategias y políticas de contacto'
-      : 'Configura cómo se segmenta la cartera y cómo se ejecutan las acciones de contacto';
+    return 'Configura cómo se segmenta la cartera y cómo se ejecutan las acciones de contacto';
   }
 
   cambiarSeccion(seccion: SeccionEstrategias): void {
@@ -345,6 +350,78 @@ export class EstrategiasComponent implements OnDestroy {
     );
   }
 
+  // ==================================================
+  // FILTROS (igual que Inicio > Casos en gestión)
+  // Cada campo del panel guarda su valor en la propiedad del mismo nombre.
+  // ==================================================
+
+  filtroAbierto: 'estrategias' | 'plantillas' | null = null;
+  borradorFiltros: Record<string, string> = {};
+
+  camposFiltro(tipo: 'estrategias' | 'plantillas'): { clave: string; etiqueta: string; todos: string; opciones: string[] }[] {
+    if (tipo === 'estrategias') {
+      return [
+        { clave: 'filtroSegmento', etiqueta: 'Segmento', todos: 'Todos los segmentos', opciones: ['Preventiva', 'Administrativa', 'Prejurídica'] },
+        { clave: 'filtroEstado', etiqueta: 'Estado', todos: 'Todos los estados', opciones: ['Activa', 'Borrador'] },
+        { clave: 'filtroVigencia', etiqueta: 'Vigencia', todos: 'Todas', opciones: ['Vigente', 'Sin iniciar'] }
+      ];
+    }
+    return [
+      { clave: 'filtroCanal', etiqueta: 'Canal', todos: 'Todos los canales', opciones: this.canalesPlantilla },
+      { clave: 'filtroEstadoPlantilla', etiqueta: 'Estado', todos: 'Todos los estados', opciones: this.estadosPlantilla },
+      { clave: 'filtroSegmentoPlantilla', etiqueta: 'Segmento', todos: 'Todos los segmentos', opciones: this.segmentosPlantilla },
+      { clave: 'filtroFecha', etiqueta: 'Fecha de actualización', todos: 'Todas las fechas', opciones: this.fechasPlantilla }
+    ];
+  }
+
+  private valorFiltro(clave: string): string {
+    return String((this as unknown as Record<string, string>)[clave] ?? '');
+  }
+
+  private ponerFiltro(clave: string, valor: string): void {
+    (this as unknown as Record<string, string>)[clave] = valor;
+  }
+
+  alternarFiltros(tipo: 'estrategias' | 'plantillas', evento: MouseEvent): void {
+    evento.stopPropagation();
+    if (this.filtroAbierto === tipo) {
+      this.filtroAbierto = null;
+      return;
+    }
+    this.borradorFiltros = {};
+    this.camposFiltro(tipo).forEach(c => this.borradorFiltros[c.clave] = this.valorFiltro(c.clave));
+    this.filtroAbierto = tipo;
+  }
+
+  aplicarFiltros(tipo: 'estrategias' | 'plantillas'): void {
+    this.camposFiltro(tipo).forEach(c => this.ponerFiltro(c.clave, this.borradorFiltros[c.clave] ?? ''));
+    this.filtroAbierto = null;
+  }
+
+  limpiarFiltros(tipo: 'estrategias' | 'plantillas'): void {
+    this.camposFiltro(tipo).forEach(c => this.ponerFiltro(c.clave, ''));
+    this.borradorFiltros = {};
+    this.filtroAbierto = null;
+  }
+
+  chipsFiltro(tipo: 'estrategias' | 'plantillas'): { clave: string; texto: string }[] {
+    return this.camposFiltro(tipo)
+      .filter(c => this.valorFiltro(c.clave))
+      .map(c => ({ clave: c.clave, texto: `${c.etiqueta}: ${this.valorFiltro(c.clave)}` }));
+  }
+
+  quitarFiltro(clave: string): void {
+    this.ponerFiltro(clave, '');
+  }
+
+  @HostListener('document:click', ['$event'])
+  cerrarFiltrosAfuera(evento: MouseEvent): void {
+    const objetivo = evento.target as HTMLElement | null;
+    if (this.filtroAbierto && !objetivo?.closest('.filtros-modal, .managed-filter')) {
+      this.filtroAbierto = null;
+    }
+  }
+
   // ----- Ventana: ver / editar plantilla -----
 
   readonly camposEditables: { clave: keyof PlantillaBackend; texto: string; largo: boolean }[] = [
@@ -505,9 +582,9 @@ export class EstrategiasComponent implements OnDestroy {
   // Ícono que acompaña cada segmento en la tabla (como en Figma)
   iconoSegmento(codigo: string): string {
     const c = this.normalizar(codigo);
-    if (c === 'PREJUDICIAL') return 'bi-briefcase';
-    if (c === 'JURIDICA') return 'bi-bank';
-    return 'bi-people';
+    if (c === 'PREJUDICIAL') return 'briefcase-business';
+    if (c === 'JURIDICA') return 'landmark';
+    return 'users';
   }
 
   nombreSegmento(codigo: string): string {

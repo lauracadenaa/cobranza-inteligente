@@ -11,10 +11,12 @@ import {
   ChangeDetectorRef
 } from '@angular/core';
 
+import { IconoComponent } from '../../shared/icono/icono.component';
+
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, IconoComponent],
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.css']
 })
